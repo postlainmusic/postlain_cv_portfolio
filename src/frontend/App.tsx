@@ -9,6 +9,10 @@ import { soundEngine } from './lib/audio';
 import { ScrollyScene3D } from './components/ScrollyScene3D';
 import { SonicDeck } from './components/SonicDeck';
 import { EdgeDispatch } from './components/EdgeDispatch';
+import { CinematicPreloader } from './components/CinematicPreloader';
+import { CustomCursor } from './components/CustomCursor';
+import { ViewfinderFrame } from './components/ViewfinderFrame';
+import { SpatialSpiral3D } from './components/SpatialSpiral3D';
 import { 
   DICTIONARY, 
   EXPERIENCES_DATA, 
@@ -20,7 +24,7 @@ export const App: React.FC = () => {
   const { locale, toggleLocale, soundEnabled, toggleSound } = usePortfolioStore();
   const t = DICTIONARY[locale];
 
-  const [activeExp, setActiveExp] = useState<number>(0);
+  const [preloaderComplete, setPreloaderComplete] = useState<boolean>(false);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState<string>('');
@@ -71,6 +75,17 @@ export const App: React.FC = () => {
   return (
     <div className="relative min-h-screen bg-[#030305] text-[#e2e8f0] font-sans selection:bg-[#a3e635] selection:text-black overflow-x-hidden">
       
+      {/* 0. Cinematic Preloader (inspired by sidewave.it) */}
+      {!preloaderComplete && (
+        <CinematicPreloader onComplete={() => setPreloaderComplete(true)} />
+      )}
+
+      {/* 0.1. Interactive Custom Crosshair Cursor (hidden on touch devices) */}
+      <CustomCursor />
+
+      {/* 0.2. Viewfinder Frame Brackets (inspired by ricardochance.com) */}
+      <ViewfinderFrame />
+
       {/* 1. Ambient Background 3D Canvas with Mobile FPS optimization */}
       <div className="fixed inset-0 z-0 pointer-events-none opacity-85">
         <ScrollyScene3D />
@@ -91,11 +106,12 @@ export const App: React.FC = () => {
       <div className="pointer-events-none fixed inset-0 z-20 opacity-[0.035] mix-blend-overlay bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]" />
 
       {/* 4. Awwwards Minimalist Floating Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 px-4 sm:px-10 py-4 sm:py-5 flex items-center justify-between backdrop-blur-xl bg-[#030305]/70 border-b border-white/[0.06]">
+      <header className="fixed top-0 left-0 right-0 z-50 px-4 sm:px-10 py-4 sm:py-5 flex items-center justify-between backdrop-blur-xl bg-[#030305]/75 border-b border-white/[0.06]">
         {/* Monogram Logo */}
         <a 
           href="#hero" 
           onClick={(e) => handleNavClick(e, 'hero')}
+          data-cursor="TOP"
           className="flex items-center gap-3 group cursor-pointer"
         >
           <div className="relative w-9 h-9 rounded-full bg-white/[0.04] border border-white/10 flex items-center justify-center overflow-hidden transition-all duration-300 group-hover:border-[#a3e635]">
@@ -129,6 +145,7 @@ export const App: React.FC = () => {
               href={`#${item.id}`}
               onClick={(e) => handleNavClick(e, item.id)}
               onMouseEnter={() => soundEngine.playHover()}
+              data-cursor="GO"
               className="px-3.5 py-1.5 rounded-full text-xs font-mono uppercase tracking-wider text-zinc-400 hover:text-white hover:bg-white/[0.05] transition-all duration-200"
             >
               {item.label}
@@ -141,6 +158,7 @@ export const App: React.FC = () => {
           {/* Language Switcher */}
           <button
             onClick={toggleLocale}
+            data-cursor="LANG"
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-xs font-mono uppercase tracking-widest text-zinc-300 hover:text-white transition-all"
             title="Switch Language / Chuyển Ngôn Ngữ"
           >
@@ -153,7 +171,8 @@ export const App: React.FC = () => {
           {/* Sound Toggle Button */}
           <button
             onClick={toggleSound}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-mono uppercase tracking-wider transition-all duration-300 ${
+            data-cursor={soundEnabled ? 'MUTE' : 'SOUND'}
+            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-xs font-mono uppercase tracking-wider transition-all duration-300 ${
               soundEnabled 
                 ? 'bg-[#a3e635]/15 border-[#a3e635]/40 text-[#a3e635] shadow-[0_0_15px_rgba(163,230,53,0.2)]' 
                 : 'bg-white/[0.03] border-white/10 text-zinc-400 hover:text-zinc-200'
@@ -185,7 +204,7 @@ export const App: React.FC = () => {
       <main className="relative z-30 pt-24 sm:pt-28">
 
         {/* ========================================================
-            HERO SECTION: MONUMENTAL TYPOGRAPHY & SCENE 3D
+            HERO SECTION: MONUMENTAL EDITORIAL TYPOGRAPHY & SCENE 3D
         ======================================================== */}
         <section id="hero" className="relative min-h-[92vh] flex flex-col justify-between px-4 sm:px-10 lg:px-16 pt-8 pb-12 overflow-hidden">
           
@@ -209,46 +228,56 @@ export const App: React.FC = () => {
             </div>
           </div>
 
-          {/* Core Kinetic Monolith Typography */}
-          <div className="my-auto py-12">
-            <div className="space-y-2">
-              <div className="flex items-center gap-3">
-                <span className="text-xs sm:text-sm font-mono text-[#a3e635] tracking-[0.3em] uppercase">
-                  {t.hero.alias}
-                </span>
-                <span className="h-px w-12 bg-[#a3e635]/40"></span>
-                <span className="text-xs sm:text-sm font-mono text-zinc-400 tracking-widest uppercase">
-                  {t.hero.subtitle}
-                </span>
-              </div>
-
-              {/* Primary Name: NGÔ PHÚC in Montserrat ExtraBold - Zero Font Breaking! */}
-              <h1 className="font-display font-black text-6xl sm:text-8xl md:text-9xl lg:text-[10.5rem] tracking-tight uppercase leading-[0.88] text-white">
-                {t.hero.name}
-              </h1>
+          {/* Core Kinetic Monolith Typography (Ricardo Chance & Forms.world style) */}
+          <div className="my-auto py-10 sm:py-14 space-y-6">
+            <div className="flex items-center gap-3">
+              <span className="text-[11px] font-mono text-[#a3e635] tracking-[0.3em] uppercase">
+                {t.hero.alias} // CREATIVE TECHNOLOGIST & OPERATIONS LEAD
+              </span>
+              <span className="h-px w-16 bg-[#a3e635]/30"></span>
             </div>
 
-            <p className="mt-8 max-w-2xl text-base sm:text-xl text-zinc-400 font-light leading-relaxed">
+            {/* Primary Monumental Name: NGÔ PHÚC (Zero Font Distortion) */}
+            <h1 className="font-display font-black text-6xl sm:text-8xl md:text-9xl lg:text-[10rem] tracking-tight uppercase leading-[0.88] text-white">
+              {t.hero.name}
+            </h1>
+
+            {/* Editorial High-Fashion Hook */}
+            <div className="text-2xl sm:text-4xl md:text-5xl font-light text-zinc-300 leading-tight pt-2">
+              <span className="font-serif italic font-normal text-white">I architect</span>{' '}
+              <span className="font-display font-black uppercase text-transparent bg-clip-text bg-gradient-to-r from-white via-zinc-200 to-zinc-400">
+                RETAIL FLOWS.
+              </span>{' '}
+              <br className="hidden sm:inline" />
+              <span className="font-serif italic font-normal text-white">I compose</span>{' '}
+              <span className="font-display font-black uppercase text-[#a3e635]">
+                SONIC REALMS.
+              </span>
+            </div>
+
+            <p className="max-w-2xl text-base sm:text-xl text-zinc-400 font-light leading-relaxed">
               {t.hero.bio}
             </p>
 
             {/* Call to action & Direct contact triggers */}
-            <div className="mt-10 flex flex-wrap items-center gap-4">
+            <div className="pt-4 flex flex-wrap items-center gap-4">
               <a
                 href="#experience"
                 onClick={(e) => handleNavClick(e, 'experience')}
-                className="px-7 py-3.5 rounded-full bg-white text-black font-display font-black text-xs uppercase tracking-widest hover:bg-[#a3e635] transition-all duration-300 flex items-center gap-2 group shadow-[0_0_30px_rgba(255,255,255,0.15)]"
+                data-cursor="3D"
+                className="px-8 py-4 rounded-full bg-white text-black font-display font-black text-xs uppercase tracking-widest hover:bg-[#a3e635] transition-all duration-300 flex items-center gap-2 group shadow-[0_0_30px_rgba(255,255,255,0.15)]"
               >
-                <span>{locale === 'vi' ? 'Khám Phá Hành Trình' : 'Explore Odyssey'}</span>
+                <span>{locale === 'vi' ? 'Khám Phá Không Gian 3D' : 'Explore 3D Odyssey'}</span>
                 <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
               </a>
 
               <a
                 href="#contact"
                 onClick={(e) => handleNavClick(e, 'contact')}
-                className="px-7 py-3.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-white font-mono text-xs uppercase tracking-widest transition-all"
+                data-cursor="CONTACT"
+                className="px-8 py-4 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-white font-mono text-xs uppercase tracking-widest transition-all"
               >
-                {locale === 'vi' ? 'Liên Hệ Trực Tiếp' : 'Get In Touch'}
+                {locale === 'vi' ? 'Kết Nối Trực Tiếp' : 'Direct Dispatch'}
               </a>
             </div>
           </div>
@@ -289,7 +318,6 @@ export const App: React.FC = () => {
           </div>
         </section>
 
-
         {/* ========================================================
             CHAPTER 01 // MANIFESTO: OPERATING THESIS
         ======================================================== */}
@@ -316,7 +344,7 @@ export const App: React.FC = () => {
               </div>
 
               <div className="lg:col-span-5">
-                <blockquote className="text-zinc-300 text-base sm:text-lg font-light leading-relaxed border-l-2 border-[#a3e635] pl-6 italic">
+                <blockquote className="text-zinc-300 text-base sm:text-lg font-light leading-relaxed border-l-2 border-[#a3e635] pl-6 font-serif italic">
                   "{t.manifesto.quote}"
                 </blockquote>
               </div>
@@ -328,6 +356,7 @@ export const App: React.FC = () => {
                 <div 
                   key={idx}
                   onMouseEnter={() => soundEngine.playHover()}
+                  data-cursor="CORE"
                   className="p-8 rounded-3xl bg-white/[0.02] border border-white/[0.06] hover:border-[#a3e635]/30 hover:bg-white/[0.04] transition-all duration-300 group"
                 >
                   <span className="font-mono text-xs text-[#a3e635] block mb-4">0{idx + 1} // FOCUS</span>
@@ -345,101 +374,11 @@ export const App: React.FC = () => {
 
 
         {/* ========================================================
-            CHAPTER 02 // EXPERIENCE ODYSSEY: SCROLLYTELLING
+            CHAPTER 02 // 3D SPATIAL SPIRAL ODYSSEY (PACOME PERTANT STYLE)
         ======================================================== */}
         <section id="experience" className="px-4 sm:px-10 lg:px-16 py-28 sm:py-36 border-t border-white/[0.06] relative">
           <div className="max-w-7xl mx-auto">
-            
-            {/* Header */}
-            <div className="max-w-2xl mb-16 sm:mb-20">
-              <span className="font-mono text-xs text-[#a3e635] tracking-widest uppercase block mb-3">
-                {t.experiences.badge}
-              </span>
-              <h2 className="font-display font-black text-4xl sm:text-6xl md:text-7xl text-white tracking-tight uppercase">
-                {t.experiences.title}
-              </h2>
-              <p className="text-zinc-400 text-sm sm:text-base font-light mt-4">
-                {t.experiences.desc}
-              </p>
-            </div>
-
-            {/* Scrollytelling Interactive Experience List */}
-            <div className="space-y-4">
-              {EXPERIENCES_DATA.map((item, idx) => {
-                const isActive = activeExp === idx;
-                const role = locale === 'vi' ? item.roleVi : item.roleEn;
-                const company = locale === 'vi' ? item.companyVi : item.companyEn;
-                const tag = locale === 'vi' ? item.tagVi : item.tagEn;
-                const highlights = locale === 'vi' ? item.highlightsVi : item.highlightsEn;
-
-                return (
-                  <div
-                    key={item.id}
-                    onClick={() => {
-                      soundEngine.playClick(500 + idx * 75);
-                      setActiveExp(idx);
-                    }}
-                    onMouseEnter={() => soundEngine.playHover()}
-                    className={`cursor-pointer rounded-3xl border transition-all duration-500 overflow-hidden ${
-                      isActive 
-                        ? 'bg-white/[0.04] border-[#a3e635]/50 shadow-[0_10px_40px_rgba(0,0,0,0.5)]' 
-                        : 'bg-white/[0.015] border-white/[0.05] hover:border-white/20 hover:bg-white/[0.03]'
-                    }`}
-                  >
-                    {/* Header Row */}
-                    <div className="p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                      <div className="flex items-start sm:items-center gap-4">
-                        <span className="font-mono text-xs sm:text-sm px-2.5 py-1 rounded bg-white/[0.05] text-[#a3e635] border border-[#a3e635]/20 font-bold">
-                          {item.episode}
-                        </span>
-                        <div>
-                          <h3 className="font-display font-bold text-xl sm:text-2xl text-white tracking-tight">
-                            {role}
-                          </h3>
-                          <div className="flex flex-wrap items-center gap-2 mt-1">
-                            <span className="text-sm font-medium text-zinc-300">{company}</span>
-                            <span className="text-zinc-600">•</span>
-                            <span className="text-xs font-mono text-zinc-500">{item.period}</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center justify-between md:justify-end gap-3">
-                        <span className="text-xs font-mono px-3 py-1 rounded-full bg-white/[0.04] text-zinc-400 border border-white/[0.06]">
-                          {tag}
-                        </span>
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center border transition-transform duration-300 ${
-                          isActive ? 'rotate-180 bg-[#a3e635] border-[#a3e635] text-black' : 'border-white/10 text-zinc-400'
-                        }`}>
-                          <ChevronDown className="w-4 h-4" />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Expandable Body Drawer */}
-                    {isActive && (
-                      <div className="px-6 sm:px-8 pb-8 pt-2 border-t border-white/[0.05]">
-                        <div className="mt-4 space-y-3 max-w-4xl">
-                          <span className="font-mono text-[11px] text-[#a3e635] uppercase tracking-widest block">
-                            {highlights.length} {t.experiences.itemsCount}
-                          </span>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
-                            {highlights.map((point, pIdx) => (
-                              <div key={pIdx} className="flex items-start gap-3 p-3.5 rounded-2xl bg-black/40 border border-white/[0.04]">
-                                <span className="w-1.5 h-1.5 rounded-full bg-[#a3e635] mt-2 flex-shrink-0" />
-                                <span className="text-xs sm:text-sm text-zinc-300 font-light leading-relaxed">
-                                  {point}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+            <SpatialSpiral3D />
           </div>
         </section>
 
@@ -472,6 +411,7 @@ export const App: React.FC = () => {
                   <div 
                     key={idx}
                     onMouseEnter={() => soundEngine.playHover()}
+                    data-cursor="SKILL"
                     className="p-8 rounded-3xl bg-white/[0.02] border border-white/[0.06] hover:border-[#a3e635]/40 hover:bg-white/[0.035] transition-all duration-300 flex flex-col justify-between"
                   >
                     <div>
@@ -552,6 +492,7 @@ export const App: React.FC = () => {
                   <div 
                     key={idx}
                     onMouseEnter={() => soundEngine.playHover()}
+                    data-cursor="ROOT"
                     className="p-8 rounded-3xl bg-white/[0.02] border border-white/[0.05] hover:border-white/20 transition-all"
                   >
                     <span className="font-mono text-xs text-[#a3e635] uppercase">{edu.year}</span>
@@ -604,6 +545,7 @@ export const App: React.FC = () => {
                     <a 
                       href="mailto:postlain.music@gmail.com"
                       onClick={() => soundEngine.playClick(700)}
+                      data-cursor="EMAIL"
                       className="inline-flex items-center gap-3 px-6 py-4 rounded-full bg-[#a3e635] text-black font-display font-black text-xs sm:text-sm uppercase tracking-wider hover:bg-white transition-all shadow-[0_0_25px_rgba(163,230,53,0.3)]"
                     >
                       <Mail className="w-4 h-4" />
@@ -612,6 +554,7 @@ export const App: React.FC = () => {
                     </a>
                     <button
                       onClick={() => handleCopy('postlain.music@gmail.com', 'email')}
+                      data-cursor="COPY"
                       className="p-4 rounded-full bg-white/[0.05] border border-white/10 hover:bg-white/10 text-zinc-300 hover:text-white transition-all"
                       title={locale === 'vi' ? 'Sao chép email' : 'Copy email'}
                     >
@@ -624,6 +567,7 @@ export const App: React.FC = () => {
                     <a 
                       href="tel:0377758764"
                       onClick={() => soundEngine.playClick(600)}
+                      data-cursor="CALL"
                       className="inline-flex items-center gap-3 px-6 py-4 rounded-full bg-white/[0.05] border border-white/10 text-white font-mono text-xs sm:text-sm uppercase tracking-wider hover:bg-white/10 transition-colors"
                     >
                       <Phone className="w-4 h-4 text-[#a3e635]" />
@@ -631,6 +575,7 @@ export const App: React.FC = () => {
                     </a>
                     <button
                       onClick={() => handleCopy('0377758764', 'phone')}
+                      data-cursor="COPY"
                       className="p-4 rounded-full bg-white/[0.05] border border-white/10 hover:bg-white/10 text-zinc-300 hover:text-white transition-all"
                       title={locale === 'vi' ? 'Sao chép số điện thoại' : 'Copy phone number'}
                     >
