@@ -7,6 +7,8 @@ import {
 import { usePortfolioStore } from './stores/usePortfolioStore';
 import { soundEngine } from './lib/audio';
 import { ScrollyScene3D } from './components/ScrollyScene3D';
+import { SonicDeck } from './components/SonicDeck';
+import { EdgeDispatch } from './components/EdgeDispatch';
 import { 
   DICTIONARY, 
   EXPERIENCES_DATA, 
@@ -264,6 +266,26 @@ export const App: React.FC = () => {
                 <span className="font-display font-bold text-xs sm:text-sm text-zinc-200 block truncate">{stat.val}</span>
               </div>
             ))}
+          </div>
+        </section>
+
+        {/* ========================================================
+            POSTLAIN SONIC LAB // INTERACTIVE AUDIO & BEAT ENGINE
+        ======================================================== */}
+        <section className="px-4 sm:px-10 lg:px-16 py-8 sm:py-12 border-t border-white/[0.06] relative">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-center justify-between gap-4 mb-4">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-[#a3e635]" />
+                <span className="font-mono text-xs text-[#a3e635] uppercase tracking-widest font-bold">
+                  {locale === 'vi' ? 'KHÔNG GIAN ÂM THANH & SẢN XUẤT' : 'INTERACTIVE SONIC LAB'}
+                </span>
+              </div>
+              <span className="text-xs font-mono text-zinc-500 hidden sm:inline">
+                {locale === 'vi' ? 'Bật Beat & Chạm Pad để chơi nhạc trực tiếp' : 'Drop the beat & jam on live pads'}
+              </span>
+            </div>
+            <SonicDeck />
           </div>
         </section>
 
@@ -621,6 +643,11 @@ export const App: React.FC = () => {
                 <div className="flex items-center gap-2.5 text-xs font-mono text-zinc-500 pt-6">
                   <MapPin className="w-3.5 h-3.5 text-[#a3e635] flex-shrink-0" />
                   <span>{t.contact.locationNote}</span>
+                </div>
+
+                {/* Live Cloudflare Worker Edge Dispatch & Contact Form */}
+                <div className="pt-8">
+                  <EdgeDispatch />
                 </div>
               </div>
             </div>

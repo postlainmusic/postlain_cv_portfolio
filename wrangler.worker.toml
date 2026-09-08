@@ -1,0 +1,7 @@
+name = "postlain-api"
+main = "src/backend/worker.ts"
+compatibility_date = "2024-09-01"
+
+[vars]
+ENVIRONMENT = "production"
+SERVICE_NAME = "postlain-api"
