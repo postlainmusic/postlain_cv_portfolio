@@ -1,37 +1,24 @@
 import React, { useEffect, useState, useRef } from 'react';
 
 export const CustomCursor: React.FC = () => {
-  const [isTouchDevice, setIsTouchDevice] = useState(true);
   const [cursorText, setCursorText] = useState<string | null>(null);
   const [isHovered, setIsHovered] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
   const dotRef = useRef<HTMLDivElement | null>(null);
   const ringRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    // Detect mobile / touch devices
-    const checkTouch = () => {
-      const isTouch = 
-        'ontouchstart' in window || 
-        navigator.maxTouchPoints > 0 || 
-        window.matchMedia('(pointer: coarse)').matches;
-      setIsTouchDevice(isTouch);
-    };
-
-    checkTouch();
-    window.addEventListener('resize', checkTouch, { passive: true });
-
-    if (isTouchDevice) return;
-
-    let mouseX = window.innerWidth / 2;
-    let mouseY = window.innerHeight / 2;
-    let ringX = mouseX;
-    let ringY = mouseY;
+    let mouseX = -100;
+    let mouseY = -100;
+    let ringX = -100;
+    let ringY = -100;
     let rafId: number;
 
     const onMouseMove = (e: MouseEvent) => {
       mouseX = e.clientX;
       mouseY = e.clientY;
+      setIsVisible(true);
 
       if (dotRef.current) {
         dotRef.current.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
@@ -51,12 +38,17 @@ export const CustomCursor: React.FC = () => {
       }
     };
 
+    const onTouchStart = () => {
+      setIsVisible(false); // Hide on touch
+    };
+
     window.addEventListener('mousemove', onMouseMove, { passive: true });
+    window.addEventListener('touchstart', onTouchStart, { passive: true });
 
     // Smooth inertia lerp for the outer ring
     const render = () => {
-      ringX += (mouseX - ringX) * 0.18;
-      ringY += (mouseY - ringY) * 0.18;
+      ringX += (mouseX - ringX) * 0.25;
+      ringY += (mouseY - ringY) * 0.25;
 
       if (ringRef.current) {
         ringRef.current.style.transform = `translate3d(${ringX}px, ${ringY}px, 0)`;
@@ -70,28 +62,27 @@ export const CustomCursor: React.FC = () => {
     return () => {
       cancelAnimationFrame(rafId);
       window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('resize', checkTouch);
+      window.removeEventListener('touchstart', onTouchStart);
     };
-  }, [isTouchDevice]);
+  }, []);
 
-  // Completely hidden on touch screens
-  if (isTouchDevice) return null;
+  if (!isVisible) return null;
 
   return (
-    <div className="pointer-events-none fixed inset-0 z-50 overflow-hidden">
+    <div className="pointer-events-none fixed inset-0 z-[99999] overflow-hidden">
       {/* Precision Center Crosshair Dot */}
       <div
         ref={dotRef}
-        className="fixed top-0 left-0 -ml-1 -mt-1 w-2 h-2 rounded-full bg-[#a3e635] shadow-[0_0_8px_#a3e635] transition-opacity duration-150"
+        className="fixed top-0 left-0 -ml-1 -mt-1 w-2 h-2 rounded-full bg-[#a3e635] shadow-[0_0_10px_#a3e635]"
       />
 
-      {/* Lerping Outer Aura Ring with Viewfinder Crosshair */}
+      {/* Lerping Outer Ring with Viewfinder Crosshair */}
       <div
         ref={ringRef}
-        className={`fixed top-0 left-0 flex items-center justify-center rounded-full border transition-all duration-200 ease-out ${
+        className={`fixed top-0 left-0 flex items-center justify-center rounded-full border transition-all duration-150 ease-out ${
           isHovered
-            ? '-ml-8 -mt-8 w-16 h-16 bg-[#a3e635]/15 border-[#a3e635] shadow-[0_0_20px_rgba(163,230,53,0.35)] backdrop-blur-[2px]'
-            : '-ml-4 -mt-4 w-8 h-8 border-white/30 bg-transparent'
+            ? '-ml-7 -mt-7 w-14 h-14 bg-[#a3e635]/20 border-[#a3e635] shadow-[0_0_25px_rgba(163,230,53,0.4)] backdrop-blur-[1px]'
+            : '-ml-4 -mt-4 w-8 h-8 border-white/40 bg-transparent'
         }`}
       >
         {isHovered && cursorText ? (
@@ -99,7 +90,7 @@ export const CustomCursor: React.FC = () => {
             {cursorText}
           </span>
         ) : (
-          <div className="w-1.5 h-1.5 rounded-full border border-white/50" />
+          <div className="w-1.5 h-1.5 rounded-full border border-white/60" />
         )}
       </div>
     </div>

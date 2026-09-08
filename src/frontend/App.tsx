@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { 
   ArrowUpRight, Sparkles, Disc, Terminal, ShieldCheck, 
   Cpu, Music2, Flame, MapPin, Mail, Phone, ExternalLink,
-  ChevronDown, Layers, Award, Zap, Volume2, VolumeX, Globe, Copy, Check
+  ChevronDown, Layers, Award, Zap, Volume2, VolumeX, Globe, Copy, Check, Radio
 } from 'lucide-react';
 import { usePortfolioStore } from './stores/usePortfolioStore';
 import { soundEngine } from './lib/audio';
@@ -25,18 +25,8 @@ export const App: React.FC = () => {
   const t = DICTIONARY[locale];
 
   const [preloaderComplete, setPreloaderComplete] = useState<boolean>(false);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState<string>('');
-
-  // Track cursor spotlight for desktop
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePos({ x: e.clientX, y: e.clientY });
-    };
-    window.addEventListener('mousemove', handleMouseMove, { passive: true });
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
 
   // Live Da Lat GMT+7 clock
   useEffect(() => {
@@ -75,12 +65,12 @@ export const App: React.FC = () => {
   return (
     <div className="relative min-h-screen bg-[#030305] text-[#e2e8f0] font-sans selection:bg-[#a3e635] selection:text-black overflow-x-hidden">
       
-      {/* 0. Cinematic Preloader (inspired by sidewave.it) */}
+      {/* 0. Cinematic Preloader (Snappy & Dismissible) */}
       {!preloaderComplete && (
         <CinematicPreloader onComplete={() => setPreloaderComplete(true)} />
       )}
 
-      {/* 0.1. Interactive Custom Crosshair Cursor (hidden on touch devices) */}
+      {/* 0.1. Interactive Custom Crosshair Cursor */}
       <CustomCursor />
 
       {/* 0.2. Viewfinder Frame Brackets (inspired by ricardochance.com) */}
@@ -91,21 +81,10 @@ export const App: React.FC = () => {
         <ScrollyScene3D />
       </div>
 
-      {/* 2. Interactive Cursor Spotlight (Desktop only) */}
-      <div 
-        className="pointer-events-none fixed z-10 transition-transform duration-75 ease-out rounded-full blur-[140px] opacity-25 bg-gradient-to-r from-[#00f2fe] via-[#a855f7] to-[#a3e635] hidden sm:block"
-        style={{
-          width: '500px',
-          height: '500px',
-          left: `${mousePos.x - 250}px`,
-          top: `${mousePos.y - 250}px`,
-        }}
-      />
+      {/* 2. Film Grain Texture Overlay */}
+      <div className="pointer-events-none fixed inset-0 z-20 opacity-[0.03] mix-blend-overlay bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]" />
 
-      {/* 3. Subtle Film Grain Texture Overlay */}
-      <div className="pointer-events-none fixed inset-0 z-20 opacity-[0.035] mix-blend-overlay bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]" />
-
-      {/* 4. Awwwards Minimalist Floating Header */}
+      {/* 3. Awwwards Minimalist Floating Header */}
       <header className="fixed top-0 left-0 right-0 z-50 px-4 sm:px-10 py-4 sm:py-5 flex items-center justify-between backdrop-blur-xl bg-[#030305]/75 border-b border-white/[0.06]">
         {/* Monogram Logo */}
         <a 
@@ -134,8 +113,9 @@ export const App: React.FC = () => {
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-1.5 lg:gap-2">
           {[
+            { id: 'spatial-odyssey', label: t.nav.experience },
+            { id: 'sonic-lab', label: 'Sonic Lab' },
             { id: 'manifesto', label: t.nav.overview },
-            { id: 'experience', label: t.nav.experience },
             { id: 'skills', label: t.nav.skills },
             { id: 'education', label: t.nav.education },
             { id: 'contact', label: t.nav.contact },
@@ -183,7 +163,6 @@ export const App: React.FC = () => {
               <>
                 <Volume2 className="w-3.5 h-3.5 animate-pulse" />
                 <span className="hidden sm:inline">{t.nav.soundOn}</span>
-                {/* Micro Equalizer Animation */}
                 <div className="flex items-end gap-0.5 h-3">
                   <span className="w-0.5 bg-[#a3e635] animate-[bounce_0.8s_infinite] h-full" />
                   <span className="w-0.5 bg-[#a3e635] animate-[bounce_0.5s_infinite] h-2/3" />
@@ -201,15 +180,15 @@ export const App: React.FC = () => {
       </header>
 
       {/* Main Scrollytelling Content Container */}
-      <main className="relative z-30 pt-24 sm:pt-28">
+      <main className="relative z-30 pt-20 sm:pt-24">
 
         {/* ========================================================
-            HERO SECTION: MONUMENTAL EDITORIAL TYPOGRAPHY & SCENE 3D
+            HERO SECTION: MONUMENTAL HIGH-FASHION EDITORIAL TYPOGRAPHY
         ======================================================== */}
-        <section id="hero" className="relative min-h-[92vh] flex flex-col justify-between px-4 sm:px-10 lg:px-16 pt-8 pb-12 overflow-hidden">
+        <section id="hero" className="relative min-h-[90vh] flex flex-col justify-center px-4 sm:px-10 lg:px-16 py-12 sm:py-20 overflow-hidden">
           
           {/* Top Status Capsule */}
-          <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="w-full flex flex-wrap items-center justify-between gap-4 mb-8">
             <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.08] backdrop-blur-md">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#a3e635] opacity-75"></span>
@@ -228,8 +207,8 @@ export const App: React.FC = () => {
             </div>
           </div>
 
-          {/* Core Kinetic Monolith Typography (Ricardo Chance & Forms.world style) */}
-          <div className="my-auto py-10 sm:py-14 space-y-6">
+          {/* Core Kinetic Monolith Typography */}
+          <div className="space-y-6 max-w-5xl">
             <div className="flex items-center gap-3">
               <span className="text-[11px] font-mono text-[#a3e635] tracking-[0.3em] uppercase">
                 {t.hero.alias} // CREATIVE TECHNOLOGIST & OPERATIONS LEAD
@@ -237,12 +216,12 @@ export const App: React.FC = () => {
               <span className="h-px w-16 bg-[#a3e635]/30"></span>
             </div>
 
-            {/* Primary Monumental Name: NGÔ PHÚC (Zero Font Distortion) */}
-            <h1 className="font-display font-black text-6xl sm:text-8xl md:text-9xl lg:text-[10rem] tracking-tight uppercase leading-[0.88] text-white">
+            {/* Monumental Name */}
+            <h1 className="font-display font-black text-6xl sm:text-8xl md:text-9xl lg:text-[10.5rem] tracking-tight uppercase leading-[0.85] text-white select-none">
               {t.hero.name}
             </h1>
 
-            {/* Editorial High-Fashion Hook */}
+            {/* Editorial High-Fashion Hook (Ricardo Chance / Forms style) */}
             <div className="text-2xl sm:text-4xl md:text-5xl font-light text-zinc-300 leading-tight pt-2">
               <span className="font-serif italic font-normal text-white">I architect</span>{' '}
               <span className="font-display font-black uppercase text-transparent bg-clip-text bg-gradient-to-r from-white via-zinc-200 to-zinc-400">
@@ -255,19 +234,19 @@ export const App: React.FC = () => {
               </span>
             </div>
 
-            <p className="max-w-2xl text-base sm:text-xl text-zinc-400 font-light leading-relaxed">
+            <p className="max-w-2xl text-base sm:text-lg text-zinc-400 font-light leading-relaxed">
               {t.hero.bio}
             </p>
 
             {/* Call to action & Direct contact triggers */}
             <div className="pt-4 flex flex-wrap items-center gap-4">
               <a
-                href="#experience"
-                onClick={(e) => handleNavClick(e, 'experience')}
+                href="#spatial-odyssey"
+                onClick={(e) => handleNavClick(e, 'spatial-odyssey')}
                 data-cursor="3D"
                 className="px-8 py-4 rounded-full bg-white text-black font-display font-black text-xs uppercase tracking-widest hover:bg-[#a3e635] transition-all duration-300 flex items-center gap-2 group shadow-[0_0_30px_rgba(255,255,255,0.15)]"
               >
-                <span>{locale === 'vi' ? 'Khám Phá Không Gian 3D' : 'Explore 3D Odyssey'}</span>
+                <span>{locale === 'vi' ? 'Khám Phá Không Gian 3D Spiral' : 'Explore 3D Spiral Odyssey'}</span>
                 <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
               </a>
 
@@ -281,33 +260,29 @@ export const App: React.FC = () => {
               </a>
             </div>
           </div>
+        </section>
 
-          {/* Quick Metrics Strip */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 pt-8 border-t border-white/[0.06]">
-            {[
-              { label: t.hero.stats.domain, val: t.hero.stats.domainVal },
-              { label: t.hero.stats.art, val: t.hero.stats.artVal },
-              { label: t.hero.stats.tech, val: t.hero.stats.techVal },
-              { label: t.hero.stats.location, val: t.hero.stats.locationVal },
-            ].map((stat, i) => (
-              <div key={i} className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.05] backdrop-blur-sm">
-                <span className="font-mono text-[10px] text-zinc-500 uppercase tracking-widest block mb-1">{stat.label}</span>
-                <span className="font-display font-bold text-xs sm:text-sm text-zinc-200 block truncate">{stat.val}</span>
-              </div>
-            ))}
+
+        {/* ========================================================
+            CHAPTER 01 // 3D SPATIAL SPIRAL CAROUSEL (PACOME PERTANT STYLE)
+        ======================================================== */}
+        <section id="spatial-odyssey" className="px-4 sm:px-10 lg:px-16 py-20 sm:py-28 border-t border-white/[0.06] relative">
+          <div className="max-w-7xl mx-auto">
+            <SpatialSpiral3D />
           </div>
         </section>
 
+
         {/* ========================================================
-            POSTLAIN SONIC LAB // INTERACTIVE AUDIO & BEAT ENGINE
+            CHAPTER 02 // POSTLAIN SONIC LAB (INTERACTIVE AUDIO ENGINE)
         ======================================================== */}
-        <section className="px-4 sm:px-10 lg:px-16 py-8 sm:py-12 border-t border-white/[0.06] relative">
+        <section id="sonic-lab" className="px-4 sm:px-10 lg:px-16 py-20 sm:py-28 border-t border-white/[0.06] relative">
           <div className="max-w-7xl mx-auto">
-            <div className="flex items-center justify-between gap-4 mb-4">
+            <div className="flex items-center justify-between gap-4 mb-6">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-[#a3e635]" />
                 <span className="font-mono text-xs text-[#a3e635] uppercase tracking-widest font-bold">
-                  {locale === 'vi' ? 'KHÔNG GIAN ÂM THANH & SẢN XUẤT' : 'INTERACTIVE SONIC LAB'}
+                  03 // POSTLAIN SONIC PRODUCTION LAB
                 </span>
               </div>
               <span className="text-xs font-mono text-zinc-500 hidden sm:inline">
@@ -318,10 +293,11 @@ export const App: React.FC = () => {
           </div>
         </section>
 
+
         {/* ========================================================
-            CHAPTER 01 // MANIFESTO: OPERATING THESIS
+            CHAPTER 03 // MANIFESTO: OPERATING THESIS
         ======================================================== */}
-        <section id="manifesto" className="px-4 sm:px-10 lg:px-16 py-28 sm:py-36 border-t border-white/[0.06] relative">
+        <section id="manifesto" className="px-4 sm:px-10 lg:px-16 py-24 sm:py-32 border-t border-white/[0.06] relative">
           <div className="max-w-7xl mx-auto">
             
             {/* Section Badge */}
@@ -374,22 +350,12 @@ export const App: React.FC = () => {
 
 
         {/* ========================================================
-            CHAPTER 02 // 3D SPATIAL SPIRAL ODYSSEY (PACOME PERTANT STYLE)
+            CHAPTER 04 // SKILLS & AI ECOSYSTEM
         ======================================================== */}
-        <section id="experience" className="px-4 sm:px-10 lg:px-16 py-28 sm:py-36 border-t border-white/[0.06] relative">
-          <div className="max-w-7xl mx-auto">
-            <SpatialSpiral3D />
-          </div>
-        </section>
-
-
-        {/* ========================================================
-            CHAPTER 03 // SKILLS & AI ECOSYSTEM
-        ======================================================== */}
-        <section id="skills" className="px-4 sm:px-10 lg:px-16 py-28 sm:py-36 border-t border-white/[0.06] relative">
+        <section id="skills" className="px-4 sm:px-10 lg:px-16 py-24 sm:py-32 border-t border-white/[0.06] relative">
           <div className="max-w-7xl mx-auto">
             
-            <div className="max-w-2xl mb-16 sm:mb-20">
+            <div className="max-w-2xl mb-16">
               <span className="font-mono text-xs text-[#a3e635] tracking-widest uppercase block mb-3">
                 {t.skills.badge}
               </span>
@@ -460,7 +426,6 @@ export const App: React.FC = () => {
                 </p>
               </div>
 
-              {/* Decorative Subtle Background Circuit */}
               <div className="absolute right-0 bottom-0 top-0 w-1/3 opacity-10 pointer-events-none bg-[radial-gradient(#a3e635_1px,transparent_1px)] [background-size:20px_20px]" />
             </div>
           </div>
@@ -468,9 +433,9 @@ export const App: React.FC = () => {
 
 
         {/* ========================================================
-            CHAPTER 04 // EDUCATION & ROOTS
+            CHAPTER 05 // ACADEMIC FOUNDATION (EDITORIAL TIMELINE STREAM)
         ======================================================== */}
-        <section id="education" className="px-4 sm:px-10 lg:px-16 py-28 sm:py-36 border-t border-white/[0.06] relative">
+        <section id="education" className="px-4 sm:px-10 lg:px-16 py-24 sm:py-32 border-t border-white/[0.06] relative">
           <div className="max-w-7xl mx-auto">
             
             <div className="max-w-2xl mb-16">
@@ -482,7 +447,8 @@ export const App: React.FC = () => {
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            {/* Sleek Minimalist Timeline Stream */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {EDUCATION_DATA.map((edu, idx) => {
                 const school = locale === 'vi' ? edu.schoolVi : edu.schoolEn;
                 const major = locale === 'vi' ? edu.majorVi : edu.majorEn;
@@ -493,16 +459,18 @@ export const App: React.FC = () => {
                     key={idx}
                     onMouseEnter={() => soundEngine.playHover()}
                     data-cursor="ROOT"
-                    className="p-8 rounded-3xl bg-white/[0.02] border border-white/[0.05] hover:border-white/20 transition-all"
+                    className="p-8 rounded-3xl bg-white/[0.02] border border-white/[0.06] hover:border-white/20 transition-all group"
                   >
-                    <span className="font-mono text-xs text-[#a3e635] uppercase">{edu.year}</span>
-                    <h3 className="font-display font-bold text-xl text-white uppercase mt-2">{school}</h3>
-                    <p className="text-xs sm:text-sm text-zinc-400 mt-1">{major}</p>
-                    {status && (
-                      <span className="inline-block mt-4 text-[10px] font-mono uppercase px-2.5 py-1 rounded bg-white/[0.05] text-zinc-400 border border-white/5">
-                        {status}
-                      </span>
-                    )}
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="font-mono text-xs text-[#a3e635] uppercase">{edu.year}</span>
+                      {status && (
+                        <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded bg-white/[0.04] text-zinc-400 border border-white/5">
+                          {status}
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="font-display font-bold text-xl text-white uppercase group-hover:text-[#a3e635] transition-colors">{school}</h3>
+                    <p className="font-serif italic text-sm text-zinc-400 mt-2">{major}</p>
                   </div>
                 );
               })}
@@ -512,9 +480,9 @@ export const App: React.FC = () => {
 
 
         {/* ========================================================
-            CHAPTER 05 // CONTACT & INVITATION (AWWWARDS FINALE)
+            CHAPTER 06 // CONTACT & INVITATION (AWWWARDS FINALE)
         ======================================================== */}
-        <section id="contact" className="px-4 sm:px-10 lg:px-16 py-28 sm:py-36 relative overflow-hidden border-t border-white/[0.06]">
+        <section id="contact" className="px-4 sm:px-10 lg:px-16 py-24 sm:py-36 relative overflow-hidden border-t border-white/[0.06]">
           <div className="max-w-7xl mx-auto">
             <div className="p-8 sm:p-16 lg:p-20 rounded-[2.5rem] bg-[#07090e] border border-white/[0.08] relative overflow-hidden">
               

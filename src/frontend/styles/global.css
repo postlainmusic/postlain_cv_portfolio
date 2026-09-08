@@ -5,12 +5,12 @@
 @layer base {
   html {
     scroll-behavior: smooth;
-    background-color: #050608;
+    background-color: #030305;
     color: #e2e8f0;
   }
 
   body {
-    background-color: #050608;
+    background-color: #030305;
     color: #e2e8f0;
     font-family: 'Plus Jakarta Sans', sans-serif;
     overflow-x: hidden;
@@ -18,7 +18,14 @@
 
   ::selection {
     background-color: #a3e635;
-    color: #050608;
+    color: #030305;
+  }
+}
+
+/* Hide OS default cursor on desktop to allow Custom Crosshair Cursor to shine */
+@media (hover: hover) and (pointer: fine) {
+  *, *::before, *::after, html, body, a, button, input, textarea, select, div, span, p, h1, h2, h3, h4 {
+    cursor: none !important;
   }
 }
 
@@ -28,16 +35,6 @@
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.07);
-}
-
-.glass-panel-hover {
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.glass-panel-hover:hover {
-  background: rgba(24, 32, 48, 0.6);
-  border-color: rgba(163, 230, 53, 0.3);
-  transform: translateY(-2px);
 }
 
 .text-gradient {
@@ -54,15 +51,15 @@
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #050608;
+  background: #030305;
 }
 ::-webkit-scrollbar-thumb {
   background: #1e293b;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #a3e635;
 }
