@@ -8,27 +8,27 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        display: ['Syne', 'sans-serif'],
+        display: ['Montserrat', 'sans-serif'],
         mono: ['Space Grotesk', 'monospace'],
         sans: ['Plus Jakarta Sans', 'sans-serif'],
       },
       colors: {
-        noir: {
-          950: '#050608',
-          900: '#0a0d13',
-          850: '#101520',
-          800: '#182030',
+        space: {
+          950: '#030305',
+          900: '#07080c',
+          850: '#0d1017',
+          800: '#141824',
         },
         accent: {
           lime: '#a3e635',
           emerald: '#10b981',
           cyan: '#06b6d4',
-          amber: '#f59e0b',
+          silver: '#e2e8f0',
         }
       },
       animation: {
-        'marquee': 'marquee 25s linear infinite',
-        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'marquee': 'marquee 28s linear infinite',
+        'pulse-slow': 'pulse 5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'float': 'float 6s ease-in-out infinite',
       },
       keyframes: {
@@ -38,7 +38,7 @@ export default {
         },
         float: {
           '0%, 100%': { transform: 'translateY(0px)' },
-          '50%': { transform: 'translateY(-10px)' },
+          '50%': { transform: 'translateY(-12px)' },
         }
       }
     },
