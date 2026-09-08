@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { usePortfolioStore } from '../stores/usePortfolioStore';
 
 interface ScrollyScene3DProps {
   className?: string;
@@ -6,6 +7,12 @@ interface ScrollyScene3DProps {
 
 export const ScrollyScene3D: React.FC<ScrollyScene3DProps> = ({ className = '' }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const activeAct = usePortfolioStore((s) => s.activeAct);
+  const activeActRef = useRef<number>(activeAct);
+
+  useEffect(() => {
+    activeActRef.current = activeAct;
+  }, [activeAct]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -45,7 +52,7 @@ export const ScrollyScene3D: React.FC<ScrollyScene3DProps> = ({ className = '' }
     const target = {
       rotX: 0.35,
       rotY: 0,
-      scrollProgress: 0,
+      actProgress: 0,
       pointerX: 0,
       pointerY: 0,
     };
@@ -53,7 +60,7 @@ export const ScrollyScene3D: React.FC<ScrollyScene3DProps> = ({ className = '' }
     const current = {
       rotX: 0.35,
       rotY: 0,
-      scrollProgress: 0,
+      actProgress: 0,
       pointerX: 0,
       pointerY: 0,
     };
@@ -69,13 +76,6 @@ export const ScrollyScene3D: React.FC<ScrollyScene3DProps> = ({ className = '' }
     window.addEventListener('mousemove', onPointerMove, { passive: true });
     window.addEventListener('touchmove', onPointerMove, { passive: true });
 
-    // Scroll listener for scrollytelling camera sync
-    const onScroll = () => {
-      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-      target.scrollProgress = maxScroll > 0 ? window.scrollY / maxScroll : 0;
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
 
     // Generate 3D Particle Cloud
     const particleCount = isMobile ? 48 : 110;
@@ -125,13 +125,14 @@ export const ScrollyScene3D: React.FC<ScrollyScene3DProps> = ({ className = '' }
 
       angleGlobal += delta * 0.65;
 
-      // Lerp physics (0.05 for buttery smooth inertia)
+      // Lerp physics (0.06 for buttery smooth inertia)
+      target.actProgress = (activeActRef.current || 0) / 4;
       current.pointerX += (target.pointerX - current.pointerX) * 0.06;
       current.pointerY += (target.pointerY - current.pointerY) * 0.06;
-      current.scrollProgress += (target.scrollProgress - current.scrollProgress) * 0.08;
+      current.actProgress += (target.actProgress - current.actProgress) * 0.06;
 
-      current.rotY = angleGlobal * 0.4 + current.pointerX * 0.8 + current.scrollProgress * Math.PI * 2.5;
-      current.rotX = 0.25 + current.pointerY * 0.5 + Math.sin(current.scrollProgress * Math.PI) * 0.5;
+      current.rotY = angleGlobal * 0.3 + current.pointerX * 0.6 + current.actProgress * Math.PI * 2;
+      current.rotX = 0.25 + current.pointerY * 0.4 + Math.sin(current.actProgress * Math.PI) * 0.4;
 
       ctx.clearRect(0, 0, width, height);
 

@@ -61,24 +61,24 @@ export const DirectDispatch: React.FC = () => {
   };
 
   return (
-    <div className="relative w-full max-w-5xl mx-auto">
-      <div className="p-8 sm:p-14 rounded-[2.5rem] bg-[#07090e]/95 border border-white/10 relative overflow-hidden backdrop-blur-2xl shadow-[0_30px_70px_rgba(0,0,0,0.8)]">
+    <div className="relative w-full max-w-5xl mx-auto h-full flex flex-col justify-center px-4 sm:px-8">
+      <div className="p-6 sm:p-10 rounded-[2.5rem] bg-[#07090e]/95 border border-white/10 relative overflow-hidden backdrop-blur-2xl shadow-[0_30px_70px_rgba(0,0,0,0.8)] max-h-[85vh] flex flex-col justify-between">
         
         {/* Background Atmosphere */}
         <div className="absolute top-0 right-0 w-80 h-80 bg-[#a3e635]/10 rounded-full blur-[100px] pointer-events-none" />
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start overflow-y-auto custom-scrollbar flex-1 py-2">
           
           {/* Left Info Column */}
-          <div className="lg:col-span-5 space-y-6">
+          <div className="lg:col-span-5 space-y-4 sm:space-y-6">
             <div>
-              <span className="font-mono text-xs text-[#a3e635] tracking-widest uppercase block mb-2">
-                05 // DIRECT INITIATION
+              <span className="font-mono text-xs text-[#a3e635] tracking-widest uppercase block mb-1">
+                04 // DIRECT INITIATION
               </span>
-              <h3 className="font-display font-black text-3xl sm:text-5xl text-white tracking-tight uppercase leading-[0.95]">
+              <h3 className="font-display font-black text-2xl sm:text-4xl text-white tracking-tight uppercase leading-[0.95]">
                 {locale === 'vi' ? 'KẾT NỐI TRỰC TIẾP' : 'GET IN TOUCH'}
               </h3>
-              <p className="font-serif italic text-base sm:text-lg text-zinc-400 mt-3">
+              <p className="font-serif italic text-sm sm:text-base text-zinc-400 mt-2">
                 {locale === 'vi' 
                   ? 'Sẵn sàng trao đổi về cơ hội Quản lí Vận hành hoặc Hợp tác Dự án Âm nhạc.' 
                   : 'Open for Operations Management or Creative Sound Projects.'}
@@ -86,14 +86,14 @@ export const DirectDispatch: React.FC = () => {
             </div>
 
             {/* Direct Contact Buttons */}
-            <div className="space-y-3 pt-2">
+            <div className="space-y-2.5 pt-1">
               {/* Phone */}
               <div className="flex items-center gap-2">
                 <a
                   href={`tel:${PROFILE_INFO.phone.replace(/[^0-9]/g, '')}`}
                   onClick={() => soundEngine.playClick(600)}
                   data-cursor="CALL"
-                  className="flex-1 flex items-center gap-3 p-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 text-white font-mono text-sm transition-all"
+                  className="flex-1 flex items-center gap-3 p-3 sm:p-3.5 rounded-2xl bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 text-white font-mono text-xs sm:text-sm transition-all"
                 >
                   <Phone className="w-4 h-4 text-[#a3e635]" />
                   <span>{PROFILE_INFO.phone}</span>
@@ -101,7 +101,7 @@ export const DirectDispatch: React.FC = () => {
                 <button
                   onClick={() => handleCopy(PROFILE_INFO.phone, 'phone')}
                   data-cursor="COPY"
-                  className="p-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 text-zinc-300 hover:text-white transition-all"
+                  className="p-3 sm:p-3.5 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 text-zinc-300 hover:text-white transition-all"
                   title="Copy Phone"
                 >
                   {copiedKey === 'phone' ? <Check className="w-4 h-4 text-[#a3e635]" /> : <Copy className="w-4 h-4" />}
@@ -114,7 +114,7 @@ export const DirectDispatch: React.FC = () => {
                   href={`mailto:${PROFILE_INFO.email}`}
                   onClick={() => soundEngine.playClick(700)}
                   data-cursor="MAIL"
-                  className="flex-1 flex items-center gap-3 p-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 text-white font-mono text-xs sm:text-sm transition-all truncate"
+                  className="flex-1 flex items-center gap-3 p-3 sm:p-3.5 rounded-2xl bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 text-white font-mono text-xs sm:text-sm transition-all truncate"
                 >
                   <Mail className="w-4 h-4 text-[#a3e635] flex-shrink-0" />
                   <span className="truncate">{PROFILE_INFO.email}</span>
@@ -122,7 +122,7 @@ export const DirectDispatch: React.FC = () => {
                 <button
                   onClick={() => handleCopy(PROFILE_INFO.email, 'email')}
                   data-cursor="COPY"
-                  className="p-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 text-zinc-300 hover:text-white transition-all"
+                  className="p-3 sm:p-3.5 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 text-zinc-300 hover:text-white transition-all"
                   title="Copy Email"
                 >
                   {copiedKey === 'email' ? <Check className="w-4 h-4 text-[#a3e635]" /> : <Copy className="w-4 h-4" />}
@@ -130,7 +130,7 @@ export const DirectDispatch: React.FC = () => {
               </div>
 
               {/* Location */}
-              <div className="flex items-center gap-3 p-4 rounded-2xl bg-white/[0.015] border border-white/[0.05] text-xs font-mono text-zinc-400">
+              <div className="flex items-center gap-3 p-3 sm:p-3.5 rounded-2xl bg-white/[0.015] border border-white/[0.05] text-xs font-mono text-zinc-400">
                 <MapPin className="w-4 h-4 text-[#a3e635] flex-shrink-0" />
                 <span>{PROFILE_INFO.locationVi}</span>
               </div>
@@ -139,10 +139,10 @@ export const DirectDispatch: React.FC = () => {
 
           {/* Right Direct Email Dispatch Form */}
           <div className="lg:col-span-7">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <form onSubmit={handleSubmit} className="space-y-3.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-mono text-zinc-400 uppercase tracking-wider mb-2">
+                  <label className="block text-xs font-mono text-zinc-400 uppercase tracking-wider mb-1.5">
                     {locale === 'vi' ? 'Họ & Tên' : 'Your Name'}
                   </label>
                   <input
@@ -151,12 +151,12 @@ export const DirectDispatch: React.FC = () => {
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder={locale === 'vi' ? 'Họ tên của bạn...' : 'John Doe...'}
-                    className="w-full px-4 py-3.5 rounded-2xl bg-white/[0.02] border border-white/10 text-white placeholder-zinc-600 text-sm focus:outline-none focus:border-[#a3e635] transition-colors"
+                    className="w-full px-4 py-3 rounded-2xl bg-white/[0.02] border border-white/10 text-white placeholder-zinc-600 text-xs sm:text-sm focus:outline-none focus:border-[#a3e635] transition-colors"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-mono text-zinc-400 uppercase tracking-wider mb-2">
+                  <label className="block text-xs font-mono text-zinc-400 uppercase tracking-wider mb-1.5">
                     Email
                   </label>
                   <input
@@ -165,36 +165,36 @@ export const DirectDispatch: React.FC = () => {
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="name@company.com"
-                    className="w-full px-4 py-3.5 rounded-2xl bg-white/[0.02] border border-white/10 text-white placeholder-zinc-600 text-sm focus:outline-none focus:border-[#a3e635] transition-colors"
+                    className="w-full px-4 py-3 rounded-2xl bg-white/[0.02] border border-white/10 text-white placeholder-zinc-600 text-xs sm:text-sm focus:outline-none focus:border-[#a3e635] transition-colors"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-mono text-zinc-400 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-mono text-zinc-400 uppercase tracking-wider mb-1.5">
                   {locale === 'vi' ? 'Nội Dung Trao Đổi' : 'Message'}
                 </label>
                 <textarea
                   required
-                  rows={4}
+                  rows={3}
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  placeholder={locale === 'vi' ? 'Đề xuất hợp tác quản lí, tuyển dụng hoặc dự án âm nhạc...' : 'Inquiry details...'}
-                  className="w-full px-4 py-3.5 rounded-2xl bg-white/[0.02] border border-white/10 text-white placeholder-zinc-600 text-sm focus:outline-none focus:border-[#a3e635] transition-colors resize-none"
+                  placeholder={locale === 'vi' ? 'Đề xuất hợp tác quản lí hoặc dự án...' : 'Inquiry details...'}
+                  className="w-full px-4 py-3 rounded-2xl bg-white/[0.02] border border-white/10 text-white placeholder-zinc-600 text-xs sm:text-sm focus:outline-none focus:border-[#a3e635] transition-colors resize-none"
                 />
               </div>
 
-              <div className="flex flex-wrap items-center justify-between gap-4 pt-2">
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
                 <button
                   type="submit"
                   disabled={isSubmitting}
                   data-cursor="SEND"
-                  className="inline-flex items-center gap-2.5 px-8 py-4 rounded-full bg-[#a3e635] text-black font-display font-black text-xs uppercase tracking-widest hover:bg-white transition-all disabled:opacity-50 shadow-[0_0_20px_rgba(163,230,53,0.3)]"
+                  className="inline-flex items-center gap-2 px-6 sm:px-8 py-3.5 rounded-full bg-[#a3e635] text-black font-display font-black text-xs uppercase tracking-widest hover:bg-white transition-all disabled:opacity-50 shadow-[0_0_20px_rgba(163,230,53,0.3)]"
                 >
                   {isSubmitting ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>{locale === 'vi' ? 'ĐANG GỬI THƯ...' : 'DISPATCHING...'}</span>
+                      <span>{locale === 'vi' ? 'ĐANG GỬI...' : 'DISPATCHING...'}</span>
                     </>
                   ) : (
                     <>
@@ -216,7 +216,14 @@ export const DirectDispatch: React.FC = () => {
 
         </div>
 
+        {/* Footer Status */}
+        <div className="pt-4 border-t border-white/[0.04] flex items-center justify-between text-[11px] font-mono text-zinc-500 flex-shrink-0">
+          <span>{locale === 'vi' ? 'DISPATCH TỚI' : 'DISPATCH TO'}: studionopu@gmail.com</span>
+          <span className="text-[#a3e635]">HOTLINE: 0938-649-420</span>
+        </div>
+
       </div>
     </div>
   );
 };
+

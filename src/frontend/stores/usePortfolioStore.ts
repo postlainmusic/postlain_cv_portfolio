@@ -5,6 +5,11 @@ export type PortfolioTab = 'overview' | 'manifesto' | 'experience' | 'skills' | 
 export type Locale = 'vi' | 'en';
 
 interface PortfolioStore {
+  activeAct: number; // 0: Hero/Overture, 1: Career Tour, 2: Hidden Music, 3: Matrix & Education, 4: Direct Dispatch
+  totalActs: number;
+  setActiveAct: (act: number) => void;
+  nextAct: () => void;
+  prevAct: () => void;
   activeTab: PortfolioTab;
   setActiveTab: (tab: PortfolioTab) => void;
   locale: Locale;
@@ -15,6 +20,30 @@ interface PortfolioStore {
 }
 
 export const usePortfolioStore = create<PortfolioStore>((set) => ({
+  activeAct: 0,
+  totalActs: 5,
+  setActiveAct: (act) => {
+    soundEngine.playClick(600 + act * 60);
+    set({ activeAct: Math.max(0, Math.min(4, act)) });
+  },
+  nextAct: () => {
+    set((state) => {
+      const next = Math.min(state.totalActs - 1, state.activeAct + 1);
+      if (next !== state.activeAct) {
+        soundEngine.playClick(750);
+      }
+      return { activeAct: next };
+    });
+  },
+  prevAct: () => {
+    set((state) => {
+      const prev = Math.max(0, state.activeAct - 1);
+      if (prev !== state.activeAct) {
+        soundEngine.playClick(550);
+      }
+      return { activeAct: prev };
+    });
+  },
   activeTab: 'overview',
   setActiveTab: (tab) => set({ activeTab: tab }),
   locale: 'vi',
@@ -31,3 +60,4 @@ export const usePortfolioStore = create<PortfolioStore>((set) => ({
       return { soundEnabled: nextSound };
     }),
 }));
+
