@@ -1,279 +1,426 @@
-import React from 'react';
-import { usePortfolioStore, PortfolioTab } from './stores/usePortfolioStore';
-import { PROFILE_DATA } from './constants/profile';
+import React, { useEffect, useRef, useState } from 'react';
 import { 
-  Terminal, User, Briefcase, Code2, Mail, MapPin, Phone, 
-  ExternalLink, Sparkles, Award, GraduationCap, Cpu, Music, Store,
-  ChevronRight, ArrowUpRight, Compass, ShieldCheck
+  ArrowUpRight, Sparkles, Disc, Terminal, ShieldCheck, 
+  Cpu, Music2, Flame, MapPin, Mail, Phone, ExternalLink,
+  ChevronDown, Layers, Award, Zap, Code2, Globe
 } from 'lucide-react';
-import { cn } from './lib/utils';
+import { PROFILE_DATA } from './constants/profile';
 
 export const App: React.FC = () => {
-  const { activeTab, setActiveTab } = usePortfolioStore();
+  const [activeTab, setActiveTab] = useState<'all' | 'management' | 'creative' | 'tech'>('all');
+  const [activeExp, setActiveExp] = useState<number>(0);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [cursorHovered, setCursorHovered] = useState(false);
+  const heroRef = useRef<HTMLDivElement>(null);
+
+  // Interactive mouse spotlight & cursor tracking
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePos({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  const filteredExperiences = PROFILE_DATA.experiences.filter(item => {
+    if (activeTab === 'all') return true;
+    if (activeTab === 'management') return item.type === 'management' || item.type === 'retail';
+    if (activeTab === 'creative') return item.type === 'management' || item.type === 'culinary';
+    if (activeTab === 'tech') return true;
+    return true;
+  });
 
   return (
-    <div className="min-h-screen bg-[#07090e] text-slate-100 flex flex-col font-sans selection:bg-emerald-500 selection:text-black">
-      {/* Dynamic Background Glows */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        <div className="absolute top-[-10%] left-[20%] w-[500px] h-[500px] bg-emerald-500/10 blur-[140px] rounded-full" />
-        <div className="absolute top-[40%] right-[-5%] w-[450px] h-[450px] bg-cyan-500/5 blur-[160px] rounded-full" />
-      </div>
+    <div className="relative min-h-screen bg-[#050608] text-[#e2e8f0] font-sans selection:bg-[#a3e635] selection:text-black overflow-x-hidden">
+      {/* Interactive Cursor Spotlight */}
+      <div 
+        className="pointer-events-none fixed z-30 transition-transform duration-75 ease-out rounded-full blur-[120px] opacity-30 bg-gradient-to-r from-[#a3e635] via-[#10b981] to-[#06b6d4]"
+        style={{
+          width: '420px',
+          height: '420px',
+          left: `${mousePos.x - 210}px`,
+          top: `${mousePos.y - 210}px`,
+        }}
+      />
 
-      {/* Modern Studio Navbar */}
-      <header className="border-b border-slate-800/80 bg-[#07090e]/80 backdrop-blur-md sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-18 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-cyan-500 p-[1px] flex items-center justify-center shadow-lg shadow-emerald-500/20">
-              <div className="w-full h-full bg-slate-950 rounded-[11px] flex items-center justify-center">
-                <Terminal className="w-5 h-5 text-emerald-400" />
-              </div>
-            </div>
-            <div>
-              <div className="font-extrabold text-base sm:text-lg tracking-tight flex items-center gap-2">
-                POSTLAIN <span className="text-[11px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono font-medium">ENGINEERING</span>
-              </div>
-              <p className="text-xs text-slate-400 font-mono">Ngô Phúc | Đà Lạt, VN</p>
-            </div>
+      {/* Noise overlay texture */}
+      <div className="pointer-events-none fixed inset-0 z-40 opacity-[0.025] mix-blend-overlay bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]" />
+
+      {/* Awwwards Minimalist Floating Header */}
+      <header className="fixed top-0 left-0 right-0 z-50 px-6 sm:px-12 py-6 flex items-center justify-between backdrop-blur-md bg-[#050608]/40 border-b border-white/[0.04]">
+        <div className="flex items-center gap-3 group cursor-pointer">
+          <div className="relative w-8 h-8 rounded-full bg-[#101520] border border-white/10 flex items-center justify-center overflow-hidden transition-all duration-300 group-hover:border-[#a3e635]">
+            <span className="font-display font-black text-xs text-[#a3e635]">P</span>
+            <div className="absolute inset-0 bg-[#a3e635]/20 scale-0 group-hover:scale-100 rounded-full transition-transform duration-300" />
           </div>
-
-          <nav className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-900/90 border border-slate-800">
-            {[
-              { id: 'overview' as PortfolioTab, label: 'Giới thiệu', icon: User },
-              { id: 'experience' as PortfolioTab, label: 'Kinh nghiệm', icon: Briefcase },
-              { id: 'skills' as PortfolioTab, label: 'Kỹ năng & AI', icon: Cpu },
-              { id: 'contact' as PortfolioTab, label: 'Liên hệ', icon: Mail },
-            ].map((item) => {
-              const Icon = item.icon;
-              const isActive = activeTab === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => setActiveTab(item.id)}
-                  className={cn(
-                    "flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200",
-                    isActive
-                      ? "bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20 font-semibold"
-                      : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
-                  )}
-                >
-                  <Icon className="w-4 h-4" />
-                  <span className="hidden sm:inline">{item.label}</span>
-                </button>
-              );
-            })}
-          </nav>
+          <div>
+            <span className="font-display font-black tracking-wider text-sm sm:text-base text-white">POSTLAIN</span>
+            <span className="text-[10px] font-mono text-zinc-500 block uppercase tracking-widest leading-none">Multi-Disciplinary</span>
+          </div>
         </div>
+
+        <nav className="flex items-center gap-1 sm:gap-2">
+          {['Kinh nghiệm', 'Năng lực', 'Học vấn', 'Kết nối'].map((label, idx) => {
+            const targets = ['#experience', '#skills', '#education', '#contact'];
+            return (
+              <a 
+                key={idx}
+                href={targets[idx]}
+                className="px-3.5 py-1.5 rounded-full text-xs font-mono uppercase tracking-wider text-zinc-400 hover:text-[#a3e635] hover:bg-white/[0.03] transition-all duration-200"
+              >
+                {label}
+              </a>
+            );
+          })}
+        </nav>
       </header>
 
-      {/* Main Container */}
-      <main className="flex-1 max-w-6xl mx-auto px-4 sm:px-6 py-10 w-full z-10">
-        {/* OVERVIEW TAB */}
-        {activeTab === 'overview' && (
-          <div className="space-y-10 animate-fade-in">
-            {/* Hero Section */}
-            <div className="relative p-8 sm:p-12 rounded-3xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-xl overflow-hidden shadow-2xl">
-              <div className="max-w-3xl space-y-5">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono">
-                  <Sparkles className="w-3.5 h-3.5" /> Quản lý • Kỹ thuật phần mềm • AI Automation
-                </div>
-                <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-white leading-tight">
-                  Ngô Phúc <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">(POSTLAIN)</span>
-                </h1>
-                <p className="text-slate-300 text-base sm:text-lg leading-relaxed font-normal">
-                  {PROFILE_DATA.bio}
-                </p>
-                <div className="flex flex-wrap gap-4 pt-4 text-xs sm:text-sm font-mono text-slate-400">
-                  <div className="flex items-center gap-1.5 bg-slate-800/60 px-3.5 py-2 rounded-xl border border-slate-700/50">
-                    <MapPin className="w-4 h-4 text-emerald-400" /> {PROFILE_DATA.location}
-                  </div>
-                  <div className="flex items-center gap-1.5 bg-slate-800/60 px-3.5 py-2 rounded-xl border border-slate-700/50">
-                    <Mail className="w-4 h-4 text-cyan-400" /> {PROFILE_DATA.email}
-                  </div>
-                  <div className="flex items-center gap-1.5 bg-slate-800/60 px-3.5 py-2 rounded-xl border border-slate-700/50">
-                    <Phone className="w-4 h-4 text-emerald-400" /> {PROFILE_DATA.phone}
-                  </div>
-                </div>
-              </div>
-            </div>
+      {/* 1. HERO SECTION (Massive Typography & Sound / Motion Aesthetics) */}
+      <section ref={heroRef} className="relative min-h-[92vh] flex flex-col justify-end px-6 sm:px-12 pb-16 pt-36 border-b border-white/[0.06]">
+        {/* Subtle Ambient Graphic Lines */}
+        <div className="absolute top-20 right-12 w-72 h-72 rounded-full border border-white/[0.05] border-dashed animate-[spin_60s_linear_infinite] pointer-events-none hidden md:block" />
+        <div className="absolute top-28 right-20 w-56 h-56 rounded-full border border-white/[0.03] pointer-events-none hidden md:block" />
 
-            {/* Core Strengths */}
-            <div>
-              <div className="flex items-center gap-2 mb-6">
-                <ShieldCheck className="w-5 h-5 text-emerald-400" />
-                <h2 className="text-xl font-bold tracking-tight text-white">Thế Mạnh Nổi Bật</h2>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                {PROFILE_DATA.strengths.map((st, i) => (
-                  <div key={i} className="p-6 rounded-2xl bg-slate-900/40 border border-slate-800/60 hover:border-emerald-500/40 transition-all duration-300 group">
-                    <div className="w-10 h-10 rounded-xl bg-slate-800/80 flex items-center justify-center text-emerald-400 mb-4 group-hover:scale-110 transition-transform">
-                      {i === 0 ? <Briefcase className="w-5 h-5" /> : i === 1 ? <Cpu className="w-5 h-5" /> : <Music className="w-5 h-5" />}
-                    </div>
-                    <h3 className="text-lg font-bold text-slate-100 mb-2">{st.title}</h3>
-                    <p className="text-sm text-slate-400 leading-relaxed">{st.description}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Education Timeline */}
-            <div>
-              <div className="flex items-center gap-2 mb-6">
-                <GraduationCap className="w-5 h-5 text-cyan-400" />
-                <h2 className="text-xl font-bold tracking-tight text-white">Học Vấn & Đào Tạo</h2>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {PROFILE_DATA.education.map((edu, idx) => (
-                  <div key={idx} className="p-5 rounded-2xl bg-slate-900/30 border border-slate-800/50 flex flex-col justify-between">
-                    <div>
-                      <span className="text-xs font-mono font-bold text-cyan-400">{edu.year}</span>
-                      <h4 className="text-base font-bold text-white mt-1">{edu.school}</h4>
-                      <p className="text-xs text-slate-400 mt-1">{edu.major}</p>
-                    </div>
-                    {edu.note && (
-                      <span className="inline-block mt-3 text-[11px] px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700 w-fit">
-                        {edu.note}
-                      </span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
+        <div className="max-w-7xl mx-auto w-full">
+          {/* Status Badge */}
+          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.08] mb-8 backdrop-blur-sm">
+            <span className="w-2 h-2 rounded-full bg-[#a3e635] animate-ping" />
+            <span className="w-2 h-2 rounded-full bg-[#a3e635] -ml-4.5" />
+            <span className="text-xs font-mono tracking-wider text-zinc-300 uppercase">Available for Operations & AI Leadership • 2026</span>
           </div>
-        )}
 
-        {/* EXPERIENCE TAB */}
-        {activeTab === 'experience' && (
-          <div className="space-y-8 animate-fade-in">
-            <div className="border-b border-slate-800 pb-4">
-              <h2 className="text-2xl font-bold text-white">Hành Trình Kinh Nghiệm</h2>
-              <p className="text-sm text-slate-400">Trải nghiệm thực tế từ Quản lý phòng thu âm, Quản lý chuỗi bán lẻ đến Bếp trưởng ẩm thực cao cấp.</p>
-            </div>
-
-            <div className="relative border-l-2 border-slate-800 ml-4 pl-6 space-y-10">
-              {PROFILE_DATA.experiences.map((exp, idx) => (
-                <div key={idx} className="relative group">
-                  {/* Dot */}
-                  <div className="absolute -left-[31px] top-1.5 w-3.5 h-3.5 rounded-full bg-slate-900 border-2 border-emerald-400 group-hover:bg-emerald-400 transition-colors" />
-
-                  <div className="p-6 rounded-2xl bg-slate-900/40 border border-slate-800/70 hover:border-slate-700 transition-all">
-                    <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                      <span className="text-xs font-mono font-semibold px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                        {exp.period}
-                      </span>
-                      <span className="text-xs text-slate-400 font-mono uppercase tracking-wider">{exp.company}</span>
-                    </div>
-
-                    <h3 className="text-xl font-bold text-white mt-1">{exp.role}</h3>
-
-                    <ul className="mt-4 space-y-2">
-                      {exp.highlights.map((h, hIdx) => (
-                        <li key={hIdx} className="text-sm text-slate-300 flex items-start gap-2 leading-relaxed">
-                          <ChevronRight className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                          <span>{h}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* SKILLS & AI TAB */}
-        {activeTab === 'skills' && (
-          <div className="space-y-8 animate-fade-in">
-            <div className="border-b border-slate-800 pb-4">
-              <h2 className="text-2xl font-bold text-white">Năng Lực Kỹ Năng & Ứng Dụng AI</h2>
-              <p className="text-sm text-slate-400">Bộ kỹ năng tích hợp giữa tư duy quản trị nhân sự, điều hành kinh doanh và giải pháp công nghệ AI tự động hóa.</p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {PROFILE_DATA.skillGroups.map((grp, idx) => (
-                <div key={idx} className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800 flex flex-col justify-between">
-                  <div>
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="font-bold text-lg text-white">{grp.category}</h3>
-                      <span className="text-xs font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                        {grp.level}
-                      </span>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {grp.skills.map((s, sIdx) => (
-                        <span key={sIdx} className="text-xs px-3 py-1.5 rounded-lg bg-slate-800/80 text-slate-200 border border-slate-700/60">
-                          {s}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* AI Philosophy Box */}
-            <div className="p-8 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-900/50 border border-emerald-500/30">
-              <div className="flex items-center gap-3 mb-3">
-                <Cpu className="w-6 h-6 text-emerald-400" />
-                <h3 className="text-lg font-bold text-white">Triết Lý Tự Động Hóa Vận Hành Bằng AI</h3>
-              </div>
-              <p className="text-slate-300 text-sm leading-relaxed">
-                Áp dụng các hệ thống Agentic AI (như Antigravity, LLM Evals, Drizzle ORM, Edge Computing) để xây dựng hệ thống quy trình quản lý nhân sự không có điểm nghẽn, tự động hoá việc báo cáo, quản lý tồn kho và tối ưu trải nghiệm khách hàng.
+          {/* Giant Display Name */}
+          <div className="space-y-1">
+            <h1 className="font-display font-black text-6xl sm:text-8xl md:text-[10.5rem] tracking-tight leading-[0.88] text-white uppercase select-none">
+              NGÔ PHÚC
+            </h1>
+            <div className="flex flex-col md:flex-row md:items-baseline justify-between gap-6 pt-3">
+              <h2 className="font-display font-black text-4xl sm:text-6xl md:text-8xl tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#a3e635] via-[#10b981] to-[#38bdf8] uppercase">
+                POSTLAIN
+              </h2>
+              <p className="max-w-md text-sm sm:text-base font-sans text-zinc-400 font-light leading-relaxed">
+                Đam mê nghệ thuật, quản trị vận hành logic và tối ưu quy trình kinh doanh kết hợp trí tuệ nhân tạo (AI Automation).
               </p>
             </div>
           </div>
-        )}
 
-        {/* CONTACT TAB */}
-        {activeTab === 'contact' && (
-          <div className="max-w-2xl mx-auto space-y-8 animate-fade-in">
-            <div className="text-center space-y-2">
-              <h2 className="text-3xl font-bold text-white">Kết Nối & Hợp Tác</h2>
-              <p className="text-sm text-slate-400">Sẵn sàng trao đổi về cơ hội quản lý vận hành, phát triển dự án công nghệ hoặc sản xuất nghệ thuật.</p>
+          {/* Quick Meta Stats Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-16 pt-8 border-t border-white/[0.06] text-xs font-mono text-zinc-400">
+            <div>
+              <span className="block text-[10px] text-zinc-600 uppercase tracking-widest">Định vị</span>
+              <span className="text-zinc-200 font-medium">Store & Studio Manager</span>
+            </div>
+            <div>
+              <span className="block text-[10px] text-zinc-600 uppercase tracking-widest">Nghệ thuật</span>
+              <span className="text-zinc-200 font-medium">Music Producer / MCN</span>
+            </div>
+            <div>
+              <span className="block text-[10px] text-zinc-600 uppercase tracking-widest">Công nghệ</span>
+              <span className="text-zinc-200 font-medium">AI Workflows & Web Design</span>
+            </div>
+            <div>
+              <span className="block text-[10px] text-zinc-600 uppercase tracking-widest">Căn cứ</span>
+              <span className="text-zinc-200 font-medium">Đà Lạt, Lâm Đồng</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 2. INFINITE MARQUEE STRIP (Awwwards Style Statement) */}
+      <div className="relative py-5 bg-[#0a0d13] border-b border-white/[0.06] overflow-hidden select-none">
+        <div className="flex gap-12 whitespace-nowrap animate-[marquee_20s_linear_infinite]">
+          {[
+            "MANAGEMENT & OPERATIONS",
+            "•",
+            "AI AUTOMATION AGENTS",
+            "•",
+            "RETAIL LEADERSHIP",
+            "•",
+            "MUSIC PRODUCTION & AUDIO",
+            "•",
+            "CULINARY ARTS & LEADERSHIP",
+            "•",
+            "HIGH-CONVERSION SYSTEMS",
+            "•"
+          ].concat([
+            "MANAGEMENT & OPERATIONS",
+            "•",
+            "AI AUTOMATION AGENTS",
+            "•",
+            "RETAIL LEADERSHIP",
+            "•",
+            "MUSIC PRODUCTION & AUDIO",
+            "•",
+            "CULINARY ARTS & LEADERSHIP",
+            "•",
+            "HIGH-CONVERSION SYSTEMS",
+            "•"
+          ]).map((txt, idx) => (
+            <span 
+              key={idx} 
+              className={`font-display font-black text-sm tracking-widest uppercase ${txt === '•' ? 'text-[#a3e635]' : 'text-zinc-500 hover:text-white transition-colors'}`}
+            >
+              {txt}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* 3. MANIFESTO & CORE STRENGTHS (Editorial Layout) */}
+      <section className="px-6 sm:px-12 py-24 sm:py-32 border-b border-white/[0.06]">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+            <div className="lg:col-span-4">
+              <span className="font-mono text-xs text-[#a3e635] tracking-widest uppercase block mb-3">01 // Triết lý & Thế mạnh</span>
+              <h3 className="font-display font-extrabold text-3xl sm:text-5xl text-white tracking-tight uppercase leading-tight">
+                VẬN HÀNH <br />BẰNG LOGIC, <br />THỔI HỒN <br />BẰNG NGHỆ THUẬT.
+              </h3>
             </div>
 
-            <div className="p-8 rounded-3xl bg-slate-900/60 border border-slate-800 space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="lg:col-span-8 space-y-12">
+              <p className="font-sans text-xl sm:text-2xl text-zinc-300 font-light leading-relaxed">
+                "Là một người giao thoa giữa nghệ thuật và công nghệ, tôi tập trung biến sự phức tạp của việc điều hành nhân sự, chuỗi bán lẻ và phòng thu thành các quy trình tinh gọn, tự động hóa và giàu cảm hứng."
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t border-white/[0.08]">
+                {PROFILE_DATA.strengths.map((s, idx) => (
+                  <div key={idx} className="group p-6 rounded-2xl bg-white/[0.02] border border-white/[0.05] hover:border-[#a3e635]/40 transition-all duration-300">
+                    <div className="w-10 h-10 rounded-xl bg-[#101520] border border-white/10 flex items-center justify-center text-[#a3e635] mb-6 group-hover:scale-110 transition-transform">
+                      {idx === 0 ? <ShieldCheck className="w-5 h-5" /> : idx === 1 ? <Cpu className="w-5 h-5" /> : <Music2 className="w-5 h-5" />}
+                    </div>
+                    <h4 className="font-display font-bold text-lg text-white mb-2 tracking-wide uppercase">{s.title}</h4>
+                    <p className="text-xs sm:text-sm text-zinc-400 font-light leading-relaxed">{s.description}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 4. INTERACTIVE EXPERIENCE REEL (Works Section inspired by Ali Sanati Works.jsx) */}
+      <section id="experience" className="px-6 sm:px-12 py-24 sm:py-32 border-b border-white/[0.06]">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-16 gap-6">
+            <div>
+              <span className="font-mono text-xs text-[#a3e635] tracking-widest uppercase block mb-3">02 // Hành trình thực tế</span>
+              <h3 className="font-display font-black text-4xl sm:text-6xl text-white tracking-tight uppercase">
+                EXPERIENCE REEL
+              </h3>
+            </div>
+
+            {/* Filter Pills */}
+            <div className="flex flex-wrap gap-2 p-1.5 rounded-full bg-white/[0.03] border border-white/[0.08] w-fit">
+              {[
+                { id: 'all', label: 'Tất cả' },
+                { id: 'management', label: 'Quản lý & Retail' },
+                { id: 'creative', label: 'Studio & Bếp' },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as any)}
+                  className={`px-4 py-1.5 rounded-full text-xs font-mono uppercase tracking-wider transition-all duration-200 ${
+                    activeTab === tab.id 
+                      ? 'bg-[#a3e635] text-black font-bold shadow-md shadow-[#a3e635]/20' 
+                      : 'text-zinc-400 hover:text-white'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Interactive Stack List */}
+          <div className="divide-y divide-white/[0.08]">
+            {filteredExperiences.map((exp, idx) => {
+              const isSelected = activeExp === idx;
+              return (
+                <div 
+                  key={idx}
+                  onClick={() => setActiveExp(idx)}
+                  className={`group py-8 sm:py-12 cursor-pointer transition-all duration-300 ${
+                    isSelected ? 'opacity-100' : 'opacity-60 hover:opacity-100'
+                  }`}
+                >
+                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                    <div className="space-y-2 flex-1">
+                      <div className="flex items-center gap-3">
+                        <span className="font-mono text-xs text-[#a3e635] px-2.5 py-0.5 rounded-full bg-[#a3e635]/10 border border-[#a3e635]/20">
+                          {exp.period}
+                        </span>
+                        <span className="text-xs font-mono uppercase text-zinc-500 tracking-widest">{exp.company}</span>
+                      </div>
+                      <h4 className="font-display font-bold text-2xl sm:text-4xl text-white group-hover:text-[#a3e635] transition-colors uppercase tracking-tight">
+                        {exp.role}
+                      </h4>
+                    </div>
+
+                    <div className="flex items-center gap-4">
+                      <span className="text-xs font-mono text-zinc-400 uppercase hidden sm:block">
+                        {exp.highlights.length} trách nhiệm cốt lõi
+                      </span>
+                      <div className={`w-10 h-10 rounded-full border border-white/10 flex items-center justify-center transition-all duration-300 ${
+                        isSelected ? 'bg-[#a3e635] text-black rotate-45' : 'text-zinc-400 group-hover:border-[#a3e635] group-hover:text-white'
+                      }`}>
+                        <ArrowUpRight className="w-5 h-5" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Expanded Detail Tray */}
+                  {isSelected && (
+                    <div className="mt-8 pt-6 border-t border-dashed border-white/[0.08] grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-in">
+                      {exp.highlights.map((item, hIdx) => (
+                        <div key={hIdx} className="flex items-start gap-3 p-4 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+                          <Zap className="w-4 h-4 text-[#a3e635] shrink-0 mt-0.5" />
+                          <p className="text-xs sm:text-sm text-zinc-300 font-light leading-relaxed">{item}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* 5. SKILLS MATRIX & AI AUTOMATION LAB (Tech / Skill Section) */}
+      <section id="skills" className="px-6 sm:px-12 py-24 sm:py-32 border-b border-white/[0.06]">
+        <div className="max-w-7xl mx-auto">
+          <div className="max-w-2xl mb-16">
+            <span className="font-mono text-xs text-[#a3e635] tracking-widest uppercase block mb-3">03 // Hệ thống Năng lực</span>
+            <h3 className="font-display font-black text-4xl sm:text-6xl text-white tracking-tight uppercase">
+              SKILLS & AI STACK
+            </h3>
+            <p className="text-sm text-zinc-400 font-light mt-4">
+              Sự kết hợp giữa tư duy nghệ thuật, kinh nghiệm điều hành và sức mạnh công nghệ AI hiện đại.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {PROFILE_DATA.skillGroups.map((grp, idx) => (
+              <div key={idx} className="relative p-8 rounded-3xl bg-[#0a0d13] border border-white/[0.06] flex flex-col justify-between overflow-hidden group hover:border-[#a3e635]/40 transition-all duration-300">
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-xs text-zinc-500 uppercase tracking-widest">Domain 0{idx + 1}</span>
+                    <span className="font-mono text-xs px-2.5 py-1 rounded-full bg-[#a3e635]/10 text-[#a3e635] border border-[#a3e635]/20">
+                      {grp.level}
+                    </span>
+                  </div>
+                  <h4 className="font-display font-bold text-2xl text-white uppercase tracking-tight">{grp.category}</h4>
+                  <div className="space-y-3 pt-2">
+                    {grp.skills.map((skill, sIdx) => (
+                      <div key={sIdx} className="flex items-center gap-2.5 text-xs sm:text-sm text-zinc-300 font-light">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#a3e635]" />
+                        <span>{skill}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mt-10 pt-6 border-t border-white/[0.06] text-zinc-500 text-[11px] font-mono uppercase tracking-widest">
+                  Ready to deploy
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* AI Workflow Philosophy Statement */}
+          <div className="mt-12 p-8 sm:p-12 rounded-3xl bg-gradient-to-br from-[#101520] via-[#0a0d13] to-[#050608] border border-[#a3e635]/20 relative overflow-hidden">
+            <div className="max-w-3xl space-y-4">
+              <span className="font-mono text-xs text-[#a3e635] uppercase tracking-widest">AI Operations Thesis</span>
+              <h4 className="font-display font-black text-2xl sm:text-3xl text-white uppercase">
+                TỰ ĐỘNG HÓA VẬN HÀNH THÔNG MINH
+              </h4>
+              <p className="text-zinc-400 text-sm sm:text-base font-light leading-relaxed">
+                Tối ưu hóa các chuỗi công việc thường nhật từ chấm công, quản lý tồn kho, chăm sóc đối tác MCN đến sản xuất âm nhạc bằng các Agent AI tự trị, giảm thiểu sai sót con người và tăng tốc độ xử lý lên gấp nhiều lần.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. EDUCATION & ROOTS */}
+      <section id="education" className="px-6 sm:px-12 py-24 sm:py-32 border-b border-white/[0.06]">
+        <div className="max-w-7xl mx-auto">
+          <div className="max-w-xl mb-16">
+            <span className="font-mono text-xs text-[#a3e635] tracking-widest uppercase block mb-3">04 // Nền tảng Học vấn</span>
+            <h3 className="font-display font-black text-4xl sm:text-6xl text-white tracking-tight uppercase">
+              EDUCATION
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            {PROFILE_DATA.education.map((edu, idx) => (
+              <div key={idx} className="p-8 rounded-3xl bg-white/[0.02] border border-white/[0.05] hover:border-white/20 transition-all">
+                <span className="font-mono text-xs text-[#a3e635] uppercase">{edu.year}</span>
+                <h4 className="font-display font-bold text-xl text-white uppercase mt-2">{edu.school}</h4>
+                <p className="text-xs sm:text-sm text-zinc-400 mt-1">{edu.major}</p>
+                {edu.note && (
+                  <span className="inline-block mt-4 text-[10px] font-mono uppercase px-2.5 py-1 rounded bg-white/[0.05] text-zinc-400">
+                    {edu.note}
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 7. CONTACT & INVITATION (Ali Sanati Contact Layout) */}
+      <section id="contact" className="px-6 sm:px-12 py-24 sm:py-36 relative overflow-hidden">
+        <div className="max-w-7xl mx-auto">
+          <div className="p-8 sm:p-16 rounded-[2.5rem] bg-[#0a0d13] border border-white/[0.08] relative overflow-hidden">
+            {/* Background Glow */}
+            <div className="absolute -right-20 -bottom-20 w-96 h-96 bg-[#a3e635]/10 rounded-full blur-[120px] pointer-events-none" />
+
+            <div className="max-w-3xl space-y-8">
+              <span className="font-mono text-xs text-[#a3e635] tracking-widest uppercase block">05 // Liên hệ trực tiếp</span>
+              <h3 className="font-display font-black text-4xl sm:text-7xl text-white tracking-tight uppercase leading-[0.95]">
+                LET’S BUILD <br />SOMETHING <br />EXTRAORDINARY.
+              </h3>
+              <p className="text-zinc-400 text-sm sm:text-lg font-light leading-relaxed">
+                Sẵn sàng hợp tác cho các vị trí Quản lý Cửa hàng/Phòng thu, Kỹ sư Vận hành Tự động hóa AI, hoặc các dự án Sản xuất Nghệ thuật.
+              </p>
+
+              <div className="flex flex-wrap gap-4 pt-4">
                 <a 
                   href={`mailto:${PROFILE_DATA.email}`}
-                  className="p-4 rounded-xl bg-slate-800/50 border border-slate-700/60 hover:border-emerald-500/50 flex items-center gap-3 transition-colors"
+                  className="inline-flex items-center gap-3 px-6 py-4 rounded-full bg-[#a3e635] text-black font-display font-black text-sm uppercase tracking-wider hover:bg-white transition-colors"
                 >
-                  <Mail className="w-5 h-5 text-emerald-400" />
-                  <div>
-                    <div className="text-xs text-slate-400 font-mono">Email Trực Tiếp</div>
-                    <div className="text-sm font-semibold text-white">{PROFILE_DATA.email}</div>
-                  </div>
+                  <Mail className="w-4 h-4" />
+                  <span>{PROFILE_DATA.email}</span>
+                  <ArrowUpRight className="w-4 h-4" />
                 </a>
 
                 <a 
                   href={`tel:${PROFILE_DATA.phone.replace(/[^0-9]/g, '')}`}
-                  className="p-4 rounded-xl bg-slate-800/50 border border-slate-700/60 hover:border-emerald-500/50 flex items-center gap-3 transition-colors"
+                  className="inline-flex items-center gap-3 px-6 py-4 rounded-full bg-white/[0.05] border border-white/10 text-white font-mono text-sm uppercase tracking-wider hover:bg-white/10 transition-colors"
                 >
-                  <Phone className="w-5 h-5 text-cyan-400" />
-                  <div>
-                    <div className="text-xs text-slate-400 font-mono">Số Điện Thoại</div>
-                    <div className="text-sm font-semibold text-white">{PROFILE_DATA.phone}</div>
-                  </div>
+                  <Phone className="w-4 h-4 text-[#a3e635]" />
+                  <span>{PROFILE_DATA.phone}</span>
                 </a>
               </div>
 
-              <div className="p-4 rounded-xl bg-slate-800/30 border border-slate-800 flex items-center gap-3">
-                <MapPin className="w-5 h-5 text-emerald-400 shrink-0" />
-                <div>
-                  <div className="text-xs text-slate-400 font-mono">Địa Điểm Làm Việc</div>
-                  <div className="text-sm text-slate-200">{PROFILE_DATA.location} (Sẵn sàng onsite / remote)</div>
-                </div>
+              <div className="flex items-center gap-2 text-xs font-mono text-zinc-500 pt-6">
+                <MapPin className="w-3.5 h-3.5 text-[#a3e635]" />
+                <span>{PROFILE_DATA.location} (Sẵn sàng làm việc Onsite tại Đà Lạt hoặc Remote toàn quốc)</span>
               </div>
             </div>
           </div>
-        )}
-      </main>
+        </div>
+      </section>
 
-      {/* Modern Studio Footer */}
-      <footer className="border-t border-slate-800/80 bg-[#07090e] py-8 text-center text-xs text-slate-500 font-mono">
-        <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div>© 2026 Ngô Phúc (POSTLAIN). All rights reserved.</div>
-          <div className="flex items-center gap-4 text-slate-400">
-            <span>React 18</span> • <span>Tailwind CSS</span> • <span>Cloudflare Workers</span> • <span>Drizzle ORM</span>
+      {/* 8. FOOTER */}
+      <footer className="px-6 sm:px-12 py-10 border-t border-white/[0.04] bg-[#050608] text-xs font-mono text-zinc-600">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div>© 2026 NGÔ PHÚC (POSTLAIN). CRAFTED WITH DISCIPLINE & AESTHETICS.</div>
+          <div className="flex items-center gap-6 text-zinc-400">
+            <span className="hover:text-[#a3e635] cursor-pointer">AILERON PROTOCOL</span>
+            <span className="hover:text-[#a3e635] cursor-pointer">CLOUDFLARE EDGE</span>
+            <span className="hover:text-[#a3e635] cursor-pointer">HONO + DRIZZLE</span>
           </div>
         </div>
       </footer>
