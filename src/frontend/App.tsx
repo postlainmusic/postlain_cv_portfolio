@@ -1,22 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { 
-  ArrowUpRight, Sparkles, Disc, Terminal, ShieldCheck, 
-  Cpu, Music2, Flame, MapPin, Mail, Phone, ExternalLink,
-  ChevronDown, Layers, Award, Zap, Volume2, VolumeX, Globe, Copy, Check, Radio
+  ArrowUpRight, Sparkles, MapPin, Mail, Phone, ExternalLink,
+  ChevronDown, Layers, Award, Zap, Volume2, VolumeX, Globe, Copy, Check
 } from 'lucide-react';
 import { usePortfolioStore } from './stores/usePortfolioStore';
 import { soundEngine } from './lib/audio';
 import { ScrollyScene3D } from './components/ScrollyScene3D';
-import { SonicDeck } from './components/SonicDeck';
-import { EdgeDispatch } from './components/EdgeDispatch';
+import { CareerTour3D } from './components/CareerTour3D';
+import { HiddenMusicShowcase } from './components/HiddenMusicShowcase';
+import { DirectDispatch } from './components/DirectDispatch';
 import { CinematicPreloader } from './components/CinematicPreloader';
 import { CustomCursor } from './components/CustomCursor';
 import { ViewfinderFrame } from './components/ViewfinderFrame';
-import { SpatialSpiral3D } from './components/SpatialSpiral3D';
 import { 
   DICTIONARY, 
-  EXPERIENCES_DATA, 
-  SKILL_GROUPS_DATA, 
+  PROFILE_INFO, 
   EDUCATION_DATA 
 } from './constants/dictionary';
 
@@ -25,7 +23,6 @@ export const App: React.FC = () => {
   const t = DICTIONARY[locale];
 
   const [preloaderComplete, setPreloaderComplete] = useState<boolean>(false);
-  const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState<string>('');
 
   // Live Da Lat GMT+7 clock
@@ -45,13 +42,6 @@ export const App: React.FC = () => {
     const timer = setInterval(updateTime, 1000);
     return () => clearInterval(timer);
   }, []);
-
-  const handleCopy = (text: string, key: string) => {
-    soundEngine.playClick(880);
-    navigator.clipboard.writeText(text);
-    setCopiedKey(key);
-    setTimeout(() => setCopiedKey(null), 2200);
-  };
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
     e.preventDefault();
@@ -73,11 +63,11 @@ export const App: React.FC = () => {
       {/* 0.1. Interactive Custom Crosshair Cursor */}
       <CustomCursor />
 
-      {/* 0.2. Viewfinder Frame Brackets (inspired by ricardochance.com) */}
+      {/* 0.2. Viewfinder Frame Brackets */}
       <ViewfinderFrame />
 
-      {/* 1. Ambient Background 3D Canvas with Mobile FPS optimization */}
-      <div className="fixed inset-0 z-0 pointer-events-none opacity-85">
+      {/* 1. Ambient Background 3D Canvas */}
+      <div className="fixed inset-0 z-0 pointer-events-none opacity-80">
         <ScrollyScene3D />
       </div>
 
@@ -105,7 +95,7 @@ export const App: React.FC = () => {
               </span>
             </div>
             <span className="text-[10px] font-mono text-zinc-500 block uppercase tracking-widest leading-tight">
-              {locale === 'vi' ? 'Đà Lạt • Vận Hành & AI' : 'Da Lat • Ops & AI'}
+              {locale === 'vi' ? 'Đà Lạt • Manager' : 'Da Lat • Manager'}
             </span>
           </div>
         </a>
@@ -113,10 +103,9 @@ export const App: React.FC = () => {
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-1.5 lg:gap-2">
           {[
-            { id: 'spatial-odyssey', label: t.nav.experience },
-            { id: 'sonic-lab', label: 'Sonic Lab' },
-            { id: 'manifesto', label: t.nav.overview },
-            { id: 'skills', label: t.nav.skills },
+            { id: 'career-tour', label: t.nav.career },
+            { id: 'featured-venture', label: t.nav.project },
+            { id: 'capabilities', label: t.nav.manifesto },
             { id: 'education', label: t.nav.education },
             { id: 'contact', label: t.nav.contact },
           ].map((item) => (
@@ -133,8 +122,16 @@ export const App: React.FC = () => {
           ))}
         </nav>
 
-        {/* Control Switches: Bilingual [VI | EN] + Audio Engine */}
+        {/* Control Switches: Bilingual [VI | EN] + Hotline Quick Dial */}
         <div className="flex items-center gap-2 sm:gap-3">
+          <a
+            href={`tel:${PROFILE_INFO.phone.replace(/[^0-9]/g, '')}`}
+            className="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-xs font-mono text-zinc-300 hover:text-white transition-all"
+          >
+            <Phone className="w-3 h-3 text-[#a3e635]" />
+            <span>{PROFILE_INFO.phone}</span>
+          </a>
+
           {/* Language Switcher */}
           <button
             onClick={toggleLocale}
@@ -147,35 +144,6 @@ export const App: React.FC = () => {
             <span className="text-zinc-600">/</span>
             <span className={locale === 'en' ? 'text-[#a3e635] font-bold' : 'text-zinc-500'}>EN</span>
           </button>
-
-          {/* Sound Toggle Button */}
-          <button
-            onClick={toggleSound}
-            data-cursor={soundEnabled ? 'MUTE' : 'SOUND'}
-            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-xs font-mono uppercase tracking-wider transition-all duration-300 ${
-              soundEnabled 
-                ? 'bg-[#a3e635]/15 border-[#a3e635]/40 text-[#a3e635] shadow-[0_0_15px_rgba(163,230,53,0.2)]' 
-                : 'bg-white/[0.03] border-white/10 text-zinc-400 hover:text-zinc-200'
-            }`}
-            title={soundEnabled ? t.nav.soundOff : t.nav.soundOn}
-          >
-            {soundEnabled ? (
-              <>
-                <Volume2 className="w-3.5 h-3.5 animate-pulse" />
-                <span className="hidden sm:inline">{t.nav.soundOn}</span>
-                <div className="flex items-end gap-0.5 h-3">
-                  <span className="w-0.5 bg-[#a3e635] animate-[bounce_0.8s_infinite] h-full" />
-                  <span className="w-0.5 bg-[#a3e635] animate-[bounce_0.5s_infinite] h-2/3" />
-                  <span className="w-0.5 bg-[#a3e635] animate-[bounce_0.7s_infinite] h-4/5" />
-                </div>
-              </>
-            ) : (
-              <>
-                <VolumeX className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">{t.nav.soundOff}</span>
-              </>
-            )}
-          </button>
         </div>
       </header>
 
@@ -183,9 +151,9 @@ export const App: React.FC = () => {
       <main className="relative z-30 pt-20 sm:pt-24">
 
         {/* ========================================================
-            HERO SECTION: MONUMENTAL HIGH-FASHION EDITORIAL TYPOGRAPHY
+            ACT 00 // THE OVERTURE (HERO VIEWPORT)
         ======================================================== */}
-        <section id="hero" className="relative min-h-[90vh] flex flex-col justify-center px-4 sm:px-10 lg:px-16 py-12 sm:py-20 overflow-hidden">
+        <section id="hero" className="relative min-h-[92vh] flex flex-col justify-center px-4 sm:px-10 lg:px-16 py-12 sm:py-20 overflow-hidden">
           
           {/* Top Status Capsule */}
           <div className="w-full flex flex-wrap items-center justify-between gap-4 mb-8">
@@ -202,7 +170,7 @@ export const App: React.FC = () => {
             {/* Da Lat Live GMT+7 Clock */}
             <div className="hidden sm:flex items-center gap-2 text-xs font-mono text-zinc-500">
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
-              <span>ĐÀ LẠT, VIỆT NAM (GMT+7):</span>
+              <span>ĐÀ LẠT, VIỆT NAM:</span>
               <span className="text-zinc-300 font-bold">{currentTime || '12:00:00'}</span>
             </div>
           </div>
@@ -211,26 +179,26 @@ export const App: React.FC = () => {
           <div className="space-y-6 max-w-5xl">
             <div className="flex items-center gap-3">
               <span className="text-[11px] font-mono text-[#a3e635] tracking-[0.3em] uppercase">
-                {t.hero.alias} // CREATIVE TECHNOLOGIST & OPERATIONS LEAD
+                {PROFILE_INFO.alias} // {t.hero.role}
               </span>
               <span className="h-px w-16 bg-[#a3e635]/30"></span>
             </div>
 
-            {/* Monumental Name */}
+            {/* SEO Semantic H1 Header */}
             <h1 className="font-display font-black text-6xl sm:text-8xl md:text-9xl lg:text-[10.5rem] tracking-tight uppercase leading-[0.85] text-white select-none">
               {t.hero.name}
             </h1>
 
-            {/* Editorial High-Fashion Hook (Ricardo Chance / Forms style) */}
+            {/* Editorial High-Fashion Statement */}
             <div className="text-2xl sm:text-4xl md:text-5xl font-light text-zinc-300 leading-tight pt-2">
-              <span className="font-serif italic font-normal text-white">I architect</span>{' '}
+              <span className="font-serif italic font-normal text-white">{t.hero.hook1}</span>{' '}
               <span className="font-display font-black uppercase text-transparent bg-clip-text bg-gradient-to-r from-white via-zinc-200 to-zinc-400">
-                RETAIL FLOWS.
+                {t.hero.hook1Bold}
               </span>{' '}
               <br className="hidden sm:inline" />
-              <span className="font-serif italic font-normal text-white">I compose</span>{' '}
+              <span className="font-serif italic font-normal text-white">{t.hero.hook2}</span>{' '}
               <span className="font-display font-black uppercase text-[#a3e635]">
-                SONIC REALMS.
+                {t.hero.hook2Bold}
               </span>
             </div>
 
@@ -238,15 +206,15 @@ export const App: React.FC = () => {
               {t.hero.bio}
             </p>
 
-            {/* Call to action & Direct contact triggers */}
+            {/* Action Buttons */}
             <div className="pt-4 flex flex-wrap items-center gap-4">
               <a
-                href="#spatial-odyssey"
-                onClick={(e) => handleNavClick(e, 'spatial-odyssey')}
-                data-cursor="3D"
+                href="#career-tour"
+                onClick={(e) => handleNavClick(e, 'career-tour')}
+                data-cursor="TOUR"
                 className="px-8 py-4 rounded-full bg-white text-black font-display font-black text-xs uppercase tracking-widest hover:bg-[#a3e635] transition-all duration-300 flex items-center gap-2 group shadow-[0_0_30px_rgba(255,255,255,0.15)]"
               >
-                <span>{locale === 'vi' ? 'Khám Phá Không Gian 3D Spiral' : 'Explore 3D Spiral Odyssey'}</span>
+                <span>{t.hero.exploreBtn}</span>
                 <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
               </a>
 
@@ -256,7 +224,7 @@ export const App: React.FC = () => {
                 data-cursor="CONTACT"
                 className="px-8 py-4 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-white font-mono text-xs uppercase tracking-widest transition-all"
               >
-                {locale === 'vi' ? 'Kết Nối Trực Tiếp' : 'Direct Dispatch'}
+                {t.hero.contactBtn}
               </a>
             </div>
           </div>
@@ -264,76 +232,42 @@ export const App: React.FC = () => {
 
 
         {/* ========================================================
-            CHAPTER 01 // 3D SPATIAL SPIRAL CAROUSEL (PACOME PERTANT STYLE)
+            ACT 01 // CHRONOLOGICAL CAREER TOUR (2019 → 2026)
         ======================================================== */}
-        <section id="spatial-odyssey" className="px-4 sm:px-10 lg:px-16 py-20 sm:py-28 border-t border-white/[0.06] relative">
-          <div className="max-w-7xl mx-auto">
-            <SpatialSpiral3D />
-          </div>
+        <section id="career-tour" className="px-4 sm:px-10 lg:px-16 py-20 sm:py-28 border-t border-white/[0.06] relative">
+          <CareerTour3D />
         </section>
 
 
         {/* ========================================================
-            CHAPTER 02 // POSTLAIN SONIC LAB (INTERACTIVE AUDIO ENGINE)
+            ACT 02 // FEATURED VENTURE: HIDDEN MUSIC PLATFORM
         ======================================================== */}
-        <section id="sonic-lab" className="px-4 sm:px-10 lg:px-16 py-20 sm:py-28 border-t border-white/[0.06] relative">
-          <div className="max-w-7xl mx-auto">
-            <div className="flex items-center justify-between gap-4 mb-6">
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-[#a3e635]" />
-                <span className="font-mono text-xs text-[#a3e635] uppercase tracking-widest font-bold">
-                  03 // POSTLAIN SONIC PRODUCTION LAB
-                </span>
-              </div>
-              <span className="text-xs font-mono text-zinc-500 hidden sm:inline">
-                {locale === 'vi' ? 'Bật Beat & Chạm Pad để chơi nhạc trực tiếp' : 'Drop the beat & jam on live pads'}
-              </span>
-            </div>
-            <SonicDeck />
-          </div>
+        <section id="featured-venture" className="px-4 sm:px-10 lg:px-16 py-20 sm:py-28 border-t border-white/[0.06] relative">
+          <HiddenMusicShowcase />
         </section>
 
 
         {/* ========================================================
-            CHAPTER 03 // MANIFESTO: OPERATING THESIS
+            ACT 03 // CORE CAPABILITIES & MANAGEMENT MATRIX
         ======================================================== */}
-        <section id="manifesto" className="px-4 sm:px-10 lg:px-16 py-24 sm:py-32 border-t border-white/[0.06] relative">
-          <div className="max-w-7xl mx-auto">
+        <section id="capabilities" className="px-4 sm:px-10 lg:px-16 py-24 sm:py-32 border-t border-white/[0.06] relative">
+          <div className="max-w-5xl mx-auto">
             
-            {/* Section Badge */}
-            <div className="flex items-center gap-3 mb-6">
-              <span className="font-mono text-xs text-[#a3e635] tracking-widest uppercase">
-                {t.manifesto.badge}
+            <div className="mb-14">
+              <span className="font-mono text-xs text-[#a3e635] tracking-widest uppercase block mb-2">
+                {t.capabilities.badge}
               </span>
-              <span className="h-px flex-1 bg-white/[0.06] max-w-xs"></span>
+              <h2 className="font-display font-black text-3xl sm:text-5xl text-white tracking-tight uppercase">
+                {t.capabilities.title}
+              </h2>
             </div>
 
-            {/* Split Editorial Typography */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
-              <div className="lg:col-span-7">
-                <h2 className="font-display font-black text-4xl sm:text-6xl md:text-7xl text-white uppercase tracking-tight leading-[0.95]">
-                  <span>{t.manifesto.title1}</span><br />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#a3e635] via-emerald-400 to-cyan-400">
-                    {t.manifesto.title2}
-                  </span>
-                </h2>
-              </div>
-
-              <div className="lg:col-span-5">
-                <blockquote className="text-zinc-300 text-base sm:text-lg font-light leading-relaxed border-l-2 border-[#a3e635] pl-6 font-serif italic">
-                  "{t.manifesto.quote}"
-                </blockquote>
-              </div>
-            </div>
-
-            {/* 3 Core Operating Pillars */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16 sm:mt-24">
-              {t.manifesto.pillars.map((pillar, idx) => (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {t.capabilities.pillars.map((pillar, idx) => (
                 <div 
                   key={idx}
-                  onMouseEnter={() => soundEngine.playHover()}
                   data-cursor="CORE"
-                  className="p-8 rounded-3xl bg-white/[0.02] border border-white/[0.06] hover:border-[#a3e635]/30 hover:bg-white/[0.04] transition-all duration-300 group"
+                  className="p-8 rounded-[2rem] bg-[#07090e]/95 border border-white/10 hover:border-[#a3e635]/40 transition-all duration-300 group"
                 >
                   <span className="font-mono text-xs text-[#a3e635] block mb-4">0{idx + 1} // FOCUS</span>
                   <h3 className="font-display font-bold text-xl text-white uppercase mb-3 group-hover:text-[#a3e635] transition-colors">
@@ -350,104 +284,20 @@ export const App: React.FC = () => {
 
 
         {/* ========================================================
-            CHAPTER 04 // SKILLS & AI ECOSYSTEM
-        ======================================================== */}
-        <section id="skills" className="px-4 sm:px-10 lg:px-16 py-24 sm:py-32 border-t border-white/[0.06] relative">
-          <div className="max-w-7xl mx-auto">
-            
-            <div className="max-w-2xl mb-16">
-              <span className="font-mono text-xs text-[#a3e635] tracking-widest uppercase block mb-3">
-                {t.skills.badge}
-              </span>
-              <h2 className="font-display font-black text-4xl sm:text-6xl md:text-7xl text-white tracking-tight uppercase">
-                {t.skills.title}
-              </h2>
-              <p className="text-zinc-400 text-sm sm:text-base font-light mt-4">
-                {t.skills.desc}
-              </p>
-            </div>
-
-            {/* 3 Domain Matrix Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {SKILL_GROUPS_DATA.map((grp, idx) => {
-                const category = locale === 'vi' ? grp.categoryVi : grp.categoryEn;
-                const level = locale === 'vi' ? grp.levelVi : grp.levelEn;
-
-                return (
-                  <div 
-                    key={idx}
-                    onMouseEnter={() => soundEngine.playHover()}
-                    data-cursor="SKILL"
-                    className="p-8 rounded-3xl bg-white/[0.02] border border-white/[0.06] hover:border-[#a3e635]/40 hover:bg-white/[0.035] transition-all duration-300 flex flex-col justify-between"
-                  >
-                    <div>
-                      <div className="flex items-center justify-between mb-4">
-                        <span className="font-mono text-xs text-zinc-500 uppercase">CLUSTER 0{idx + 1}</span>
-                        <span className="font-mono text-xs px-2.5 py-0.5 rounded-full bg-[#a3e635]/10 text-[#a3e635] border border-[#a3e635]/20 font-bold">
-                          {level}
-                        </span>
-                      </div>
-                      <h3 className="font-display font-bold text-xl text-white uppercase mb-6 tracking-tight">
-                        {category}
-                      </h3>
-                      <div className="space-y-3">
-                        {grp.skills.map((skill, sIdx) => (
-                          <div key={sIdx} className="flex items-center gap-2.5 text-xs sm:text-sm text-zinc-300 font-light">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#a3e635]" />
-                            <span>{skill}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="mt-8 pt-4 border-t border-white/[0.05] flex items-center justify-between text-[11px] font-mono text-zinc-500 uppercase tracking-widest">
-                      <span>{locale === 'vi' ? 'Sẵn sàng triển khai' : 'Deploy Ready'}</span>
-                      <Zap className="w-3.5 h-3.5 text-[#a3e635]" />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Autonomous AI Operations Thesis Card */}
-            <div className="mt-8 p-8 sm:p-12 rounded-3xl bg-gradient-to-br from-[#0e131d] via-[#050608] to-[#030305] border border-[#a3e635]/20 relative overflow-hidden">
-              <div className="max-w-3xl space-y-4 relative z-10">
-                <div className="flex items-center gap-2">
-                  <Cpu className="w-4 h-4 text-[#a3e635]" />
-                  <span className="font-mono text-xs text-[#a3e635] uppercase tracking-widest">
-                    {t.skills.thesisTitle}
-                  </span>
-                </div>
-                <h3 className="font-display font-black text-2xl sm:text-4xl text-white uppercase">
-                  {locale === 'vi' ? 'KIẾN TRÚC TỰ ĐỘNG HÓA THÔNG MINH' : 'INTELLIGENT AUTONOMOUS ARCHITECTURE'}
-                </h3>
-                <p className="text-zinc-400 text-sm sm:text-base font-light leading-relaxed">
-                  {t.skills.thesisDesc}
-                </p>
-              </div>
-
-              <div className="absolute right-0 bottom-0 top-0 w-1/3 opacity-10 pointer-events-none bg-[radial-gradient(#a3e635_1px,transparent_1px)] [background-size:20px_20px]" />
-            </div>
-          </div>
-        </section>
-
-
-        {/* ========================================================
-            CHAPTER 05 // ACADEMIC FOUNDATION (EDITORIAL TIMELINE STREAM)
+            ACT 04 // ACADEMIC FOUNDATION (EDITORIAL TIMELINE)
         ======================================================== */}
         <section id="education" className="px-4 sm:px-10 lg:px-16 py-24 sm:py-32 border-t border-white/[0.06] relative">
-          <div className="max-w-7xl mx-auto">
+          <div className="max-w-5xl mx-auto">
             
-            <div className="max-w-2xl mb-16">
-              <span className="font-mono text-xs text-[#a3e635] tracking-widest uppercase block mb-3">
+            <div className="mb-14">
+              <span className="font-mono text-xs text-[#a3e635] tracking-widest uppercase block mb-2">
                 {t.education.badge}
               </span>
-              <h2 className="font-display font-black text-4xl sm:text-6xl md:text-7xl text-white tracking-tight uppercase">
+              <h2 className="font-display font-black text-3xl sm:text-5xl text-white tracking-tight uppercase">
                 {t.education.title}
               </h2>
             </div>
 
-            {/* Sleek Minimalist Timeline Stream */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {EDUCATION_DATA.map((edu, idx) => {
                 const school = locale === 'vi' ? edu.schoolVi : edu.schoolEn;
@@ -457,9 +307,8 @@ export const App: React.FC = () => {
                 return (
                   <div 
                     key={idx}
-                    onMouseEnter={() => soundEngine.playHover()}
-                    data-cursor="ROOT"
-                    className="p-8 rounded-3xl bg-white/[0.02] border border-white/[0.06] hover:border-white/20 transition-all group"
+                    data-cursor="ACAD"
+                    className="p-8 rounded-[2rem] bg-[#07090e]/95 border border-white/10 hover:border-white/20 transition-all group"
                   >
                     <div className="flex items-center justify-between mb-3">
                       <span className="font-mono text-xs text-[#a3e635] uppercase">{edu.year}</span>
@@ -480,107 +329,25 @@ export const App: React.FC = () => {
 
 
         {/* ========================================================
-            CHAPTER 06 // CONTACT & INVITATION (AWWWARDS FINALE)
+            ACT 05 // DIRECT INITIATION & EMAIL DISPATCH
         ======================================================== */}
         <section id="contact" className="px-4 sm:px-10 lg:px-16 py-24 sm:py-36 relative overflow-hidden border-t border-white/[0.06]">
-          <div className="max-w-7xl mx-auto">
-            <div className="p-8 sm:p-16 lg:p-20 rounded-[2.5rem] bg-[#07090e] border border-white/[0.08] relative overflow-hidden">
-              
-              {/* Background Ambient Glow */}
-              <div className="absolute -right-24 -bottom-24 w-96 h-96 bg-[#a3e635]/15 rounded-full blur-[140px] pointer-events-none" />
-              <div className="absolute -left-24 -top-24 w-96 h-96 bg-cyan-500/10 rounded-full blur-[140px] pointer-events-none" />
-
-              <div className="max-w-4xl space-y-8 relative z-10">
-                <span className="font-mono text-xs text-[#a3e635] tracking-widest uppercase block">
-                  {t.contact.badge}
-                </span>
-
-                <h2 className="font-display font-black text-4xl sm:text-7xl lg:text-8xl text-white tracking-tight uppercase leading-[0.92]">
-                  <span>{t.contact.title1}</span><br />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#a3e635] via-emerald-300 to-cyan-400">
-                    {t.contact.title2}
-                  </span>
-                </h2>
-
-                <p className="text-zinc-400 text-sm sm:text-lg font-light leading-relaxed max-w-2xl">
-                  {t.contact.desc}
-                </p>
-
-                {/* Direct Action Interactive Contact Buttons */}
-                <div className="flex flex-wrap items-center gap-4 pt-4">
-                  {/* Email Button */}
-                  <div className="flex items-center gap-2">
-                    <a 
-                      href="mailto:postlain.music@gmail.com"
-                      onClick={() => soundEngine.playClick(700)}
-                      data-cursor="EMAIL"
-                      className="inline-flex items-center gap-3 px-6 py-4 rounded-full bg-[#a3e635] text-black font-display font-black text-xs sm:text-sm uppercase tracking-wider hover:bg-white transition-all shadow-[0_0_25px_rgba(163,230,53,0.3)]"
-                    >
-                      <Mail className="w-4 h-4" />
-                      <span>postlain.music@gmail.com</span>
-                      <ArrowUpRight className="w-4 h-4" />
-                    </a>
-                    <button
-                      onClick={() => handleCopy('postlain.music@gmail.com', 'email')}
-                      data-cursor="COPY"
-                      className="p-4 rounded-full bg-white/[0.05] border border-white/10 hover:bg-white/10 text-zinc-300 hover:text-white transition-all"
-                      title={locale === 'vi' ? 'Sao chép email' : 'Copy email'}
-                    >
-                      {copiedKey === 'email' ? <Check className="w-4 h-4 text-[#a3e635]" /> : <Copy className="w-4 h-4" />}
-                    </button>
-                  </div>
-
-                  {/* Phone Button */}
-                  <div className="flex items-center gap-2">
-                    <a 
-                      href="tel:0377758764"
-                      onClick={() => soundEngine.playClick(600)}
-                      data-cursor="CALL"
-                      className="inline-flex items-center gap-3 px-6 py-4 rounded-full bg-white/[0.05] border border-white/10 text-white font-mono text-xs sm:text-sm uppercase tracking-wider hover:bg-white/10 transition-colors"
-                    >
-                      <Phone className="w-4 h-4 text-[#a3e635]" />
-                      <span>0377 758 764</span>
-                    </a>
-                    <button
-                      onClick={() => handleCopy('0377758764', 'phone')}
-                      data-cursor="COPY"
-                      className="p-4 rounded-full bg-white/[0.05] border border-white/10 hover:bg-white/10 text-zinc-300 hover:text-white transition-all"
-                      title={locale === 'vi' ? 'Sao chép số điện thoại' : 'Copy phone number'}
-                    >
-                      {copiedKey === 'phone' ? <Check className="w-4 h-4 text-[#a3e635]" /> : <Copy className="w-4 h-4" />}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Location Note */}
-                <div className="flex items-center gap-2.5 text-xs font-mono text-zinc-500 pt-6">
-                  <MapPin className="w-3.5 h-3.5 text-[#a3e635] flex-shrink-0" />
-                  <span>{t.contact.locationNote}</span>
-                </div>
-
-                {/* Live Cloudflare Worker Edge Dispatch & Contact Form */}
-                <div className="pt-8">
-                  <EdgeDispatch />
-                </div>
-              </div>
-            </div>
-          </div>
+          <DirectDispatch />
         </section>
 
       </main>
 
       {/* ========================================================
-          FOOTER
+          FOOTER (MINIMALIST & CLEAN)
       ======================================================== */}
       <footer className="px-4 sm:px-10 lg:px-16 py-10 border-t border-white/[0.04] bg-[#030305] text-xs font-mono text-zinc-500 relative z-30">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
-            © 2026 NGÔ PHÚC (POSTLAIN). CRAFTED WITH DISCIPLINE & AESTHETICS.
+            © 2026 NGÔ PHÚC (POSTLAIN). ALL RIGHTS RESERVED.
           </div>
           <div className="flex items-center gap-6 text-zinc-400">
-            <span className="hover:text-[#a3e635] transition-colors">AWWWARDS STANDARD</span>
-            <span className="hover:text-[#a3e635] transition-colors">CLOUDFLARE EDGE</span>
-            <span className="hover:text-[#a3e635] transition-colors">WEB AUDIO API</span>
+            <a href="mailto:studionopu@gmail.com" className="hover:text-[#a3e635] transition-colors">studionopu@gmail.com</a>
+            <a href="tel:0938649420" className="hover:text-[#a3e635] transition-colors">0938-649-420</a>
           </div>
         </div>
       </footer>

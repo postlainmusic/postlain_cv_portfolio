@@ -50,7 +50,7 @@ export const CinematicPreloader: React.FC<CinematicPreloaderProps> = ({ onComple
       {/* Top Preloader Status */}
       <div className="w-full flex items-center justify-between text-[11px] font-mono text-zinc-500 uppercase tracking-widest">
         <span>POSTLAIN DIGITAL EXPERIENCE // 2026</span>
-        <span className="text-[#a3e635]">ĐÀ LẠT • CLOUDFLARE EDGE</span>
+        <span className="text-[#a3e635]">ĐÀ LẠT • PORTFOLIO</span>
       </div>
 
       {/* Center Cinematic Liquid Chrome Orb */}
@@ -69,10 +69,10 @@ export const CinematicPreloader: React.FC<CinematicPreloaderProps> = ({ onComple
 
         <div className="text-center space-y-1.5 max-w-md">
           <p className="font-mono text-xs sm:text-sm text-zinc-300 tracking-[0.2em] uppercase">
-            INITIALIZING POSTLAIN EDGE SYSTEM
+            NGÔ PHÚC // PORTFOLIO EXPERIENCE
           </p>
           <p className="font-mono text-[10px] text-zinc-600 tracking-widest">
-            CLICK ANYWHERE TO ENTER IMMEDIATELY
+            CLICK ANYWHERE TO ENTER
           </p>
         </div>
       </div>
