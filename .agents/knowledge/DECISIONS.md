@@ -74,4 +74,11 @@
 - **Tradeoff:** Prohibits complex animation engines (GSAP/Framer Motion) and scrolljacking; relies strictly on CSS transitions and native layout hierarchy.
 - **Status:** **APPROVED & ACTIVE (Phase 4A Baseline)**
 
+---
 
+## DEC-009: Narrative Discovery Architecture & 8-Scene Story Engine
+- **Decision:** Shift from a conventional vertical section stack (`Hero -> Timeline -> Music -> Skills -> Contact`) to an 8-stage causality-driven story engine (`Entry -> Curiosity -> Observation -> Discovery -> Connection -> Realization -> Resolution -> Exit`). De-densify the Hero (Chapter 00) from a 9-element text-wall to an austere Orientation Gate (Direction 3: Split Monograph), reserving granular recruiter summaries and synthesized evidence for downstream scenes.
+- **Reason:** Forensic audit revealed that dumping the complete thesis, title, recruiter summary, and CTAs in the first viewport eliminated narrative tension and discovery, while music and operations felt like disconnected silos rather than expressions of the same underlying orchestration instinct.
+- **Evidence:** `.agents/reports/POSTLAIN_PHASE_4C_STORY_ENGINE.md`, `src/frontend/sections/Chapter00Overture.tsx`.
+- **Tradeoff:** Requires discipline to keep the hero minimal; ensures full recruiter scannability is retained via a dedicated 20–30s fast path.
+- **Status:** **APPROVED & ACTIVE (Phase 4C Baseline)**
