@@ -69,11 +69,171 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--paper); outline
 .world--void[data-composition='2'] .void-copy { transform: translate(5vw, -2vh); }
 .world--void[data-composition='2'] .void-copy h1 span:last-child { padding-left: clamp(1rem, 31vw, 27rem); }
 
+/* WORLD 01: WATER */
+.world--water {
+  position: relative;
+  min-height: 100svh;
+  background: radial-gradient(circle at 60% 40%, #1e2c35 0%, #12191f 100%);
+  color: #e7e3d9;
+  touch-action: pan-y;
+  overflow: clip;
+}
+
+.water-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0.88;
+  z-index: 0;
+}
+
+.water-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 50%, transparent 40%, rgba(14, 20, 26, 0.6) 100%);
+  z-index: 1;
+}
+
+.water-index {
+  position: absolute;
+  top: 50%;
+  left: clamp(1.25rem, 3vw, 3rem);
+  writing-mode: vertical-rl;
+  transform: translateY(-50%);
+  margin: 0;
+  font-size: clamp(.58rem, .7vw, .72rem);
+  letter-spacing: .16em;
+  color: #7890a3;
+  z-index: 2;
+}
+
+.water-copy {
+  position: relative;
+  z-index: 2;
+  max-width: 38rem;
+}
+
+.water-kicker {
+  margin: 0 0 clamp(0.75rem, 2vh, 1.5rem);
+  font-size: clamp(.58rem, .7vw, .72rem);
+  letter-spacing: .16em;
+  color: #7890a3;
+}
+
+.water-copy h2 {
+  margin: 0 0 1.2rem;
+  font-family: Georgia, 'Times New Roman', 'Noto Serif', serif;
+  font-size: clamp(2.8rem, 6.5vw, 6.5rem);
+  font-weight: 400;
+  line-height: .92;
+  letter-spacing: -.05em;
+  color: #f0ede6;
+}
+
+.water-statement {
+  max-width: 32ch;
+  margin: 0 0 1rem;
+  font-size: clamp(1.05rem, 1.6vw, 1.45rem);
+  font-weight: 400;
+  line-height: 1.35;
+  letter-spacing: -.02em;
+  color: #e7e3d9;
+}
+
+.water-secondary {
+  max-width: 34ch;
+  margin: 0;
+  color: #9cb0be;
+  font-size: clamp(.82rem, .95vw, .95rem);
+  line-height: 1.55;
+}
+
+.water-controls {
+  position: absolute;
+  z-index: 2;
+  right: clamp(1.25rem, 7vw, 9rem);
+  bottom: clamp(4.25rem, 11vh, 8rem);
+}
+
+.water-compose {
+  display: flex;
+  align-items: center;
+  gap: .8rem;
+  border: 0;
+  border-bottom: 1px solid rgba(120, 144, 163, 0.4);
+  padding: .7rem 0;
+  background: transparent;
+  color: #e7e3d9;
+  font-size: .68rem;
+  letter-spacing: .07em;
+  text-align: left;
+  transition: border-color 200ms ease, color 200ms ease;
+}
+
+.water-compose span {
+  color: #7890a3;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.water-compose:hover {
+  border-color: #f0ede6;
+  color: #fff;
+}
+
+.water-artifact {
+  position: absolute;
+  z-index: 2;
+  right: clamp(1.25rem, 7vw, 9rem);
+  top: clamp(5rem, 12vh, 8rem);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  color: #7890a3;
+  pointer-events: none;
+}
+
+.water-artifact span {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(2.5rem, 5vw, 4.5rem);
+  line-height: 0.85;
+  opacity: 0.35;
+}
+
+.water-artifact small {
+  margin-top: 0.5rem;
+  font-size: 0.58rem;
+  letter-spacing: 0.18em;
+  opacity: 0.6;
+}
+
+.water-next {
+  position: absolute;
+  z-index: 2;
+  bottom: 1.6rem;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  color: #7890a3;
+  font-size: .62rem;
+  letter-spacing: .1em;
+  text-decoration: none;
+  transform: translateX(-50%);
+  transition: color 200ms ease;
+}
+
+.water-next i { color: #e7e3d9; font-size: 1rem; font-style: normal; }
+.water-next:hover { color: #e7e3d9; }
+
 .world-copy { position: relative; z-index: 1; max-width: 33rem; }
 .world-copy h2 { margin: .8rem 0; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(3rem, 7vw, 7rem); font-weight: 400; line-height: .9; letter-spacing: -.06em; }
 .world-copy p { line-height: 1.6; }
 .world-index { margin: 0; color: currentColor; font-size: .68rem; letter-spacing: .16em; }
-.world--water { background: #283943; color: #e7e3d9; }
 .world--wood { justify-content: end; background: #273c2b; color: #e3ddca; }
 .world--fire { background: #591d17; color: #f2d8c0; }
 .world--metal { justify-content: end; background: #868279; color: #181916; }
@@ -111,6 +271,12 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--paper); outline
   .void-controls { right: auto; bottom: 4.75rem; left: 2rem; }
   .void-compose { max-width: 15rem; line-height: 1.45; }
   .void-next { bottom: 1.1rem; }
+  .world--water { min-height: 100svh; padding-right: 1.25rem; padding-left: 2rem; }
+  .water-index { left: .65rem; }
+  .water-controls { right: auto; bottom: 4.75rem; left: 2rem; }
+  .water-compose { max-width: 15rem; line-height: 1.45; }
+  .water-artifact { display: none; }
+  .water-next { bottom: 1.1rem; }
   .world-copy h2 { font-size: clamp(3.3rem, 17vw, 5rem); }
   .water-field { min-height: 100svh; padding-right: 1.5rem; }
   .water-copy { width: 100%; transform: translate(calc((var(--flow-x) - .5) * -1vw), calc((var(--flow-y) - .5) * -0.5vh)); }
@@ -125,4 +291,6 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--paper); outline
   .world--void, .void-orbit, .void-axis, .void-copy, .void-copy h1 span { transform: none !important; transition: none !important; }
   .world--void { background: var(--ink); }
   .water-field::before, .water-copy, .water-fragments span, .water-current { transition: none !important; }
+  .water-canvas { display: none !important; }
+  .world--water { background: #1a252d; }
 }

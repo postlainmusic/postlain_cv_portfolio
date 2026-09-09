@@ -93,11 +93,16 @@ Motion is direct manipulation: pointer/touch coordinates set CSS variables throu
 
 ### Content and data visualization
 
-Copy stays sparse and bilingual. One real work, Hidden Music, will be given depth in FIRE rather than padded with fictional projects.
+Copy stays sparse and bilingual.
+- **VOID (00):** Typographic orbit field responding directly to pointer coordinates and composition controls.
+- **WATER (01):** Interactive 2D fluid ripple simulation ($128 \times 72$ discrete wave grid, damping $0.965$) reflecting the early convergence of disparate experiences (Viva Star Coffee 2019–2020). Supports three flow states (Still Pond, Slow Stream, Ripple Surge) and full reduced-motion bypass.
+- **FIRE (03):** Real work, Hidden Music, will be given depth in FIRE rather than padded with fictional projects.
 
 ## Do's and Don'ts
 
 - **Do:** Use large type and negative space to make discovery feel intentional.
 - **Do:** Give every pointer-only behavior an equivalent touch and keyboard path.
+- **Do:** Use discrete fluid simulation equations with restrained color grading (`#7890a3`, `#12191f`) rather than generic noisy particle effects.
 - **Don't:** Use interaction merely as a scroll-triggered fade or translate effect.
 - **Don't:** Introduce dashboards, rounded cards, WebGL backgrounds, or generic portfolio decoration.
+

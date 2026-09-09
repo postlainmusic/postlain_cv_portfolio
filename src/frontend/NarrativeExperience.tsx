@@ -97,7 +97,7 @@ export const NarrativeExperience: React.FC = () => {
 
       <main>
         <Void copy={t} sectionRef={(node) => { refs.current.void = node; }} />
-        <Water copy={{ water: t.water, label: t.waterLabel }} sectionRef={(node) => { refs.current.water = node; }} />
+        <Water copy={t} locale={locale} sectionRef={(node) => { refs.current.water = node; }} />
 
         <section id="wood" ref={(node) => { refs.current.wood = node; }} className="world world--wood">
           <div className="canopy" aria-hidden="true" /><div className="tree tree--one" aria-hidden="true" /><div className="tree tree--two" aria-hidden="true" />
