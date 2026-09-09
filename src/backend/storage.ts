@@ -1,3 +1,4 @@
+import type { D1Database, R2Bucket } from '@cloudflare/workers-types';
 import { drizzle } from 'drizzle-orm/d1';
 import { and, asc, eq } from 'drizzle-orm';
 import { mediaAssets } from '../db/schema';
