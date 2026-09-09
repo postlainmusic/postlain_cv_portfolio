@@ -50,8 +50,9 @@ const contactSchema = z.object({
 app.post('/api/contact', zValidator('json', contactSchema), async (c) => {
   const payload = c.req.valid('json');
   const clientIp = c.req.header('cf-connecting-ip') || c.req.header('x-forwarded-for') || 'Unknown IP';
-  const city = c.req.raw.cf?.city || 'Đà Lạt';
-  const country = c.req.raw.cf?.country || 'VN';
+  const cf = (c.req.raw as unknown as { cf?: { city?: string; country?: string } }).cf;
+  const city = cf?.city || 'Đà Lạt';
+  const country = cf?.country || 'VN';
   const timestamp = new Date().toISOString();
 
   // HTML Email Body

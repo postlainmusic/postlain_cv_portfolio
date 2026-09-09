@@ -8,40 +8,62 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        display: ['Montserrat', 'sans-serif'],
+        display: ['Montserrat', '-apple-system', 'sans-serif'],
+        heading: ['"Plus Jakarta Sans"', '-apple-system', 'sans-serif'],
+        body: ['"Plus Jakarta Sans"', '-apple-system', 'sans-serif'],
+        mono: ['"Space Grotesk"', 'monospace'],
         serif: ['"Cormorant Garamond"', 'serif'],
-        mono: ['Space Grotesk', 'monospace'],
-        sans: ['Plus Jakarta Sans', 'sans-serif'],
+        sans: ['"Plus Jakarta Sans"', '-apple-system', 'sans-serif'],
       },
       colors: {
-        space: {
-          950: '#030305',
-          900: '#07080c',
-          850: '#0d1017',
-          800: '#141824',
+        bg: {
+          base: '#0b0d12',
+          surface: '#121620',
+          elevated: '#1a202c',
+        },
+        ink: {
+          hero: '#f8fafc',
+          body: '#cbd5e1',
+          muted: '#64748b',
+        },
+        edge: {
+          subtle: '#1e293b',
+          active: '#334155',
+          accent: '#e2b714',
         },
         accent: {
-          lime: '#a3e635',
-          emerald: '#10b981',
-          cyan: '#06b6d4',
-          silver: '#e2e8f0',
-        }
-      },
-      animation: {
-        'marquee': 'marquee 28s linear infinite',
-        'pulse-slow': 'pulse 5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'float': 'float 6s ease-in-out infinite',
-      },
-      keyframes: {
-        marquee: {
-          '0%': { transform: 'translateX(0%)' },
-          '100%': { transform: 'translateX(-50%)' },
+          amber: '#e2b714',
+          cyan: '#38bdf8',
         },
-        float: {
-          '0%, 100%': { transform: 'translateY(0px)' },
-          '50%': { transform: 'translateY(-12px)' },
-        }
-      }
+      },
+      letterSpacing: {
+        tighter: '-0.035em',
+        tight: '-0.02em',
+        normal: '0',
+        wide: '+0.06em',
+        wider: '+0.10em',
+      },
+      borderRadius: {
+        'xs': '2px',
+        'sm': '4px',
+        'md': '6px',
+        'lg': '8px',
+        'xl': '12px',
+      },
+      transitionTimingFunction: {
+        'tactile': 'cubic-bezier(0.16, 1, 0.3, 1)',
+        'reveal': 'ease-out',
+        'disclosure': 'cubic-bezier(0.25, 1, 0.5, 1)',
+        'drawer': 'cubic-bezier(0.16, 1, 0.3, 1)',
+        'status': 'ease-in-out',
+      },
+      transitionDuration: {
+        '100': '100ms',
+        '150': '150ms',
+        '200': '200ms',
+        '300': '300ms',
+        '400': '400ms',
+      },
     },
   },
   plugins: [],
