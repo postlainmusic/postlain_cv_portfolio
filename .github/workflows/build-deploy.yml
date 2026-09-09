@@ -44,3 +44,5 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy ./dist --project-name=postlain-cv-portfolio --branch=main
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+
+# Production deploy pipeline: GitHub Actions builds and publishes directly to Pages.
