@@ -1,0 +1,12 @@
+# Copy the binding blocks below into wrangler.worker.toml after creating the
+# Cloudflare resources. Keep account-specific IDs out of source until they exist.
+
+[[d1_databases]]
+binding = "DB"
+database_name = "postlain-db"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"
+migrations_dir = "drizzle"
+
+[[r2_buckets]]
+binding = "MEDIA_BUCKET"
+bucket_name = "postlain-media"
