@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useAppStore } from './stores/useAppStore';
 import { Void } from './narrative/worlds/Void';
+import { Water } from './narrative/worlds/Water';
 
 const worlds = [
   { id: 'void', number: '00', nameVi: 'Khoảng không', nameEn: 'The Void', element: 'moon' },
@@ -17,6 +18,7 @@ const copy = {
     openingSmall: 'Một hành trình của những điều nhỏ bé dần tụ hội.',
     void: 'Không biết không phải là khoảng trống. Nó là nơi mọi thứ bắt đầu.',
     water: 'Mỗi nơi đi qua để lại một chút. Những điều rời rạc bắt đầu tìm thấy nhau.',
+    waterLabel: 'Những thứ bắt đầu tụ lại.',
     wood: 'Từ những gì đã học, một cách nhìn dần bén rễ.',
     fire: 'Có những thứ không thể học nếu chưa từng đứng giữa sức nóng của nó.',
     metal: 'Sau những gì đã trải qua, những mảnh rời rạc bắt đầu kết tinh.',
@@ -31,6 +33,7 @@ const copy = {
     openingSmall: 'A journey where small pieces slowly find each other.',
     void: 'Not knowing is not an emptiness. It is where everything begins.',
     water: 'Every place leaves something behind. Disparate pieces begin to find each other.',
+    waterLabel: 'Things begin to gather.',
     wood: 'From what I learned, a way of seeing slowly takes root.',
     fire: 'Some things cannot be learned until you have stood inside their heat.',
     metal: 'After everything lived through, the scattered pieces begin to crystallize.',
@@ -94,19 +97,7 @@ export const NarrativeExperience: React.FC = () => {
 
       <main>
         <Void copy={t} sectionRef={(node) => { refs.current.void = node; }} />
-
-        <section id="water" ref={(node) => { refs.current.water = node; }} className="world world--water">
-          <div className="water-surface" aria-hidden="true"><span /><span /><span /></div>
-          <div className="fish fish--one" aria-hidden="true" /><div className="fish fish--two" aria-hidden="true" />
-          <div className="water-bank" aria-hidden="true" />
-          <div className="trace trace--water" aria-hidden="true" />
-          <div className="world-copy world-copy--left">
-            <p className="world-index">01 / WATER</p>
-            <h2>{locale === 'vi' ? 'Những thứ bắt đầu tụ lại.' : 'Things begin to gather.'}</h2>
-            <p>{t.water}</p>
-          </div>
-          <div className="artifact artifact--water" aria-hidden="true">01</div>
-        </section>
+        <Water copy={{ water: t.water, label: t.waterLabel }} sectionRef={(node) => { refs.current.water = node; }} />
 
         <section id="wood" ref={(node) => { refs.current.wood = node; }} className="world world--wood">
           <div className="canopy" aria-hidden="true" /><div className="tree tree--one" aria-hidden="true" /><div className="tree tree--two" aria-hidden="true" />
