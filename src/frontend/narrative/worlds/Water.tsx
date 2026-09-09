@@ -7,47 +7,43 @@ import './Water.css';
 type WaterCopy = { water: string; label: string };
 type WaterProps = { copy: WaterCopy; sectionRef: RefCallback<HTMLElement> };
 
-const fragments = ['LISTEN', 'BUILD', 'OBSERVE', 'MAKE', 'LEARN', 'REPEAT'];
-
 export const Water = ({ copy, sectionRef }: WaterProps) => {
   const fieldRef = useRef<HTMLDivElement>(null);
-  const reducedMotionRef = useRef(false);
 
   useEffect(() => {
-    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
-    reducedMotionRef.current = media.matches;
-    const onChange = () => { reducedMotionRef.current = media.matches; };
-    media.addEventListener('change', onChange);
-
     let cancelled = false;
     let cleanup: (() => void) | undefined;
 
     void loadGSAP().then((gsap) => {
       const field = fieldRef.current;
-      if (!field || !gsap || cancelled || reducedMotionRef.current) return;
-
-      const copyLayer = field.querySelector<HTMLElement>('.water-copy');
-      const fragmentNodes = Array.from(field.querySelectorAll<HTMLElement>('.water-fragments span'));
+      if (!field || !gsap || cancelled || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
       const onMove = (event: PointerEvent) => {
         const rect = field.getBoundingClientRect();
         const x = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width));
         const y = Math.min(1, Math.max(0, (event.clientY - rect.top) / rect.height));
-        const centerX = x - 0.5;
-        const centerY = y - 0.5;
+        const dx = (x - 0.5) * 2;
+        const dy = (y - 0.5) * 2;
 
-        gsap.to(field, { '--flow-x': x, '--flow-y': y, '--flow-active': 1, duration: 0.75, ease: 'power3.out', overwrite: 'auto' });
-        if (copyLayer) gsap.to(copyLayer, { x: centerX * -22, y: centerY * -14, duration: 0.9, ease: 'power3.out', overwrite: 'auto' });
-        fragmentNodes.forEach((node, index) => {
-          const strength = 10 + index * 3;
-          gsap.to(node, { x: centerX * -strength, y: centerY * -strength * 0.7, rotation: centerX * (index % 2 ? -7 : 7), duration: 0.7 + index * 0.04, ease: 'power3.out', overwrite: 'auto' });
+        gsap.to(field, {
+          '--water-x': dx,
+          '--water-y': dy,
+          '--water-presence': 1,
+          duration: 0.7,
+          ease: 'power3.out',
+          overwrite: 'auto',
         });
       };
 
       const onLeave = () => {
-        gsap.to(field, { '--flow-active': 0, duration: 1.4, ease: 'power2.out' });
-        if (copyLayer) gsap.to(copyLayer, { x: 0, y: 0, duration: 1.5, ease: 'elastic.out(1, 0.7)' });
-        fragmentNodes.forEach((node, index) => gsap.to(node, { x: 0, y: 0, rotation: 0, duration: 1.2 + index * 0.05, ease: 'elastic.out(1, 0.75)' }));
+        gsap.to(field, {
+          '--water-x': 0,
+          '--water-y': 0,
+          '--water-presence': 0,
+          duration: 1.2,
+          ease: 'power2.out',
+          overwrite: 'auto',
+        });
       };
 
       field.addEventListener('pointermove', onMove, { passive: true });
@@ -61,7 +57,6 @@ export const Water = ({ copy, sectionRef }: WaterProps) => {
     return () => {
       cancelled = true;
       cleanup?.();
-      media.removeEventListener('change', onChange);
     };
   }, []);
 
@@ -71,15 +66,19 @@ export const Water = ({ copy, sectionRef }: WaterProps) => {
     <section id="water" ref={sectionRef} className="world world--water water-field" aria-labelledby="water-title">
       <div ref={fieldRef} className="water-fluid-surface">
         <WaterFluid reducedMotion={reducedMotion} />
-        <div className="water-copy">
-          <p className="world-index">01 / WATER · FLOW</p>
+
+        <div className="water-header" aria-hidden="true">
+          <span>01 / WATER</span>
+          <span>FLOW</span>
+        </div>
+
+        <div className="water-composition">
+          <p className="water-kicker">AN OPEN FIELD FOR MAKING</p>
           <h2 id="water-title">{copy.label}</h2>
           <p className="water-description">{copy.water}</p>
         </div>
-        <div className="water-fragments" aria-hidden="true">
-          {fragments.map((fragment, index) => <span key={fragment} style={{ ['--fragment-index' as string]: index }}>{fragment}</span>)}
-        </div>
-        <div className="water-instruction">Move through the field</div>
+
+        <div className="water-instruction" aria-hidden="true">Move through the field</div>
       </div>
     </section>
   );
