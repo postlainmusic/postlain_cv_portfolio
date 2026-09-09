@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import type { RefCallback } from 'react';
 import { WaterFluid } from '../interaction/WaterFluid';
 import '../interaction/gsap';
+import './Water.css';
 
 type WaterCopy = { water: string; label: string };
 type WaterProps = { copy: WaterCopy; sectionRef: RefCallback<HTMLElement> };
