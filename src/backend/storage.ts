@@ -1,4 +1,4 @@
-import type { D1Database, R2Bucket } from '@cloudflare/workers-types';
+import type { D1Database, Headers as WorkerHeaders, R2Bucket } from '@cloudflare/workers-types';
 import { drizzle } from 'drizzle-orm/d1';
 import { and, asc, eq } from 'drizzle-orm';
 import { mediaAssets } from '../db/schema';
@@ -40,10 +40,17 @@ export async function getPublishedMediaObject(env: StorageEnv, objectKey: string
   const object = await env.MEDIA_BUCKET.get(objectKey);
   if (!object) return null;
 
-  const headers = new Headers();
+  // Workers and DOM use structurally different Header/ReadableStream definitions.
+  // The runtime objects are compatible, so retain the Cloudflare types at the R2 boundary.
+  const headers = new Headers() as unknown as WorkerHeaders;
   object.writeHttpMetadata(headers);
   headers.set('etag', object.httpEtag);
   headers.set('cache-control', 'public, max-age=31536000, immutable');
 
-  return { asset, response: new Response(object.body, { headers }) };
+  return {
+    asset,
+    response: new Response(object.body as unknown as BodyInit, {
+      headers: headers as unknown as Headers,
+    }),
+  };
 }

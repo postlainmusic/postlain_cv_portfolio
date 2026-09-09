@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useAppStore } from './stores/useAppStore';
+import { Void } from './narrative/worlds/Void';
 
 const worlds = [
   { id: 'void', number: '00', nameVi: 'Khoảng không', nameEn: 'The Void', element: 'moon' },
@@ -92,19 +93,7 @@ export const NarrativeExperience: React.FC = () => {
       </nav>
 
       <main>
-        <section id="void" ref={(node) => { refs.current.void = node; }} className="world world--void">
-          <div className="moon" aria-hidden="true" />
-          <div className="star-field" aria-hidden="true" />
-          <div className="desert" aria-hidden="true" />
-          <div className="trace trace--void" aria-hidden="true" />
-          <div className="world-copy world-copy--opening">
-            <p className="world-index">00 / THE VOID</p>
-            <h1>{t.entity}</h1>
-            <p className="opening-line">{t.opening}</p>
-            <p className="opening-small">{t.openingSmall}</p>
-          </div>
-          <div className="scroll-cue">{t.scroll}<span>↓</span></div>
-        </section>
+        <Void copy={t} sectionRef={(node) => { refs.current.void = node; }} />
 
         <section id="water" ref={(node) => { refs.current.water = node; }} className="world world--water">
           <div className="water-surface" aria-hidden="true"><span /><span /><span /></div>
