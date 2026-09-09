@@ -1,4 +1,7 @@
 .water-field {
+  --water-x: 0;
+  --water-y: 0;
+  --water-presence: 0;
   position: relative;
   display: block;
   min-height: 100svh;
@@ -7,7 +10,6 @@
   background: #18313a;
   color: #e7e3d9;
   isolation: isolate;
-  touch-action: pan-y;
 }
 
 .water-fluid-surface {
@@ -16,6 +18,7 @@
   overflow: hidden;
   isolation: isolate;
   cursor: crosshair;
+  touch-action: pan-y;
 }
 
 .water-fluid {
@@ -26,7 +29,7 @@
   height: 100%;
   display: block;
   pointer-events: none;
-  opacity: .96;
+  opacity: .98;
 }
 
 .water-fluid-surface::after {
@@ -36,88 +39,124 @@
   z-index: 1;
   pointer-events: none;
   background:
-    linear-gradient(90deg, rgb(9 25 30 / 26%), transparent 42%, rgb(235 231 218 / 5%)),
-    radial-gradient(circle at 50% 50%, transparent 0 32%, rgb(7 22 27 / 25%) 100%);
-  mix-blend-mode: multiply;
+    radial-gradient(circle at calc(50% + var(--water-x) * 8%) calc(50% + var(--water-y) * 8%), transparent 0 24%, rgb(7 22 27 / 18%) 72%, rgb(5 17 21 / 34%) 100%),
+    linear-gradient(90deg, rgb(8 23 28 / 24%), transparent 38%, rgb(235 231 218 / 5%));
 }
 
-.water-copy {
+.water-header {
+  position: absolute;
+  inset: 1.5rem clamp(1.25rem, 4vw, 4rem) auto;
+  z-index: 3;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  color: rgb(231 227 217 / 58%);
+  font-size: .62rem;
+  line-height: 1;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.water-composition {
   position: absolute;
   z-index: 3;
-  left: clamp(1.5rem, 8vw, 10rem);
+  left: clamp(1.25rem, 12vw, 12rem);
   top: 50%;
-  width: min(37rem, 48vw);
-  transform: translateY(-50%);
+  width: min(62rem, 76vw);
+  transform: translate3d(calc(var(--water-x) * -10px), calc(var(--water-y) * -7px), 0);
   pointer-events: none;
   will-change: transform;
 }
 
-.water-copy h2 {
-  margin: .8rem 0 1.3rem;
-  max-width: 7ch;
+.water-kicker {
+  margin: 0 0 clamp(1rem, 2vw, 1.8rem) clamp(.15rem, 4vw, 4rem);
+  color: rgb(231 227 217 / 60%);
+  font-size: clamp(.58rem, .7vw, .72rem);
+  line-height: 1;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+
+.water-composition h2 {
+  margin: 0;
+  max-width: 8ch;
   font-family: Georgia, 'Times New Roman', serif;
-  font-size: clamp(4.5rem, 10vw, 10rem);
+  font-size: clamp(5.5rem, 13vw, 13rem);
   font-weight: 400;
-  line-height: .76;
-  letter-spacing: -.075em;
+  line-height: .78;
+  letter-spacing: -.085em;
   text-wrap: balance;
 }
 
 .water-description {
-  max-width: 32ch;
-  margin: 0 0 0 clamp(1rem, 7vw, 7rem);
+  width: min(28rem, 52vw);
+  margin: clamp(1.5rem, 3vw, 2.75rem) 0 0 clamp(4rem, 13vw, 13rem);
   color: rgb(231 227 217 / 78%);
-  font-size: clamp(.9rem, 1.15vw, 1.15rem);
+  font-size: clamp(.85rem, 1vw, 1.05rem);
   line-height: 1.5;
 }
 
-.water-fragments {
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  pointer-events: none;
-}
-
-.water-fragments span {
-  position: absolute;
-  left: calc(53% + var(--fragment-index) * 5%);
-  top: calc(13% + var(--fragment-index) * 13%);
-  color: rgb(231 227 217 / 58%);
-  font-size: clamp(.56rem, .72vw, .76rem);
-  letter-spacing: .18em;
-  will-change: transform;
-  text-shadow: 0 1px 18px rgb(8 25 30 / 35%);
-}
-
-.water-fragments span:nth-child(2n) { color: rgb(231 227 217 / 32%); }
-.water-fragments span:nth-child(3n) { top: calc(18% + var(--fragment-index) * 11%); }
-
 .water-instruction {
   position: absolute;
-  right: clamp(1.25rem, 6vw, 7rem);
-  bottom: 2rem;
-  z-index: 4;
-  color: rgb(231 227 217 / 48%);
-  font-size: .6rem;
-  letter-spacing: .14em;
+  right: clamp(1.25rem, 4vw, 4rem);
+  bottom: 1.5rem;
+  z-index: 3;
+  color: rgb(231 227 217 / 45%);
+  font-size: .58rem;
+  letter-spacing: .15em;
   text-transform: uppercase;
   pointer-events: none;
 }
 
 @media (max-width: 700px) {
-  .water-fluid-surface { min-height: 100svh; }
-  .water-copy {
-    left: 1.5rem;
-    top: 48%;
-    width: min(78vw, 27rem);
+  .water-header {
+    top: 1.1rem;
+    left: 1.1rem;
+    right: 1.1rem;
   }
-  .water-copy h2 { font-size: clamp(4rem, 21vw, 7rem); }
-  .water-description { margin-left: 1.2rem; max-width: 27ch; font-size: .88rem; }
-  .water-fragments span { left: calc(48% + var(--fragment-index) * 5%); }
-  .water-instruction { right: 1.25rem; bottom: 1.3rem; }
+
+  .water-composition {
+    left: 1.25rem;
+    top: 50%;
+    width: calc(100vw - 2.5rem);
+    transform: translate3d(0, calc(var(--water-y) * -4px), 0);
+  }
+
+  .water-kicker {
+    margin-left: 1.8rem;
+    margin-bottom: 1rem;
+  }
+
+  .water-composition h2 {
+    max-width: 6ch;
+    font-size: clamp(4.5rem, 22vw, 8rem);
+    line-height: .8;
+  }
+
+  .water-description {
+    width: min(27rem, 78vw);
+    margin-top: 1.5rem;
+    margin-left: 2.4rem;
+    font-size: .84rem;
+  }
+
+  .water-instruction {
+    right: 1.1rem;
+    bottom: 1.1rem;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .water-fluid { display: none; }
-  .water-fluid-surface { background: #18313a; }
+  .water-fluid {
+    display: none;
+  }
+
+  .water-fluid-surface {
+    background: #18313a;
+  }
+
+  .water-composition {
+    transform: none;
+  }
 }
