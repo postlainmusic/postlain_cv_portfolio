@@ -1,8 +1,8 @@
 import React from 'react';
-import { GraduationCap, Award } from 'lucide-react';
+import { GraduationCap } from 'lucide-react';
 import { SiteContent } from '../content/types';
 import { EditorialSection } from '../components/EditorialSection';
-import { CapabilityCard } from '../components/CapabilityCard';
+import { EditorialGrid } from '../components/EditorialGrid';
 
 interface Chapter03Props {
   content: SiteContent['chapter03'];
@@ -11,77 +11,71 @@ interface Chapter03Props {
 export const Chapter03Matrix: React.FC<Chapter03Props> = ({ content }) => {
   return (
     <EditorialSection id="matrix">
-      <div className="space-y-12 sm:space-y-16">
-        
-        {/* Section Header */}
-        <div className="space-y-3 max-w-3xl">
-          <div className="flex items-center gap-2 text-xs font-mono text-accent-amber font-semibold tracking-wider uppercase">
-            <Award className="w-3.5 h-3.5" />
-            <span>{content.index}</span>
+      <div className="space-y-16 sm:space-y-24">
+        <div className="max-w-3xl space-y-4">
+          <div className="text-[11px] font-mono uppercase tracking-[0.18em] text-accent-amber">
+            {content.index}
           </div>
-          <h2 className="font-heading font-extrabold text-2xl sm:text-4xl text-ink-hero tracking-tight uppercase">
+          <h2 className="font-heading text-3xl sm:text-5xl font-semibold leading-[0.95] tracking-tight text-ink-hero">
             {content.title}
           </h2>
-          <p className="text-sm sm:text-base text-ink-muted">
+          <p className="max-w-2xl text-sm sm:text-base leading-7 text-ink-muted">
             {content.subtitle}
           </p>
-          <p className="text-sm text-ink-hero/80 italic border-l-2 border-edge-subtle pl-3.5 pt-1 max-w-2xl">
-            "{content.layerAObservation}"
-          </p>
         </div>
 
-        {/* 3 Core Capability Pillars */}
-        <div className="space-y-4">
-          <h3 className="text-xs font-mono uppercase text-ink-muted tracking-wider font-semibold">
-            {content.capabilitiesTitle}
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {content.capabilities.map((pillar, idx) => (
-              <CapabilityCard key={idx} pillar={pillar} index={idx} />
-            ))}
+        <EditorialGrid>
+          <div className="md:col-span-5 lg:col-span-4">
+            <p className="text-lg sm:text-xl leading-8 text-ink-hero">
+              {content.layerAObservation}
+            </p>
           </div>
-        </div>
 
-        {/* Academic Foundation Ledger */}
-        <div className="space-y-6 pt-6 border-t border-edge-subtle">
-          <div className="flex items-center gap-2 text-xs font-mono text-ink-muted tracking-wider uppercase font-semibold">
+          <div className="md:col-span-7 lg:col-span-8 space-y-10">
+            <div className="border-t border-edge-subtle">
+              {content.capabilities.map((pillar, idx) => (
+                <article key={idx} className="grid grid-cols-[2rem_1fr] sm:grid-cols-[3rem_1fr] gap-4 sm:gap-6 py-7 border-b border-edge-subtle">
+                  <span className="font-mono text-xs text-ink-muted pt-1">0{idx + 1}</span>
+                  <div>
+                    <h3 className="font-heading text-lg sm:text-xl font-semibold text-ink-hero">
+                      {pillar.title}
+                    </h3>
+                    <p className="mt-2 max-w-2xl text-sm leading-6 text-ink-body">
+                      {pillar.desc}
+                    </p>
+                    <p className="mt-4 text-[10px] font-mono uppercase tracking-[0.13em] text-ink-muted">
+                      {pillar.skills.join('  /  ')}
+                    </p>
+                  </div>
+                </article>
+              ))}
+            </div>
+
+            <p className="max-w-2xl text-sm sm:text-base leading-7 text-ink-muted italic">
+              “{content.transitionText}”
+            </p>
+          </div>
+        </EditorialGrid>
+
+        <div className="border-t border-edge-subtle pt-8">
+          <div className="flex items-center gap-2 text-[11px] font-mono uppercase tracking-[0.18em] text-ink-muted">
             <GraduationCap className="w-4 h-4 text-accent-amber" />
             <span>{content.educationTitle}</span>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-8">
             {content.education.map((edu, idx) => (
-              <div
-                key={idx}
-                className="p-6 rounded-lg border border-edge-subtle bg-bg-surface space-y-3"
-              >
-                <div className="flex items-center justify-between text-xs font-mono">
-                  <span className="text-accent-amber font-semibold">{edu.year}</span>
-                  <span className="px-2 py-0.5 rounded text-[10px] uppercase border border-edge-subtle text-ink-muted">
-                    {edu.status}
-                  </span>
+              <article key={idx} className="border-t border-edge-subtle pt-4">
+                <div className="flex justify-between gap-4 text-[10px] font-mono uppercase tracking-[0.12em] text-ink-muted">
+                  <span>{edu.year}</span>
+                  <span>{edu.status}</span>
                 </div>
-                <h4 className="font-heading font-bold text-base text-ink-hero">
-                  {edu.school}
-                </h4>
-                <p className="text-xs text-ink-body font-medium">
-                  {edu.major}
-                </p>
-                {edu.note && (
-                  <p className="text-[11px] text-ink-muted leading-relaxed border-t border-edge-subtle/50 pt-2">
-                    {edu.note}
-                  </p>
-                )}
-              </div>
+                <h3 className="mt-4 font-heading font-semibold text-base text-ink-hero">{edu.school}</h3>
+                <p className="mt-1 text-xs text-ink-body">{edu.major}</p>
+                {edu.note && <p className="mt-3 text-[11px] leading-5 text-ink-muted">{edu.note}</p>}
+              </article>
             ))}
           </div>
         </div>
-
-        {/* Narrative Transition Bridge */}
-        <div className="pt-6 border-t border-edge-subtle text-xs font-mono text-ink-muted italic">
-          <span>→ {content.transitionText}</span>
-        </div>
-
       </div>
     </EditorialSection>
   );
