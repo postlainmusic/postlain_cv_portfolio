@@ -1,0 +1,47 @@
+name: Optimize production dependencies
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "optimize-dependencies.trigger"
+
+permissions:
+  contents: write
+
+jobs:
+  optimize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.22.0
+          cache: npm
+
+      - name: Remove unused heavyweight tooling
+        run: |
+          npm pkg delete devDependencies.mem0ai
+          npm pkg delete devDependencies.promptfoo
+          npm pkg delete devDependencies.repomix
+          npm pkg delete scripts.eval
+          npm pkg delete scripts.pack:context
+
+      - name: Regenerate lockfile
+        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+
+      - name: Verify production build
+        run: npm ci --ignore-scripts --no-audit --no-fund && npm run build
+
+      - name: Commit optimized dependency tree
+        run: |
+          rm -f optimize-dependencies.trigger
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json optimize-dependencies.trigger
+          git diff --cached --quiet && exit 0
+          git commit -m "chore(build): prune unused heavyweight tooling [lockbot]"
+          git push
