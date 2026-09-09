@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: read
+  deployments: write
 
 concurrency:
   group: pages-production
@@ -16,9 +17,10 @@ env:
   NODE_VERSION: 22.22.0
 
 jobs:
-  build:
-    name: Build production
+  build-and-deploy:
+    name: Build and deploy production
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -35,27 +37,10 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./dist
-
-  deploy:
-    name: Deploy production
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: production
-      url: ${{ steps.deployment.outputs.page_url }}
-    permissions:
-      pages: write
-      id-token: write
-    steps:
       - name: Deploy to Cloudflare Pages
-        id: deployment
-        uses: cloudflare/pages-action@v1
+        uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: postlain-cv-portfolio
-          directory: ./dist
+          command: pages deploy ./dist --project-name=postlain-cv-portfolio --branch=main
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
