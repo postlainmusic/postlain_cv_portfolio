@@ -10,41 +10,55 @@ interface Chapter01Props {
 export const Chapter01Orchestration: React.FC<Chapter01Props> = ({ content }) => {
   return (
     <EditorialSection id="orchestration">
-      <div className="space-y-12 sm:space-y-16">
-        
-        {/* Section Header */}
-        <div className="space-y-3 max-w-3xl">
-          <div className="flex items-center gap-2 text-xs font-mono text-accent-amber font-semibold tracking-wider uppercase">
-            <span>{content.index}</span>
+      <div className="space-y-20 sm:space-y-28">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start">
+          <div className="lg:col-span-4">
+            <span className="text-xs font-mono text-accent-amber font-semibold tracking-wider uppercase">
+              {content.index}
+            </span>
           </div>
-          <h2 className="font-heading font-extrabold text-2xl sm:text-4xl text-ink-hero tracking-tight uppercase">
-            {content.title}
-          </h2>
-          <p className="text-sm sm:text-base text-ink-muted">
-            {content.subtitle}
+          <div className="lg:col-span-7 lg:col-start-6 space-y-7">
+            <h2 className="font-heading font-extrabold text-3xl sm:text-5xl text-ink-hero tracking-tight leading-[0.98]">
+              {content.title}
+            </h2>
+            <p className="text-lg sm:text-xl text-ink-body leading-relaxed max-w-2xl">
+              {content.subtitle}
+            </p>
+            <p className="text-sm sm:text-base text-ink-muted italic leading-relaxed max-w-xl border-l border-accent-amber pl-5">
+              {content.layerAObservation}
+            </p>
+          </div>
+        </div>
+
+        <div className="max-w-5xl ml-auto">
+          <div className="mb-8 sm:mb-12 flex items-baseline justify-between gap-6 border-b border-edge-subtle pb-4">
+            <span className="text-[11px] font-mono uppercase tracking-widest text-ink-muted">
+              Field record
+            </span>
+            <span className="text-[11px] font-mono text-ink-muted">
+              2019 / 2026
+            </span>
+          </div>
+          <div className="space-y-0">
+            {content.milestones.map((milestone) => (
+              <TimelineNode
+                key={milestone.id}
+                milestone={milestone}
+                expandLabel={content.expandLogsLabel}
+                collapseLabel={content.collapseLogsLabel}
+              />
+            ))}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-4">
+          <div className="lg:col-span-4 text-xs font-mono text-ink-muted uppercase tracking-widest">
+            What the floor teaches
+          </div>
+          <p className="lg:col-span-7 lg:col-start-6 text-xl sm:text-2xl text-ink-hero leading-snug">
+            {content.transitionText}
           </p>
-          <p className="text-sm text-ink-hero/80 italic border-l-2 border-edge-subtle pl-3.5 pt-1 max-w-2xl">
-            "{content.layerAObservation}"
-          </p>
         </div>
-
-        {/* Chronological Timeline Nodes (2019 - 2026) */}
-        <div className="space-y-0">
-          {content.milestones.map((milestone) => (
-            <TimelineNode
-              key={milestone.id}
-              milestone={milestone}
-              expandLabel={content.expandLogsLabel}
-              collapseLabel={content.collapseLogsLabel}
-            />
-          ))}
-        </div>
-
-        {/* Narrative Transition Bridge */}
-        <div className="pt-6 border-t border-edge-subtle text-xs font-mono text-ink-muted italic">
-          <span>→ {content.transitionText}</span>
-        </div>
-
       </div>
     </EditorialSection>
   );
