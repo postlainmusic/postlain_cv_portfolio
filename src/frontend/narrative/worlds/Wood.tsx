@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import type { WorldCopy } from '../../content/narrativeCopy';
+import { InputSampler } from '../interaction/InputSampler';
 
 interface WoodProps {
   copy: WorldCopy;
@@ -36,13 +37,13 @@ const MAX_SEGMENTS = 250;
 export const Wood: React.FC<WoodProps> = ({ copy, locale }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const typoRef = useRef<HTMLDivElement | null>(null);
   const [accumulatedGrowth, setAccumulatedGrowth] = useState<number>(0);
   const isReducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const segmentsRef = useRef<GrowthSegment[]>([]);
   const budsRef = useRef<BudNode[]>([]);
   const lastPointRef = useRef<{ x: number; y: number } | null>(null);
-  const pointerEnergyRef = useRef<number>(0);
 
   // Initialize initial organic trunk anchor
   const initSeed = useCallback((w: number, h: number) => {
@@ -57,7 +58,7 @@ export const Wood: React.FC<WoodProps> = ({ copy, locale }) => {
     segmentsRef.current.push({
       x1: rootX,
       y1: rootY,
-      x2: rootX + (Math.random() - 0.5) * 20,
+      x2: rootX + (Math.random() - 0.5) * 15,
       y2: rootY - trunkHeight,
       thickness: 4.5,
       growth: 1,
@@ -93,56 +94,75 @@ export const Wood: React.FC<WoodProps> = ({ copy, locale }) => {
     );
   }, []);
 
-  // Grow memory from pointer trail
-  const addPointerTrace = useCallback((x: number, y: number) => {
-    if (!lastPointRef.current) {
-      lastPointRef.current = { x, y };
-      return;
-    }
-
-    const prev = lastPointRef.current;
-    const dist = Math.hypot(x - prev.x, y - prev.y);
-
-    if (dist > 18) {
-      const segments = segmentsRef.current;
-      if (segments.length >= MAX_SEGMENTS) {
-        // Recycle oldest branch while preserving trunk
-        segments.splice(1, 1);
+  // Prune & Consolidate memory when exceeding MAX_SEGMENTS (Engineering law)
+  const pruneMemory = useCallback(() => {
+    const segments = segmentsRef.current;
+    if (segments.length >= MAX_SEGMENTS) {
+      // Find oldest high-generation twig (keep generation 0 and 1 intact)
+      let candidateIdx = -1;
+      for (let i = 2; i < segments.length; i++) {
+        if (segments[i].generation >= 2) {
+          candidateIdx = i;
+          break;
+        }
       }
-
-      // Add user trace directly to permanent growth memory
-      segments.push({
-        x1: prev.x,
-        y1: prev.y,
-        x2: x,
-        y2: y,
-        thickness: Math.max(1.2, 3.8 - segments.length * 0.01),
-        growth: 0.1,
-        targetGrowth: 1,
-        generation: 2,
-        colorAlpha: 0.75,
-      });
-
-      // Sprout sub-branch buds from the user's path
-      if (Math.random() > 0.4 && budsRef.current.length < 15) {
-        const branchAngle = Math.atan2(y - prev.y, x - prev.x) + (Math.random() > 0.5 ? 0.7 : -0.7);
-        budsRef.current.push({
-          x,
-          y,
-          angle: branchAngle,
-          speed: 1.5 + Math.random() * 1.5,
-          generation: 3,
-          length: 40 + Math.random() * 45,
-          currentLength: 0,
-          thickness: 2.0,
-          isComplete: false,
-        });
+      if (candidateIdx > 0) {
+        segments.splice(candidateIdx, 1);
+      } else {
+        segments.splice(2, 1);
       }
-
-      lastPointRef.current = { x, y };
-      setAccumulatedGrowth((g) => Math.min(100, g + 1));
     }
   }, []);
+
+  // Grow memory from pointer trail
+  const addPointerTrace = useCallback(
+    (x: number, y: number) => {
+      if (!lastPointRef.current) {
+        lastPointRef.current = { x, y };
+        return;
+      }
+
+      const prev = lastPointRef.current;
+      const dist = Math.hypot(x - prev.x, y - prev.y);
+
+      if (dist > 18) {
+        pruneMemory();
+
+        // Add user trace directly to persistent growth memory
+        segmentsRef.current.push({
+          x1: prev.x,
+          y1: prev.y,
+          x2: x,
+          y2: y,
+          thickness: Math.max(1.2, 3.8 - segmentsRef.current.length * 0.008),
+          growth: 0.1,
+          targetGrowth: 1,
+          generation: 2,
+          colorAlpha: 0.75,
+        });
+
+        // Sprout sub-branch buds from the user's path
+        if (Math.random() > 0.45 && budsRef.current.length < 12) {
+          const branchAngle = Math.atan2(y - prev.y, x - prev.x) + (Math.random() > 0.5 ? 0.7 : -0.7);
+          budsRef.current.push({
+            x,
+            y,
+            angle: branchAngle,
+            speed: 1.5 + Math.random() * 1.5,
+            generation: 3,
+            length: 40 + Math.random() * 45,
+            currentLength: 0,
+            thickness: 2.0,
+            isComplete: false,
+          });
+        }
+
+        lastPointRef.current = { x, y };
+        setAccumulatedGrowth((g) => Math.min(100, g + 1));
+      }
+    },
+    [pruneMemory]
+  );
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -165,9 +185,11 @@ export const Wood: React.FC<WoodProps> = ({ copy, locale }) => {
 
     window.addEventListener('resize', handleResize);
 
+    const sampler = InputSampler.getInstance();
+
     const render = () => {
       // Dark organic canvas background trail
-      ctx.fillStyle = 'rgba(12, 17, 13, 0.15)';
+      ctx.fillStyle = 'rgba(12, 17, 13, 0.16)';
       ctx.fillRect(0, 0, width, height);
 
       const segments = segmentsRef.current;
@@ -186,6 +208,7 @@ export const Wood: React.FC<WoodProps> = ({ copy, locale }) => {
         const nextX = bud.x + Math.cos(bud.angle) * step;
         const nextY = bud.y + Math.sin(bud.angle) * step;
 
+        pruneMemory();
         segments.push({
           x1: bud.x,
           y1: bud.y,
@@ -200,14 +223,12 @@ export const Wood: React.FC<WoodProps> = ({ copy, locale }) => {
 
         bud.x = nextX;
         bud.y = nextY;
-
-        // Random subtle organic curvature
         bud.angle += (Math.random() - 0.5) * 0.12;
 
         if (bud.currentLength >= bud.length) {
           bud.isComplete = true;
-          // Chance to sprout secondary offspring
-          if (bud.generation < 4 && Math.random() > 0.5) {
+          // Secondary offspring
+          if (bud.generation < 4 && Math.random() > 0.55 && buds.length < 12) {
             buds.push({
               x: bud.x,
               y: bud.y,
@@ -252,12 +273,20 @@ export const Wood: React.FC<WoodProps> = ({ copy, locale }) => {
         ctx.stroke();
 
         // Node crystallization point on tips
-        if (i % 7 === 0 && seg.growth >= 0.9) {
+        if (i % 8 === 0 && seg.growth >= 0.9) {
           ctx.beginPath();
-          ctx.arc(currentX2, currentY2, seg.thickness * 0.8, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(215, 235, 195, ${alpha * 0.8})`;
+          ctx.arc(currentX2, currentY2, seg.thickness * 0.85, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(215, 235, 195, ${alpha * 0.85})`;
           ctx.fill();
         }
+      }
+
+      // Micro typography tension coupling
+      const ptr = sampler.getPointerState();
+      if (typoRef.current && !isReducedMotion) {
+        const typoShiftX = (ptr.x - 0.5) * 2.0; // Strictly within 2px bounds
+        const typoShiftY = (ptr.y - 0.5) * 1.5;
+        typoRef.current.style.transform = `translate3d(${typoShiftX.toFixed(2)}px, ${typoShiftY.toFixed(2)}px, 0px)`;
       }
 
       animId = requestAnimationFrame(render);
@@ -269,11 +298,10 @@ export const Wood: React.FC<WoodProps> = ({ copy, locale }) => {
       cancelAnimationFrame(animId);
       window.removeEventListener('resize', handleResize);
     };
-  }, [initSeed]);
+  }, [initSeed, pruneMemory, isReducedMotion]);
 
   const handlePointerMove = (e: React.PointerEvent) => {
     if (isReducedMotion) return;
-    pointerEnergyRef.current = 1;
     addPointerTrace(e.clientX, e.clientY);
   };
 
@@ -306,7 +334,7 @@ export const Wood: React.FC<WoodProps> = ({ copy, locale }) => {
           <span className="world-verb-badge">GROW · VẬT THỂ TÍCH LŨY</span>
         </div>
 
-        <div className="world-typography-block wood-typography">
+        <div ref={typoRef} className="world-typography-block wood-typography">
           <p className="world-kicker-text">{copy.kicker}</p>
           <h2 className="world-display-heading">{copy.title}</h2>
           {copy.subtitle && <p className="world-subtitle-text">{copy.subtitle}</p>}
@@ -320,8 +348,8 @@ export const Wood: React.FC<WoodProps> = ({ copy, locale }) => {
           <div className="tactile-pulse" />
           <span className="tactile-caption">
             {locale === 'vi'
-              ? 'Mọi đường nét bạn kéo qua đều trở thành cấu trúc tồn tại vĩnh viễn'
-              : 'Every stroke you draw crystallizes into living structural memory'}
+              ? 'Mọi đường nét bạn kéo qua đều kết tinh thành bộ nhớ cấu trúc hữu cơ'
+              : 'Every stroke you draw crystallizes into persistent structural memory'}
           </span>
         </div>
       </div>

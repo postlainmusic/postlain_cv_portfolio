@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { WaterFluid } from '../interaction/WaterFluid';
 import { loadGSAP } from '../interaction/gsap';
+import { InputSampler } from '../interaction/InputSampler';
 import type { WorldCopy } from '../../content/narrativeCopy';
 import './Water.css';
 
@@ -11,6 +12,7 @@ interface WaterProps {
 
 export const Water: React.FC<WaterProps> = ({ copy, locale }) => {
   const fieldRef = useRef<HTMLDivElement>(null);
+  const typoRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -18,7 +20,10 @@ export const Water: React.FC<WaterProps> = ({ copy, locale }) => {
 
     void loadGSAP().then((gsap) => {
       const field = fieldRef.current;
+      const typo = typoRef.current;
       if (!field || !gsap || cancelled || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      const sampler = InputSampler.getInstance();
 
       const onMove = (event: PointerEvent) => {
         const rect = field.getBoundingClientRect();
@@ -27,14 +32,31 @@ export const Water: React.FC<WaterProps> = ({ copy, locale }) => {
         const dx = (x - 0.5) * 2;
         const dy = (y - 0.5) * 2;
 
+        const ptr = sampler.getPointerState();
+        const speed = Math.hypot(ptr.vx, ptr.vy);
+
+        // Fluid presence and refraction coupling
         gsap.to(field, {
           '--water-x': dx,
           '--water-y': dy,
           '--water-presence': 1,
-          duration: 0.7,
+          duration: 0.6,
           ease: 'power3.out',
           overwrite: 'auto',
         });
+
+        // Typography physical displacement (Strictly bounded to 3.5px max)
+        if (typo) {
+          const shiftX = dx * Math.min(3.5, 1 + speed * 1.5);
+          const shiftY = dy * Math.min(2.5, 1 + speed * 1.0);
+          gsap.to(typo, {
+            x: shiftX,
+            y: shiftY,
+            duration: 0.8,
+            ease: 'sine.out',
+            overwrite: 'auto',
+          });
+        }
       };
 
       const onLeave = () => {
@@ -42,10 +64,20 @@ export const Water: React.FC<WaterProps> = ({ copy, locale }) => {
           '--water-x': 0,
           '--water-y': 0,
           '--water-presence': 0,
-          duration: 1.2,
+          duration: 1.4,
           ease: 'power2.out',
           overwrite: 'auto',
         });
+
+        if (typo) {
+          gsap.to(typo, {
+            x: 0,
+            y: 0,
+            duration: 1.2,
+            ease: 'elastic.out(1, 0.4)',
+            overwrite: 'auto',
+          });
+        }
       };
 
       field.addEventListener('pointermove', onMove, { passive: true });
@@ -76,7 +108,7 @@ export const Water: React.FC<WaterProps> = ({ copy, locale }) => {
             <span className="world-verb-badge">FLOW · DÒNG CHẢY KHOÁNG CHẤT</span>
           </div>
 
-          <div className="world-typography-block water-composition">
+          <div ref={typoRef} className="world-typography-block water-composition">
             <p className="world-kicker-text">{copy.kicker}</p>
             <h2 className="world-display-heading">{copy.title}</h2>
             {copy.subtitle && <p className="world-subtitle-text">{copy.subtitle}</p>}

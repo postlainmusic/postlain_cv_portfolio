@@ -8,6 +8,7 @@ import { Wood } from './narrative/worlds/Wood';
 import { Fire } from './narrative/worlds/Fire';
 import { Metal } from './narrative/worlds/Metal';
 import { Earth } from './narrative/worlds/Earth';
+import { PerformanceHUD } from './narrative/performance/PerformanceHUD';
 import './styles/narrative.css';
 
 export const NarrativeExperience: React.FC = () => {
@@ -93,6 +94,9 @@ export const NarrativeExperience: React.FC = () => {
       <footer className="experience-footer" aria-hidden="true">
         <span className="ambient-instruction-txt">{copy.navigation.instruction}</span>
       </footer>
+
+      {/* Dev-Only Realtime Telemetry HUD (Shift + P) */}
+      <PerformanceHUD currentWorldId={currentWorldId} />
     </div>
   );
 };
