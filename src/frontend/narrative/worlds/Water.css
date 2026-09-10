@@ -7,7 +7,7 @@
   min-height: 100svh;
   padding: 0;
   overflow: hidden;
-  background: #18313a;
+  background: #12222a;
   color: #e7e3d9;
   isolation: isolate;
 }
@@ -39,8 +39,8 @@
   z-index: 1;
   pointer-events: none;
   background:
-    radial-gradient(circle at calc(50% + var(--water-x) * 8%) calc(50% + var(--water-y) * 8%), transparent 0 24%, rgb(7 22 27 / 18%) 72%, rgb(5 17 21 / 34%) 100%),
-    linear-gradient(90deg, rgb(8 23 28 / 24%), transparent 38%, rgb(235 231 218 / 5%));
+    radial-gradient(circle at calc(50% + var(--water-x) * 8%) calc(50% + var(--water-y) * 8%), transparent 0 26%, rgb(6 18 24 / 22%) 74%, rgb(4 14 18 / 42%) 100%),
+    linear-gradient(90deg, rgb(6 18 24 / 28%), transparent 40%, rgb(235 231 218 / 6%));
 }
 
 .water-header {
@@ -64,14 +64,14 @@
   left: clamp(1.25rem, 12vw, 12rem);
   top: 50%;
   width: min(62rem, 76vw);
-  transform: translate3d(calc(var(--water-x) * -10px), calc(var(--water-y) * -7px), 0);
+  transform: translate3d(calc(var(--water-x) * -12px), calc(var(--water-y) * -8px), 0);
   pointer-events: none;
   will-change: transform;
 }
 
 .water-kicker {
   margin: 0 0 clamp(1rem, 2vw, 1.8rem) clamp(.15rem, 4vw, 4rem);
-  color: rgb(231 227 217 / 60%);
+  color: rgb(231 227 217 / 65%);
   font-size: clamp(.58rem, .7vw, .72rem);
   line-height: 1;
   letter-spacing: .18em;
@@ -87,14 +87,16 @@
   line-height: .78;
   letter-spacing: -.085em;
   text-wrap: balance;
+  text-shadow: 0 4px 28px rgba(0, 0, 0, 0.45);
 }
 
 .water-description {
   width: min(28rem, 52vw);
   margin: clamp(1.5rem, 3vw, 2.75rem) 0 0 clamp(4rem, 13vw, 13rem);
-  color: rgb(231 227 217 / 78%);
+  color: rgb(231 227 217 / 82%);
   font-size: clamp(.85rem, 1vw, 1.05rem);
-  line-height: 1.5;
+  line-height: 1.55;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.5);
 }
 
 .water-instruction {
@@ -107,6 +109,32 @@
   letter-spacing: .15em;
   text-transform: uppercase;
   pointer-events: none;
+}
+
+.water-next {
+  position: absolute;
+  z-index: 3;
+  bottom: 1.6rem;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  color: rgb(231 227 217 / 55%);
+  font-size: .62rem;
+  letter-spacing: .1em;
+  text-decoration: none;
+  transform: translateX(-50%);
+  transition: color 200ms ease;
+}
+
+.water-next i {
+  color: #e7e3d9;
+  font-size: 1rem;
+  font-style: normal;
+}
+
+.water-next:hover {
+  color: #e7e3d9;
 }
 
 @media (max-width: 700px) {
@@ -142,7 +170,10 @@
   }
 
   .water-instruction {
-    right: 1.1rem;
+    display: none;
+  }
+
+  .water-next {
     bottom: 1.1rem;
   }
 }
@@ -153,7 +184,7 @@
   }
 
   .water-fluid-surface {
-    background: #18313a;
+    background: #12222a;
   }
 
   .water-composition {

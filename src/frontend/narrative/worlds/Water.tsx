@@ -1,83 +1,104 @@
-import type { MutableRefObject, RefCallback } from 'react';
-import { useWaterSimulation } from '../interaction/useWaterSimulation';
+import { useEffect, useRef } from 'react';
+import type { RefCallback } from 'react';
+import { WaterFluid } from '../interaction/WaterFluid';
+import { loadGSAP } from '../interaction/gsap';
+import './Water.css';
 
 type WaterCopy = {
   water: string;
-  scroll: string;
+  waterLabel?: string;
+  label?: string;
+  scroll?: string;
 };
 
 type WaterProps = {
   copy: WaterCopy;
-  locale: 'vi' | 'en';
+  locale?: 'vi' | 'en';
   sectionRef: RefCallback<HTMLElement>;
 };
 
-const flowLabels = {
-  vi: ['Mặt nước tĩnh (Pond)', 'Dòng chảy êm (Stream)', 'Sóng xung lực (Surge)'],
-  en: ['Still Pond', 'Slow Stream', 'Ripple Surge'],
-};
+export const Water = ({ copy, locale = 'vi', sectionRef }: WaterProps) => {
+  const fieldRef = useRef<HTMLDivElement>(null);
 
-export const Water = ({ copy, locale, sectionRef }: WaterProps) => {
-  const { bind, canvasRef, containerRef, flowState, isReducedMotion, nextFlowState } = useWaterSimulation();
+  useEffect(() => {
+    let cancelled = false;
+    let cleanup: (() => void) | undefined;
+
+    void loadGSAP().then((gsap) => {
+      const field = fieldRef.current;
+      if (!field || !gsap || cancelled || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      const onMove = (event: PointerEvent) => {
+        const rect = field.getBoundingClientRect();
+        const x = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width));
+        const y = Math.min(1, Math.max(0, (event.clientY - rect.top) / rect.height));
+        const dx = (x - 0.5) * 2;
+        const dy = (y - 0.5) * 2;
+
+        gsap.to(field, {
+          '--water-x': dx,
+          '--water-y': dy,
+          '--water-presence': 1,
+          duration: 0.7,
+          ease: 'power3.out',
+          overwrite: 'auto',
+        });
+      };
+
+      const onLeave = () => {
+        gsap.to(field, {
+          '--water-x': 0,
+          '--water-y': 0,
+          '--water-presence': 0,
+          duration: 1.2,
+          ease: 'power2.out',
+          overwrite: 'auto',
+        });
+      };
+
+      field.addEventListener('pointermove', onMove, { passive: true });
+      field.addEventListener('pointerleave', onLeave, { passive: true });
+      cleanup = () => {
+        field.removeEventListener('pointermove', onMove);
+        field.removeEventListener('pointerleave', onLeave);
+      };
+    });
+
+    return () => {
+      cancelled = true;
+      cleanup?.();
+    };
+  }, []);
+
+  const reducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const title = copy.waterLabel || copy.label || (locale === 'vi' ? 'Những thứ bắt đầu tụ lại.' : 'Things begin to gather.');
+  const kicker = locale === 'vi' ? '2019 — 2020 // KHỞI ĐẦU THỰC CHIẾN' : '2019 — 2020 // EARLY GROUNDING';
 
   return (
-    <section
-      id="water"
-      ref={(node) => {
-        sectionRef(node);
-        (containerRef as MutableRefObject<HTMLElement | null>).current = node;
-      }}
-      className="world world--water"
-      data-flow={flowState}
-      data-reduced-motion={isReducedMotion || undefined}
-      {...bind}
-      aria-labelledby="water-title"
-    >
-      <canvas ref={canvasRef} className="water-canvas" aria-hidden="true" />
-      <div className="water-vignette" aria-hidden="true" />
-      <p className="water-index" aria-hidden="true">01 — GATHER</p>
+    <section id="water" ref={sectionRef} className="world world--water water-field" aria-labelledby="water-title">
+      <div ref={fieldRef} className="water-fluid-surface">
+        <WaterFluid reducedMotion={reducedMotion} />
 
-      <div className="water-copy">
-        <p className="water-kicker">
-          {locale === 'vi' ? '2019 — 2020 // KHỞI ĐẦU THỰC CHIẾN' : '2019 — 2020 // EARLY GROUNDING'}
-        </p>
-        <h2 id="water-title">
-          {locale === 'vi' ? 'Những thứ bắt đầu tụ lại.' : 'Things begin to gather.'}
-        </h2>
-        <p className="water-statement">{copy.water}</p>
-        <p className="water-secondary">
-          {locale === 'vi'
-            ? 'Những ca làm đầu tiên tại Viva Star Coffee — nơi sự kiên nhẫn và trật tự dòng chảy hình thành trước khi chạm vào âm thanh.'
-            : 'Early frontline shifts at Viva Star Coffee — where patience and operational flow took shape before meeting sound.'}
-        </p>
+        <div className="water-header" aria-hidden="true">
+          <span>01 / WATER</span>
+          <span>FLOW</span>
+        </div>
+
+        <div className="water-composition">
+          <p className="water-kicker">{kicker}</p>
+          <h2 id="water-title">{title}</h2>
+          <p className="water-description">{copy.water}</p>
+        </div>
+
+        <div className="water-instruction" aria-hidden="true">
+          {locale === 'vi' ? 'Di chuyển hoặc kéo chuột để khuấy động mặt nước' : 'Move or drag across the field'}
+        </div>
+
+        <a className="water-next" href="#wood">
+          <span>{copy.scroll || (locale === 'vi' ? 'Cuộn để đi tiếp' : 'Scroll to continue')}</span>
+          <i aria-hidden="true">↓</i>
+        </a>
       </div>
-
-      <div className="water-controls">
-        <button
-          type="button"
-          className="water-compose"
-          onClick={nextFlowState}
-          aria-describedby="water-instruction"
-        >
-          <span aria-hidden="true">{String(flowState + 1).padStart(2, '0')}</span>
-          {isReducedMotion
-            ? flowLabels[locale][flowState]
-            : `${flowLabels[locale][flowState]} — ${locale === 'vi' ? 'Chạm để khuấy động' : 'Touch to disturb'}`}
-        </button>
-        <p id="water-instruction" className="sr-only">
-          Move pointer or drag to produce fluid ripples across the water surface. The button cycles flow intensities.
-        </p>
-      </div>
-
-      <div className="water-artifact" aria-hidden="true">
-        <span>01</span>
-        <small>H₂O // CONVERGENCE</small>
-      </div>
-
-      <a className="water-next" href="#wood">
-        <span>{copy.scroll}</span>
-        <i aria-hidden="true">↓</i>
-      </a>
     </section>
   );
 };

@@ -2,7 +2,16 @@ import { useEffect, useRef } from 'react';
 
 type WaterFluidProps = { reducedMotion?: boolean };
 
-type Point = { x: number; y: number; vx: number; vy: number; down: boolean };
+type Point = {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  down: boolean;
+  impulseX: number;
+  impulseY: number;
+  impulseStrength: number;
+};
 
 const vertex = `
   attribute vec2 a_position;
@@ -21,6 +30,9 @@ const updateFragment = `
   uniform vec2 u_velocity;
   uniform vec2 u_texel;
   uniform float u_active;
+  uniform vec2 u_impulse;
+  uniform float u_impulse_strength;
+  uniform float u_time;
 
   float hash(vec2 p) {
     p = fract(p * vec2(127.1, 311.7));
@@ -45,26 +57,45 @@ const updateFragment = `
 
     float speed = length(velocity);
     vec2 aspect = vec2(1.0, u_texel.x / max(u_texel.y, 0.0001));
-    vec2 back = velocity * 0.0075;
+    vec2 back = velocity * 0.008;
     vec2 flowUv = v_uv - back;
     vec4 advected = texture2D(u_state, flowUv);
 
-    velocity = (advected.rg * 2.0 - 1.0) * 0.985;
-    float dye = advected.b * 0.992;
+    velocity = (advected.rg * 2.0 - 1.0) * 0.984;
+    float dye = advected.b * 0.991;
 
+    // Pointer brush force
     vec2 delta = (v_uv - u_pointer) * aspect;
     float dist = length(delta);
-    float brush = exp(-dist * 85.0) * u_active;
-    vec2 impulse = u_velocity * (0.85 + brush * 5.0);
-    velocity += impulse * brush * 2.5;
-    dye += brush * (0.22 + length(u_velocity) * 4.0);
+    float brush = exp(-dist * 80.0) * u_active;
+    vec2 impulse = u_velocity * (0.9 + brush * 5.5);
+    velocity += impulse * brush * 2.8;
+    dye += brush * (0.24 + length(u_velocity) * 4.2);
 
+    // Droplet click shockwave
+    if (u_impulse_strength > 0.01) {
+      vec2 impDelta = (v_uv - u_impulse) * aspect;
+      float impDist = length(impDelta);
+      float ring = exp(-pow(impDist - 0.045, 2.0) * 450.0) * u_impulse_strength;
+      vec2 outward = normalize(impDelta + 0.0001) * ring * 1.5;
+      velocity += outward;
+      dye += ring * 0.85;
+    }
+
+    // Ambient Da Lat nocturnal stream drift
+    vec2 ambientFlow = vec2(-0.0004, -0.0003) + vec2(
+      sin(u_time * 0.4 + v_uv.y * 3.5),
+      cos(u_time * 0.35 + v_uv.x * 3.5)
+    ) * 0.00035;
+    velocity += ambientFlow * (0.4 + speed * 0.6);
+
+    // Micro turbulence noise
     vec2 n = vec2(
-      noise(v_uv * 7.0 + velocity * 2.0),
-      noise(v_uv * 7.0 - velocity * 2.0)
+      noise(v_uv * 8.0 + velocity * 2.2 + u_time * 0.1),
+      noise(v_uv * 8.0 - velocity * 2.2 - u_time * 0.1)
     ) - 0.5;
-    velocity += n * 0.0025 * (0.3 + speed);
-    velocity *= 0.997;
+    velocity += n * 0.0028 * (0.25 + speed);
+    velocity *= 0.996;
 
     gl_FragColor = vec4(velocity * 0.5 + 0.5, clamp(dye, 0.0, 1.0), 1.0);
   }
@@ -79,27 +110,55 @@ const renderFragment = `
 
   void main() {
     vec2 texel = 1.0 / u_resolution;
+
+    // Central state
     vec4 state = texture2D(u_state, v_uv);
     float dye = state.b;
 
+    // Normal gradient calculation
     float left = texture2D(u_state, v_uv - vec2(texel.x, 0.0)).b;
     float right = texture2D(u_state, v_uv + vec2(texel.x, 0.0)).b;
     float up = texture2D(u_state, v_uv + vec2(0.0, texel.y)).b;
     float down = texture2D(u_state, v_uv - vec2(0.0, texel.y)).b;
-    float edge = abs(left - right) + abs(up - down);
+    vec2 normal = vec2(left - right, down - up);
+    float edge = length(normal);
 
-    float shimmer = 0.5 + 0.5 * sin(u_time * 0.7 + v_uv.y * 8.0 + state.r * 5.0);
-    vec3 deep = vec3(0.025, 0.075, 0.095);
-    vec3 water = vec3(0.08, 0.25, 0.30);
-    vec3 light = vec3(0.74, 0.82, 0.78);
+    // Chromatic dispersion (RGB split at wave crests)
+    vec2 offsetR = normal * 1.8 * texel;
+    vec2 offsetB = -normal * 1.8 * texel;
+    float dyeR = texture2D(u_state, v_uv + offsetR).b;
+    float dyeB = texture2D(u_state, v_uv + offsetB).b;
 
-    vec3 color = mix(deep, water, smoothstep(0.0, 0.55, dye));
-    color = mix(color, light, smoothstep(0.25, 0.95, dye) * 0.42);
-    color += light * edge * 1.8;
-    color += light * shimmer * dye * 0.035;
+    // Natural light shimmer & specular reflection
+    float shimmer = 0.5 + 0.5 * sin(u_time * 0.8 + v_uv.y * 9.0 + state.r * 6.0);
+    vec3 lightDir = normalize(vec3(0.3, 0.6, 0.7));
+    vec3 surfNormal = normalize(vec3(normal * 45.0, 1.0));
+    float specular = pow(max(0.0, dot(surfNormal, lightDir)), 14.0) * (0.4 + edge * 2.5);
 
-    float vignette = smoothstep(1.12, 0.22, length((v_uv - 0.5) * vec2(1.05, 0.95)));
-    gl_FragColor = vec4(color * vignette, 0.97);
+    // Editorial Palette tokens:
+    // Deep Ink Water: #081a20 (0.03, 0.10, 0.13)
+    // Water Slate:    #16323d (0.085, 0.195, 0.24)
+    // Fog Highlight:  #7890a3 (0.47, 0.56, 0.64)
+    // Light Shimmer:  #e7e3d9 (0.91, 0.89, 0.85)
+    vec3 deep = vec3(0.03, 0.10, 0.13);
+    vec3 midWater = vec3(0.085, 0.195, 0.24);
+    vec3 fogAccent = vec3(0.47, 0.56, 0.64);
+    vec3 light = vec3(0.91, 0.89, 0.85);
+
+    // Composite fluid color layers
+    vec3 colorR = mix(deep, midWater, smoothstep(0.0, 0.5, dyeR));
+    vec3 colorG = mix(deep, midWater, smoothstep(0.0, 0.5, dye));
+    vec3 colorB = mix(deep, midWater, smoothstep(0.0, 0.5, dyeB));
+    vec3 color = vec3(colorR.r, colorG.g, colorB.b);
+
+    color = mix(color, fogAccent, smoothstep(0.2, 0.85, dye) * 0.55);
+    color += light * edge * 2.2;
+    color += light * specular * 0.35;
+    color += fogAccent * shimmer * dye * 0.045;
+
+    // Atmospheric Vignette
+    float vignette = smoothstep(1.18, 0.28, length((v_uv - 0.5) * vec2(1.08, 0.92)));
+    gl_FragColor = vec4(color * vignette, 0.98);
   }
 `;
 
@@ -178,7 +237,16 @@ export const WaterFluid = ({ reducedMotion = false }: WaterFluidProps) => {
     let read = 0;
     let raf = 0;
     let last = performance.now();
-    const point: Point = { x: 0.5, y: 0.5, vx: 0, vy: 0, down: false };
+    const point: Point = {
+      x: 0.5,
+      y: 0.5,
+      vx: 0.05,
+      vy: 0.03,
+      down: false,
+      impulseX: 0.5,
+      impulseY: 0.5,
+      impulseStrength: 0.4,
+    };
     let targetPointer = { x: 0.5, y: 0.5 };
 
     const bindQuad = (program: WebGLProgram) => {
@@ -222,15 +290,27 @@ export const WaterFluid = ({ reducedMotion = false }: WaterFluidProps) => {
       const dx = x - targetPointer.x;
       const dy = y - targetPointer.y;
       targetPointer = { x, y };
-      point.vx = point.vx * 0.55 + dx * 0.45;
-      point.vy = point.vy * 0.55 + dy * 0.45;
+      point.vx = point.vx * 0.52 + dx * 0.48;
+      point.vy = point.vy * 0.52 + dy * 0.48;
     };
 
-    const down = () => { point.down = true; };
-    const up = () => { point.down = false; };
+    const down = (event: PointerEvent) => {
+      point.down = true;
+      const rect = canvas.getBoundingClientRect();
+      const x = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width));
+      const y = Math.min(1, Math.max(0, 1 - (event.clientY - rect.top) / rect.height));
+      point.impulseX = x;
+      point.impulseY = y;
+      point.impulseStrength = 1.0;
+    };
 
-    canvas.addEventListener('pointermove', move, { passive: true });
-    canvas.addEventListener('pointerdown', down, { passive: true });
+    const up = () => {
+      point.down = false;
+    };
+
+    const container = canvas.parentElement || canvas;
+    container.addEventListener('pointermove', move as EventListener, { passive: true });
+    container.addEventListener('pointerdown', down as EventListener, { passive: true });
     window.addEventListener('pointerup', up, { passive: true });
     window.addEventListener('resize', resize);
     resize();
@@ -247,6 +327,7 @@ export const WaterFluid = ({ reducedMotion = false }: WaterFluidProps) => {
       point.y += (targetPointer.y - point.y) * Math.min(1, dt * 9);
       point.vx *= Math.pow(0.035, dt);
       point.vy *= Math.pow(0.035, dt);
+      point.impulseStrength = Math.max(0, point.impulseStrength - dt * 1.8);
 
       const write = 1 - read;
       gl.bindFramebuffer(gl.FRAMEBUFFER, targets[write].framebuffer);
@@ -259,7 +340,10 @@ export const WaterFluid = ({ reducedMotion = false }: WaterFluidProps) => {
       gl.uniform2f(gl.getUniformLocation(update.program, 'u_pointer'), point.x, point.y);
       gl.uniform2f(gl.getUniformLocation(update.program, 'u_velocity'), point.vx, point.vy);
       gl.uniform2f(gl.getUniformLocation(update.program, 'u_texel'), width, height);
-      gl.uniform1f(gl.getUniformLocation(update.program, 'u_active'), point.down ? 1 : 0.25);
+      gl.uniform1f(gl.getUniformLocation(update.program, 'u_active'), point.down ? 1.0 : 0.45);
+      gl.uniform2f(gl.getUniformLocation(update.program, 'u_impulse'), point.impulseX, point.impulseY);
+      gl.uniform1f(gl.getUniformLocation(update.program, 'u_impulse_strength'), point.impulseStrength);
+      gl.uniform1f(gl.getUniformLocation(update.program, 'u_time'), now / 1000);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -280,8 +364,8 @@ export const WaterFluid = ({ reducedMotion = false }: WaterFluidProps) => {
     raf = requestAnimationFrame(draw);
     return () => {
       cancelAnimationFrame(raf);
-      canvas.removeEventListener('pointermove', move);
-      canvas.removeEventListener('pointerdown', down);
+      container.removeEventListener('pointermove', move as EventListener);
+      container.removeEventListener('pointerdown', down as EventListener);
       window.removeEventListener('pointerup', up);
       window.removeEventListener('resize', resize);
       targets.forEach((target) => {
