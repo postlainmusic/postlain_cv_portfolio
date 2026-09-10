@@ -1,8 +1,9 @@
 import React from 'react';
-import { NarrativeStage } from './narrative/NarrativeStage';
+import { ThreeStage } from './three/ThreeStage';
 
 export const NarrativeExperience: React.FC = () => {
-  return <NarrativeStage />;
+  return <ThreeStage />;
 };
 
 export default NarrativeExperience;
+
