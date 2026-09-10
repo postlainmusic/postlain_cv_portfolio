@@ -1,0 +1,687 @@
+/* ==========================================================================
+   POSTLAIN: AWWARDS-LEVEL SINGLE-FRAME INTERACTIVE ART PORTFOLIO
+   Aesthetics: Editorial, Cinematic, Minimalist, Tactile, High-Performance
+   ========================================================================== */
+
+:root {
+  --font-serif: Georgia, 'Times New Roman', 'Noto Serif', serif;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  
+  --color-ink: #0a0c0e;
+  --color-paper: #ece8df;
+  --color-muted: #8b8882;
+  --color-ember: #e85338;
+  --color-mineral: #1a2730;
+  
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Master Experience Container (Fixed 100dvh Single-Frame Viewport) */
+.postlain-experience {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
+  min-height: -webkit-fill-available;
+  overflow: hidden;
+  background-color: var(--color-ink);
+  color: var(--color-paper);
+  font-family: var(--font-sans);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: pan-y;
+  transition: background-color 700ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* World background color shifts */
+.postlain-experience.world-active--void { background-color: #070809; }
+.postlain-experience.world-active--water { background-color: #0b1419; }
+.postlain-experience.world-active--wood { background-color: #0d130e; }
+.postlain-experience.world-active--fire { background-color: #140b08; }
+.postlain-experience.world-active--metal { background-color: #0d1014; }
+.postlain-experience.world-active--earth { background-color: #12100d; }
+
+/* ==========================================================================
+   AMBIENT HEADER & ORIENTATION
+   ========================================================================== */
+.experience-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(1.25rem + var(--safe-top)) clamp(1.25rem, 4vw, 3.5rem) 1rem;
+  pointer-events: none;
+  mix-blend-mode: difference;
+}
+
+.experience-brand-mark {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  pointer-events: auto;
+  padding: 0.5rem 0;
+  transition: opacity 200ms ease;
+}
+
+.experience-brand-mark:hover {
+  opacity: 0.75;
+}
+
+.experience-header-meta {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  pointer-events: auto;
+}
+
+.ambient-orientation {
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.7);
+  font-variant-numeric: tabular-nums;
+}
+
+.ambient-orientation .total-divider {
+  margin: 0 0.3rem;
+  opacity: 0.4;
+}
+
+.experience-lang-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 999px;
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  padding: 0.25rem 0.65rem;
+  cursor: pointer;
+  transition: all 200ms ease;
+}
+
+.experience-lang-btn:hover {
+  background: #fff;
+  color: #000;
+}
+
+/* ==========================================================================
+   SINGLE-FRAME STAGE & MORPHING
+   ========================================================================== */
+.single-frame-stage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.world-stage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: calc(4.5rem + var(--safe-top)) clamp(1.5rem, 6vw, 6rem) calc(3rem + var(--safe-bottom));
+  animation: worldStageEnter 650ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes worldStageEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.98) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.world-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.world-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 50%, transparent 40%, rgba(10, 12, 14, 0.65) 100%);
+  z-index: 2;
+}
+
+.world-content-layer {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 80rem;
+  margin: 0 auto;
+}
+
+/* ==========================================================================
+   WORLD EDITORIAL TYPOGRAPHY & LAYOUTS
+   ========================================================================== */
+.world-editorial-header {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  margin-bottom: clamp(1rem, 3vh, 2.5rem);
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  color: var(--color-muted);
+}
+
+.world-verb-badge {
+  font-size: 0.62rem;
+  padding: 0.2rem 0.6rem;
+  background: rgba(236, 232, 223, 0.08);
+  border-radius: 2px;
+  letter-spacing: 0.12em;
+  color: rgba(236, 232, 223, 0.85);
+}
+
+.world-kicker-text {
+  font-size: clamp(0.68rem, 0.9vw, 0.8rem);
+  letter-spacing: 0.15em;
+  color: var(--color-muted);
+  margin-bottom: 0.8rem;
+  text-transform: uppercase;
+}
+
+.world-display-heading {
+  font-family: var(--font-serif);
+  font-size: clamp(2.8rem, 7vw, 6.5rem);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  margin: 0 0 1rem;
+  color: var(--color-paper);
+}
+
+.world-subtitle-text {
+  font-size: clamp(0.85rem, 1.2vw, 1.05rem);
+  color: rgba(236, 232, 223, 0.65);
+  margin-bottom: 1.5rem;
+}
+
+.world-statement-box {
+  max-width: 48ch;
+}
+
+.world-statement-text {
+  font-size: clamp(1.05rem, 1.8vw, 1.5rem);
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+  color: var(--color-paper);
+  margin-bottom: 1rem;
+}
+
+.world-secondary-text {
+  font-size: clamp(0.85rem, 1.1vw, 0.95rem);
+  line-height: 1.6;
+  color: var(--color-muted);
+}
+
+.world-tactile-indicator {
+  position: absolute;
+  bottom: calc(1.5rem + var(--safe-bottom));
+  left: clamp(1.5rem, 6vw, 6rem);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  color: var(--color-muted);
+  pointer-events: none;
+}
+
+.tactile-pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-paper);
+  box-shadow: 0 0 8px var(--color-paper);
+  animation: pulseTactile 2s infinite ease-in-out;
+}
+
+@keyframes pulseTactile {
+  0%, 100% { opacity: 0.3; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.3); }
+}
+
+/* ==========================================================================
+   00 VOID SPECIFIC
+   ========================================================================== */
+.world-stage--void {
+  --pointer-x: 0.5;
+  --pointer-y: 0.5;
+  --pointer-energy: 0;
+  background: radial-gradient(
+    circle at calc(var(--pointer-x) * 100%) calc(var(--pointer-y) * 100%),
+    rgba(232, 83, 56, calc(0.12 + var(--pointer-energy) * 0.12)),
+    transparent 35vw
+  );
+}
+
+.void-orbit {
+  position: absolute;
+  width: min(75vw, 65rem);
+  aspect-ratio: 1;
+  border: 1px solid rgba(236, 232, 223, 0.1);
+  border-radius: 50%;
+  left: calc(50% + (var(--pointer-x) - 0.5) * 6vw);
+  top: calc(50% + (var(--pointer-y) - 0.5) * 5vh);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  transition: left 300ms ease-out, top 300ms ease-out;
+}
+
+.void-axis {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 49.9%, rgba(236, 232, 223, 0.08) 50%, transparent 50.1%);
+  pointer-events: none;
+}
+
+.void-hero-title {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-serif);
+  font-size: clamp(4.5rem, 16vw, 13rem);
+  font-weight: 400;
+  line-height: 0.78;
+  letter-spacing: -0.07em;
+  margin: 0.5rem 0 1.5rem;
+}
+
+.void-hero-title span:first-child {
+  transform: translateX(calc((var(--pointer-x) - 0.5) * 4vw));
+  transition: transform 250ms ease-out;
+}
+
+.void-hero-title span:last-child {
+  padding-left: clamp(1.5rem, 12vw, 10rem);
+  transform: translateX(calc((var(--pointer-x) - 0.5) * -4vw));
+  transition: transform 250ms ease-out;
+}
+
+.void-compose-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: transparent;
+  border: 1px solid rgba(236, 232, 223, 0.2);
+  border-radius: 4px;
+  color: var(--color-paper);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  margin-top: 1.5rem;
+  transition: all 200ms ease;
+}
+
+.void-compose-btn:hover {
+  border-color: var(--color-paper);
+  background: rgba(236, 232, 223, 0.06);
+}
+
+.compose-num {
+  color: var(--color-ember);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
+   03 FIRE SPECIFIC (HIDDEN MUSIC AS LIVING OBJECT)
+   ========================================================================== */
+.world-stage--fire {
+  background: radial-gradient(circle at 50% 50%, rgba(232, 83, 56, 0.15), transparent 60vw);
+}
+
+.fire-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 3rem;
+}
+
+@media (max-width: 860px) {
+  .fire-layout {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+.hidden-music-artifact {
+  position: relative;
+  padding: 2.5rem;
+  background: rgba(24, 12, 10, 0.75);
+  border: 1px solid rgba(232, 83, 56, calc(0.3 + var(--resonance, 0.2) * 0.7));
+  border-radius: 8px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 0 calc(20px + var(--resonance, 0.2) * 40px) rgba(232, 83, 56, 0.2);
+  transform: scale(calc(1 + var(--resonance, 0.2) * 0.04));
+  transition: border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease;
+}
+
+.artifact-tag {
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  color: var(--color-ember);
+  text-transform: uppercase;
+  margin-bottom: 0.6rem;
+}
+
+.artifact-title {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 3.5vw, 3rem);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.8rem;
+  color: #fff;
+}
+
+.artifact-desc {
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: rgba(236, 232, 223, 0.75);
+  margin-bottom: 1.75rem;
+}
+
+.artifact-action-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: var(--color-ember);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  padding: 0.75rem 1.4rem;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: transform 200ms ease, background-color 200ms ease;
+}
+
+.artifact-action-link:hover {
+  background: #f06a52;
+  transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   04 METAL SPECIFIC (COMPOSITION INSTRUMENT)
+   ========================================================================== */
+.metal-layout {
+  position: relative;
+}
+
+.metal-combo-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 1rem;
+  background: rgba(200, 220, 240, 0.12);
+  border: 1px solid rgba(200, 220, 240, 0.4);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: #e2e8f0;
+  animation: comboPulse 300ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes comboPulse {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.metal-material-node {
+  position: absolute;
+  cursor: grab;
+  touch-action: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: rgba(20, 26, 32, 0.85);
+  border: 1px solid rgba(200, 220, 240, 0.45);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+  z-index: 25;
+}
+
+.metal-material-node:hover,
+.metal-material-node.is-selected {
+  border-color: #fff;
+  box-shadow: 0 0 25px rgba(200, 220, 240, 0.5);
+}
+
+.node-title {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #fff;
+}
+
+.node-descriptor {
+  font-size: 0.5rem;
+  color: rgba(236, 232, 223, 0.6);
+  text-align: center;
+  line-height: 1;
+  margin-top: 2px;
+}
+
+/* ==========================================================================
+   05 EARTH SPECIFIC (HUMAN SETTLE & IDENTITY)
+   ========================================================================== */
+.world-stage--earth {
+  background: radial-gradient(circle at 50% 60%, rgba(180, 140, 95, 0.12), transparent 60vw);
+}
+
+.earth-identity-block {
+  max-width: 55rem;
+}
+
+.earth-kicker {
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  color: var(--color-muted);
+  margin-bottom: 0.6rem;
+  text-transform: uppercase;
+}
+
+.earth-person-name {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  font-family: var(--font-serif);
+  font-size: clamp(3rem, 7vw, 6rem);
+  line-height: 0.95;
+  color: #fff;
+  margin-bottom: 0.5rem;
+}
+
+.name-entity {
+  font-family: var(--font-sans);
+  font-size: clamp(1rem, 2vw, 1.8rem);
+  font-weight: 300;
+  letter-spacing: 0.12em;
+  color: rgba(236, 232, 223, 0.45);
+}
+
+.earth-tagline {
+  font-size: clamp(1rem, 1.5vw, 1.25rem);
+  color: rgba(236, 232, 223, 0.85);
+  margin-bottom: 2rem;
+}
+
+.earth-narrative-prose {
+  margin-bottom: 2.5rem;
+  max-width: 48ch;
+}
+
+.prose-statement {
+  font-size: clamp(1.1rem, 1.8vw, 1.45rem);
+  line-height: 1.4;
+  color: var(--color-paper);
+  margin-bottom: 0.8rem;
+}
+
+.prose-secondary {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--color-muted);
+}
+
+.earth-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 3rem;
+  flex-wrap: wrap;
+}
+
+.earth-email-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 0.85rem 1.6rem;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: transform 200ms ease, background-color 200ms ease;
+}
+
+.earth-email-button:hover {
+  transform: translateY(-2px);
+  background: #fff;
+}
+
+.earth-copy-btn {
+  background: transparent;
+  border: 1px solid rgba(236, 232, 223, 0.3);
+  color: var(--color-paper);
+  font-size: 0.78rem;
+  padding: 0.85rem 1.2rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: border-color 200ms ease;
+}
+
+.earth-copy-btn:hover {
+  border-color: var(--color-paper);
+}
+
+.earth-footer-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  color: var(--color-muted);
+  flex-wrap: wrap;
+}
+
+.earth-restart-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-paper);
+  font-size: inherit;
+  letter-spacing: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* ==========================================================================
+   AMBIENT INDEX NAVIGATION (ORIENTATION, NOT SLIDESHOW)
+   ========================================================================== */
+.ambient-index-nav {
+  position: absolute;
+  right: clamp(1.25rem, 3vw, 2.5rem);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.index-dot {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: transparent;
+  border: none;
+  color: rgba(236, 232, 223, 0.35);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  padding: 0.3rem 0;
+  cursor: pointer;
+  transition: all 250ms ease;
+}
+
+.index-line {
+  display: inline-block;
+  width: 12px;
+  height: 1px;
+  background: currentColor;
+  transition: width 250ms ease;
+}
+
+.index-dot:hover,
+.index-dot.is-active {
+  color: var(--color-paper);
+}
+
+.index-dot.is-active .index-line {
+  width: 28px;
+  background: var(--color-paper);
+}
+
+/* ==========================================================================
+   AMBIENT INSTRUCTION FOOTER
+   ========================================================================== */
+.experience-footer {
+  position: absolute;
+  bottom: calc(0.85rem + var(--safe-bottom));
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 40;
+}
+
+.ambient-instruction-txt {
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  color: rgba(236, 232, 223, 0.35);
+  text-transform: uppercase;
+}

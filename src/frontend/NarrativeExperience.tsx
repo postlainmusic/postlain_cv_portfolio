@@ -1,153 +1,98 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import { useAppStore } from './stores/useAppStore';
+import { getNarrativeCopy } from './content/narrativeCopy';
+import { useStageManager, WORLD_IDS } from './narrative/stage/useStageManager';
 import { Void } from './narrative/worlds/Void';
 import { Water } from './narrative/worlds/Water';
-
-const worlds = [
-  { id: 'void', number: '00', nameVi: 'Khoảng không', nameEn: 'The Void', element: 'moon' },
-  { id: 'water', number: '01', nameVi: 'Nước', nameEn: 'Water', element: 'water' },
-  { id: 'wood', number: '02', nameVi: 'Mộc', nameEn: 'Wood', element: 'wood' },
-  { id: 'fire', number: '03', nameVi: 'Hỏa', nameEn: 'Fire', element: 'fire' },
-  { id: 'metal', number: '04', nameVi: 'Kim', nameEn: 'Metal', element: 'metal' },
-  { id: 'earth', number: '05', nameVi: 'Đất', nameEn: 'Earth', element: 'earth' },
-] as const;
-
-const copy = {
-  vi: {
-    opening: 'Tôi không biết tất cả. Tôi chỉ tiếp tục học.',
-    openingSmall: 'Một hành trình của những điều nhỏ bé dần tụ hội.',
-    void: 'Không biết không phải là khoảng trống. Nó là nơi mọi thứ bắt đầu.',
-    water: 'Mỗi nơi đi qua để lại một chút. Những điều rời rạc bắt đầu tìm thấy nhau.',
-    waterLabel: 'Những thứ bắt đầu tụ lại.',
-    wood: 'Từ những gì đã học, một cách nhìn dần bén rễ.',
-    fire: 'Có những thứ không thể học nếu chưa từng đứng giữa sức nóng của nó.',
-    metal: 'Sau những gì đã trải qua, những mảnh rời rạc bắt đầu kết tinh.',
-    earth: 'Cuối cùng, mọi thứ trở về với một con người.',
-    contact: 'Nếu chúng ta cùng một tần số, hãy nói chuyện.',
-    scroll: 'Cuộn để đi tiếp',
-    person: 'NGÔ PHÚC',
-    entity: 'POSTLAIN',
-  },
-  en: {
-    opening: 'I do not know everything. I just keep learning.',
-    openingSmall: 'A journey where small pieces slowly find each other.',
-    void: 'Not knowing is not an emptiness. It is where everything begins.',
-    water: 'Every place leaves something behind. Disparate pieces begin to find each other.',
-    waterLabel: 'Things begin to gather.',
-    wood: 'From what I learned, a way of seeing slowly takes root.',
-    fire: 'Some things cannot be learned until you have stood inside their heat.',
-    metal: 'After everything lived through, the scattered pieces begin to crystallize.',
-    earth: 'In the end, everything returns to a person.',
-    contact: 'If we are on the same frequency, let us talk.',
-    scroll: 'Scroll to continue',
-    person: 'NGÔ PHÚC',
-    entity: 'POSTLAIN',
-  },
-};
-
-type Locale = keyof typeof copy;
+import { Wood } from './narrative/worlds/Wood';
+import { Fire } from './narrative/worlds/Fire';
+import { Metal } from './narrative/worlds/Metal';
+import { Earth } from './narrative/worlds/Earth';
+import './styles/narrative.css';
 
 export const NarrativeExperience: React.FC = () => {
-  const locale = useAppStore((state) => state.locale) as Locale;
+  const locale = useAppStore((state) => state.locale);
   const toggleLocale = useAppStore((state) => state.toggleLocale);
-  const [active, setActive] = useState('void');
-  const refs = useRef<Record<string, HTMLElement | null>>({});
-  const t = copy[locale];
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (visible) setActive(visible.target.id);
-      },
-      { threshold: [0.2, 0.45, 0.7], rootMargin: '-15% 0px -15% 0px' },
-    );
-    Object.values(refs.current).forEach((node) => node && observer.observe(node));
-    return () => observer.disconnect();
-  }, []);
+  const { currentStage, currentWorldId, isTransitioning, direction, goToStage, nextStage, prevStage } =
+    useStageManager();
 
-  const scrollTo = (id: string) => refs.current[id]?.scrollIntoView({ behavior: 'smooth' });
+  const copy = getNarrativeCopy(locale);
 
   return (
-    <div className={`narrative narrative--${active}`}>
-      <header className="narrative-header">
-        <button className="narrative-mark" onClick={() => scrollTo('void')} aria-label="Back to beginning">
-          {t.entity}
+    <div
+      className={`postlain-experience world-active--${currentWorldId} ${
+        isTransitioning ? `is-transitioning dir--${direction}` : ''
+      }`}
+      role="region"
+      aria-label="POSTLAIN Interactive Art Experience"
+    >
+      {/* Ambient Header: Brand mark, subtle orientation, locale toggle */}
+      <header className="experience-header" role="banner">
+        <button
+          type="button"
+          className="experience-brand-mark"
+          onClick={() => goToStage(0)}
+          aria-label="Return to beginning (Void)"
+        >
+          <span className="brand-logo-txt">{copy.brand.entity}</span>
         </button>
-        <div className="narrative-header-right">
-          <span>{worlds.find((world) => world.id === active)?.number ?? '00'} / 05</span>
-          <button onClick={toggleLocale} aria-label="Switch language">{locale === 'vi' ? 'EN' : 'VI'}</button>
+
+        <div className="experience-header-meta">
+          <div className="ambient-orientation" aria-hidden="true">
+            <span className="current-num">{String(currentStage).padStart(2, '0')}</span>
+            <span className="total-divider">/</span>
+            <span className="total-num">05</span>
+          </div>
+
+          <button
+            type="button"
+            className="experience-lang-btn"
+            onClick={toggleLocale}
+            aria-label={`Switch language to ${locale === 'vi' ? 'English' : 'Tiếng Việt'}`}
+          >
+            {locale === 'vi' ? 'EN' : 'VI'}
+          </button>
         </div>
       </header>
 
-      <nav className="narrative-nav" aria-label="Story chapters">
-        {worlds.map((world) => (
-          <button
-            key={world.id}
-            className={active === world.id ? 'is-active' : ''}
-            onClick={() => scrollTo(world.id)}
-            aria-label={locale === 'vi' ? world.nameVi : world.nameEn}
-          >
-            <span>{world.number}</span>
-          </button>
-        ))}
+      {/* Single Frame Stage: 100dvh Frame */}
+      <main className="single-frame-stage" role="main">
+        {currentStage === 0 && <Void copy={copy.worlds.void} locale={locale} />}
+        {currentStage === 1 && <Water copy={copy.worlds.water} locale={locale} />}
+        {currentStage === 2 && <Wood copy={copy.worlds.wood} locale={locale} onNext={nextStage} />}
+        {currentStage === 3 && <Fire copy={copy.worlds.fire} locale={locale} project={copy.project} />}
+        {currentStage === 4 && <Metal copy={copy.worlds.metal} locale={locale} materials={copy.materials} />}
+        {currentStage === 5 && (
+          <Earth copy={copy.worlds.earth} locale={locale} brand={copy.brand} onRestart={() => goToStage(0)} />
+        )}
+      </main>
+
+      {/* Minimalist Orientation Navigation (Non-intrusive index bar) */}
+      <nav className="ambient-index-nav" aria-label="World orientation">
+        {WORLD_IDS.map((worldId, idx) => {
+          const isActive = currentStage === idx;
+          const worldCopy = copy.worlds[worldId];
+          return (
+            <button
+              key={worldId}
+              type="button"
+              className={`index-dot ${isActive ? 'is-active' : ''}`}
+              onClick={() => goToStage(idx)}
+              aria-label={`Jump to ${worldCopy.name} (${String(idx).padStart(2, '0')})`}
+              aria-current={isActive ? 'step' : undefined}
+            >
+              <span className="index-line" />
+              <span className="index-label">{String(idx).padStart(2, '0')}</span>
+            </button>
+          );
+        })}
       </nav>
 
-      <main>
-        <Void copy={t} sectionRef={(node) => { refs.current.void = node; }} />
-        <Water copy={t} locale={locale} sectionRef={(node) => { refs.current.water = node; }} />
-
-        <section id="wood" ref={(node) => { refs.current.wood = node; }} className="world world--wood">
-          <div className="canopy" aria-hidden="true" /><div className="tree tree--one" aria-hidden="true" /><div className="tree tree--two" aria-hidden="true" />
-          <div className="petals" aria-hidden="true"><i /><i /><i /><i /><i /></div>
-          <div className="trace trace--wood" aria-hidden="true" />
-          <div className="world-copy world-copy--right">
-            <p className="world-index">02 / WOOD</p>
-            <h2>{locale === 'vi' ? 'Những thứ bén rễ.' : 'Things take root.'}</h2>
-            <p>{t.wood}</p>
-          </div>
-          <div className="bird-notes" aria-hidden="true">· · ·</div>
-        </section>
-
-        <section id="fire" ref={(node) => { refs.current.fire = node; }} className="world world--fire">
-          <div className="volcano" aria-hidden="true"><span className="lava lava--one" /><span className="lava lava--two" /><span className="lava lava--three" /></div>
-          <div className="ember-field" aria-hidden="true"><i /><i /><i /><i /><i /><i /><i /></div>
-          <div className="trace trace--fire" aria-hidden="true" />
-          <div className="world-copy world-copy--left world-copy--fire">
-            <p className="world-index">03 / FIRE</p>
-            <h2>{locale === 'vi' ? 'Những thứ phải trải qua.' : 'Things lived through.'}</h2>
-            <p>{t.fire}</p>
-          </div>
-          <div className="fire-word" aria-hidden="true">HEAT</div>
-        </section>
-
-        <section id="metal" ref={(node) => { refs.current.metal = node; }} className="world world--metal">
-          <div className="sun" aria-hidden="true" />
-          <div className="crystal-field" aria-hidden="true"><i /><i /><i /><i /><i /></div>
-          <div className="metal-form" aria-hidden="true"><span /><span /><span /><span /></div>
-          <div className="trace trace--metal" aria-hidden="true" />
-          <div className="world-copy world-copy--right world-copy--metal">
-            <p className="world-index">04 / METAL</p>
-            <h2>{locale === 'vi' ? 'Những thứ kết tinh.' : 'Things crystallize.'}</h2>
-            <p>{t.metal}</p>
-          </div>
-        </section>
-
-        <section id="earth" ref={(node) => { refs.current.earth = node; }} className="world world--earth">
-          <div className="home-light" aria-hidden="true" /><div className="home-shape" aria-hidden="true" />
-          <div className="earth-grain" aria-hidden="true" />
-          <div className="humanoid" aria-hidden="true"><span className="humanoid-head" /><span className="humanoid-body" /><span className="humanoid-ribbon humanoid-ribbon--one" /><span className="humanoid-ribbon humanoid-ribbon--two" /></div>
-          <div className="world-copy world-copy--earth">
-            <p className="world-index">05 / EARTH</p>
-            <h2>{t.earth}</h2>
-            <p>{t.contact}</p>
-            <div className="earth-name"><span>{t.person}</span><small>{t.entity}</small></div>
-            <a href="mailto:hello@postlain.com" className="earth-email">hello@postlain.com</a>
-          </div>
-        </section>
-      </main>
+      {/* Ambient Instruction Footer */}
+      <footer className="experience-footer" aria-hidden="true">
+        <span className="ambient-instruction-txt">{copy.navigation.instruction}</span>
+      </footer>
     </div>
   );
 };

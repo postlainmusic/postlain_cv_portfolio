@@ -1,23 +1,15 @@
-import { useEffect, useRef } from 'react';
-import type { RefCallback } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { WaterFluid } from '../interaction/WaterFluid';
 import { loadGSAP } from '../interaction/gsap';
+import type { WorldCopy } from '../../content/narrativeCopy';
 import './Water.css';
 
-type WaterCopy = {
-  water: string;
-  waterLabel?: string;
-  label?: string;
-  scroll?: string;
-};
+interface WaterProps {
+  copy: WorldCopy;
+  locale: 'vi' | 'en';
+}
 
-type WaterProps = {
-  copy: WaterCopy;
-  locale?: 'vi' | 'en';
-  sectionRef: RefCallback<HTMLElement>;
-};
-
-export const Water = ({ copy, locale = 'vi', sectionRef }: WaterProps) => {
+export const Water: React.FC<WaterProps> = ({ copy, locale }) => {
   const fieldRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -71,34 +63,34 @@ export const Water = ({ copy, locale = 'vi', sectionRef }: WaterProps) => {
   }, []);
 
   const reducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const title = copy.waterLabel || copy.label || (locale === 'vi' ? 'Những thứ bắt đầu tụ lại.' : 'Things begin to gather.');
-  const kicker = locale === 'vi' ? '2019 — 2020 // KHỞI ĐẦU THỰC CHIẾN' : '2019 — 2020 // EARLY GROUNDING';
 
   return (
-    <section id="water" ref={sectionRef} className="world world--water water-field" aria-labelledby="water-title">
+    <div id="water" className="world-stage world-stage--water water-field" aria-label="World 01: Water">
       <div ref={fieldRef} className="water-fluid-surface">
+        {/* Preserving verified baseline fluid simulation */}
         <WaterFluid reducedMotion={reducedMotion} />
 
-        <div className="water-header" aria-hidden="true">
-          <span>01 / WATER</span>
-          <span>FLOW</span>
-        </div>
+        <div className="world-content-layer water-layout">
+          <div className="world-editorial-header" aria-hidden="true">
+            <span className="world-index-num">01 / WATER</span>
+            <span className="world-verb-badge">FLOW · DÒNG CHẢY KHOÁNG CHẤT</span>
+          </div>
 
-        <div className="water-composition">
-          <p className="water-kicker">{kicker}</p>
-          <h2 id="water-title">{title}</h2>
-          <p className="water-description">{copy.water}</p>
-        </div>
+          <div className="world-typography-block water-composition">
+            <p className="world-kicker-text">{copy.kicker}</p>
+            <h2 className="world-display-heading">{copy.title}</h2>
+            {copy.subtitle && <p className="world-subtitle-text">{copy.subtitle}</p>}
+            <div className="world-statement-box">
+              <p className="world-statement-text">{copy.statement}</p>
+              {copy.secondary && <p className="world-secondary-text">{copy.secondary}</p>}
+            </div>
+          </div>
 
-        <div className="water-instruction" aria-hidden="true">
-          {locale === 'vi' ? 'Di chuyển hoặc kéo chuột để khuấy động mặt nước' : 'Move or drag across the field'}
+          <div className="world-tactile-indicator" aria-hidden="true">
+            <span className="tactile-caption">{copy.prompt}</span>
+          </div>
         </div>
-
-        <a className="water-next" href="#wood">
-          <span>{copy.scroll || (locale === 'vi' ? 'Cuộn để đi tiếp' : 'Scroll to continue')}</span>
-          <i aria-hidden="true">↓</i>
-        </a>
       </div>
-    </section>
+    </div>
   );
 };

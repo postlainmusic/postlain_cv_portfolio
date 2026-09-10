@@ -44,6 +44,7 @@ Mọi mã nguồn sinh ra phải tuân thủ nghiêm ngặt theo đúng Tech Sta
 | **State Management** | **Zustand** | Quản lý state toàn cục nhẹ gọn, module hóa theo store, không lạm dụng context API cồng kềnh. |
 | **Component System & Docs** | **Storybook** | Component-driven development, tài liệu hóa UI component, visual testing. |
 | **UI/UX Excellence** | **UI/UX Pro Max Principles** | Phối màu chuẩn WCAG AA (>=4.5:1), font typography có tính nhận diện, animation GPU-accelerated (200-300ms). |
+| **Creative & 3D WebGL** | **Three.js / OGL / WebGPU + Lenis + GSAP** | Trải nghiệm tương tác cao cấp (SOTY/SOTD), single-loop RAF, DOM-to-WebGL projection, shaders. |
 | **Backend & Routing** | **Hono** (`honojs/hono`) | Web framework siêu nhẹ, type-safe, chạy tối ưu trên edge/serverless/Node.js/Bun. |
 | **ORM & Schema** | **Drizzle ORM** (`drizzle-team/drizzle-orm`) | Type-safe SQL ORM, schema khai báo rõ ràng, zero-overhead. |
 | **Schema Validation** | **Zod** (`colinhacks/zod`) | Validation ở mọi ranh giới (API Request/Response, Form data, Drizzle schema bridge via `drizzle-zod`). |
@@ -52,9 +53,9 @@ Mọi mã nguồn sinh ra phải tuân thủ nghiêm ngặt theo đúng Tech Sta
 
 ---
 
-## 3. DESIGN & UI/UX POLICY (UI-UX-PRO-MAX)
+## 3. DESIGN, UI/UX & CREATIVE ENGINEERING POLICY
 
-1. **Từ chối giao diện AI rập khuôn (No Cliché):** Không lạm dụng gradient tím xanh bừa bãi, không lạm dụng hiệu ứng glassmorphism mờ mịt gây khó đọc, không tự chế custom cursor.
+1. **Từ chối giao diện AI rập khuôn (No Cliché):** Không lạm dụng gradient tím xanh bừa bãi, không lạm dụng hiệu ứng glassmorphism mờ mịt gây khó đọc.
 2. **Typography & Layout chuyên nghiệp:** 
    - Ghép cặp Display font (tiêu đề cá tính) và Body font (dễ đọc, hỗ trợ số tabular).
    - Độ dài dòng lý tưởng: `45-75ch`.
@@ -64,13 +65,18 @@ Mọi mã nguồn sinh ra phải tuân thủ nghiêm ngặt theo đúng Tech Sta
    - Animation mượt mà, chỉ can thiệp vào thuộc tính `opacity` và `transform` để tận dụng GPU.
    - Thời gian chuyển động lý tưởng: `200ms - 300ms`.
    - Luôn tôn trọng tùy chọn `prefers-reduced-motion`.
+4. **Kỷ luật Creative WebGL & 60/120 FPS:**
+   - **Central RAF Single Loop:** Tất cả scroll (Lenis), physics, uniforms và WebGL render phải gom trong 1 ticker duy nhất.
+   - **Zero Allocation in Loop:** Cấm `new` đối tượng trong render loop; tái sử dụng biến tĩnh / object pool để triệt tiêu Garbage Collection lag.
+   - **DPR Clamping & Disposal:** Luôn giới hạn `setPixelRatio(Math.min(devicePixelRatio, 2))` và gọi `dispose()` toàn bộ geometry/material/texture khi unmount.
 
 ---
 
 ## 4. QUY TRÌNH PHÁT TRIỂN TIÊU CHUẨN (STANDARD OPERATING LOOP)
 
-1. **Khảo sát:** Đọc code hiện tại, tra cứu JIT Skill tương ứng trong `.github/skills/` hoặc `.agents/skills/`.
+1. **Khảo sát:** Đọc code hiện tại, tra cứu JIT Skill tương ứng trong `.agents/skills/` (`creative-engineering`, `frontend-mastery`, `ui-ux-pro-max`).
 2. **Kế hoạch:** Xác định phạm vi sửa đổi tối thiểu (narrow edits), không đụng chạm file không liên quan.
 3. **Thực thi:** Áp dụng đúng công nghệ cố định.
 4. **Kiểm tra:** Chạy type-check, lint, build hoặc unit test.
 5. **Báo cáo:** Trả về kết quả ngắn gọn, tập trung vào: *thay đổi gì, file nào, kết quả xác minh ra sao*.
+

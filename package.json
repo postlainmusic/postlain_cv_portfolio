@@ -31,7 +31,7 @@
     "zustand": "^5.0.15"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250216.0",
+    "@cloudflare/workers-types": "^5.20260910.1",
     "@storybook/addon-essentials": "^8.5.5",
     "@storybook/addon-interactions": "^8.5.5",
     "@storybook/addon-links": "^8.5.5",

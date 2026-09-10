@@ -1,58 +1,67 @@
-import type { MutableRefObject, RefCallback } from 'react';
+import React, { type MutableRefObject } from 'react';
 import { usePointerField } from '../interaction/usePointerField';
+import type { WorldCopy } from '../../content/narrativeCopy';
 
-type VoidCopy = {
-  entity: string;
-  opening: string;
-  openingSmall: string;
-  scroll: string;
-};
+interface VoidProps {
+  copy: WorldCopy;
+  locale: 'vi' | 'en';
+}
 
-type VoidProps = {
-  copy: VoidCopy;
-  sectionRef: RefCallback<HTMLElement>;
-};
-
-export const Void = ({ copy, sectionRef }: VoidProps) => {
+export const Void: React.FC<VoidProps> = ({ copy, locale }) => {
   const { bind, composition, isReducedMotion, nextComposition, surfaceRef } = usePointerField();
 
   return (
-    <section
+    <div
       id="void"
       ref={(node) => {
-        sectionRef(node);
         (surfaceRef as MutableRefObject<HTMLElement | null>).current = node;
       }}
-      className="world world--void"
+      className="world-stage world-stage--void"
       data-composition={composition}
       data-reduced-motion={isReducedMotion || undefined}
       {...bind}
-      aria-labelledby="void-title"
+      aria-label="World 00: The Void"
     >
       <div className="void-orbit" aria-hidden="true" />
       <div className="void-axis" aria-hidden="true" />
-      <p className="void-index" aria-hidden="true">00 — RESPOND</p>
-      <div className="void-copy">
-        <p className="void-kicker">AN OPEN FIELD FOR MAKING</p>
-        <h1 id="void-title" aria-label={copy.entity}>
-          <span>POST</span>
-          <span>LAIN</span>
-        </h1>
-        <p className="void-statement">{copy.opening}</p>
-        <p className="void-secondary">{copy.openingSmall}</p>
+
+      <div className="world-content-layer void-layout">
+        <div className="world-editorial-header" aria-hidden="true">
+          <span className="world-index-num">00 / VOID</span>
+          <span className="world-verb-badge">RESPOND · TRƯỜNG PHẢN HỒI</span>
+        </div>
+
+        <div className="void-copy-main">
+          <p className="world-kicker-text">{copy.kicker}</p>
+          <h1 className="void-hero-title" aria-label="POSTLAIN">
+            <span>POST</span>
+            <span>LAIN</span>
+          </h1>
+
+          <div className="void-statements-grid">
+            <p className="void-statement-text">{copy.statement}</p>
+            {copy.secondary && <p className="void-secondary-text">{copy.secondary}</p>}
+          </div>
+        </div>
+
+        <div className="void-composition-switch">
+          <button
+            type="button"
+            className="void-compose-btn"
+            onClick={nextComposition}
+            aria-label="Cycle typographical composition"
+          >
+            <span className="compose-num">{(composition + 1).toString().padStart(2, '0')}</span>
+            <span className="compose-label">
+              {locale === 'vi' ? 'Biến đổi bố cục trường' : 'Shift field composition'}
+            </span>
+          </button>
+        </div>
+
+        <div className="world-tactile-indicator" aria-hidden="true">
+          <span className="tactile-caption">{copy.prompt}</span>
+        </div>
       </div>
-      <div className="void-controls">
-        <button type="button" className="void-compose" onClick={nextComposition} aria-describedby="void-instruction">
-          <span aria-hidden="true">{String(composition + 1).padStart(2, '0')}</span>
-          {isReducedMotion ? 'Shift composition' : 'Move / touch the field'}
-        </button>
-        <p id="void-instruction" className="sr-only">
-          Move a pointer or drag across this section to change the typographic composition. The button cycles the same states.
-        </p>
-      </div>
-      <a className="void-next" href="#water">
-        <span>{copy.scroll}</span><i aria-hidden="true">↓</i>
-      </a>
-    </section>
+    </div>
   );
 };
