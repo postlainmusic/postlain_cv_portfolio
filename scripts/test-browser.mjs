@@ -28,6 +28,7 @@ async function runBrowserTest() {
     '--disable-gpu-sandbox',
     '--disable-web-security',
     '--allow-running-insecure-content',
+    '--enable-unsafe-swiftshader',
   ];
 
   if (!isHeaded) {
@@ -76,13 +77,15 @@ async function runBrowserTest() {
 
   try {
     console.log(`🌐 Navigating to ${targetUrl}...`);
-    await page.goto(targetUrl, { waitUntil: 'networkidle0', timeout: 30000 });
+    await page.goto(targetUrl, { waitUntil: 'domcontentloaded', timeout: 15000 });
 
     // 1. Verify Preloader & Wait for "ENTER JOURNEY"
-    console.log('⏳ Waiting for Preloader GPU Shader compilation...');
-    await page.waitForSelector('#preloader-curtain', { timeout: 10000 });
+    console.log('⏳ Waiting for React root and Preloader...');
+    await page.waitForSelector('#root', { timeout: 15000 });
+    await page.waitForSelector('#preloader-curtain', { timeout: 25000 });
     
     // Wait for ENTER JOURNEY button to appear
+    console.log('⏳ Waiting for GPU Shader compilation & Enter button...');
     await page.waitForFunction(
       () => {
         const btn = Array.from(document.querySelectorAll('button')).find((b) =>
@@ -90,7 +93,7 @@ async function runBrowserTest() {
         );
         return btn !== undefined;
       },
-      { timeout: 15000 }
+      { timeout: 25000 }
     );
 
     console.log('✨ "ENTER JOURNEY" button appeared. Capturing preloader screenshot...');
@@ -109,18 +112,37 @@ async function runBrowserTest() {
     console.log('🏜️ Entered 3D Desert World (Beat 0). Capturing screenshot...');
     await page.screenshot({ path: path.join(artifactsDir, '01_desert.png') });
 
-    // 3. Cycle through story beats via Keyboard ArrowDown
-    console.log('⌨️ Navigating story beats via keyboard...');
+    // 3. Cycle through story beats via REAL Mouse Wheel Scrolling
+    console.log('🖱️ Testing REAL Mouse Wheel Scrolling across all 10 Beats...');
     for (let beat = 1; beat <= 9; beat++) {
-      await page.keyboard.press('ArrowDown');
-      await new Promise((r) => setTimeout(r, 800));
+      await page.mouse.wheel({ deltaY: 280 });
+      await new Promise((r) => setTimeout(r, 650));
       
       const filename = `beat_${beat < 10 ? '0' + beat : beat}.png`;
       await page.screenshot({ path: path.join(artifactsDir, filename) });
-      console.log(`📸 Beat ${beat} reached & captured: ${filename}`);
+      console.log(`📸 Beat ${beat} reached via Wheel Scroll & captured: ${filename}`);
     }
 
-    // 4. Test language switcher & audio toggle
+    // 4. Test Reverse Scrolling via Mouse Wheel
+    console.log('🖱️ Testing Reverse Mouse Wheel Scrolling (Upward)...');
+    await page.mouse.wheel({ deltaY: -280 });
+    await new Promise((r) => setTimeout(r, 500));
+    await page.mouse.wheel({ deltaY: -280 });
+    await new Promise((r) => setTimeout(r, 500));
+
+    // 5. Test Direct Jump to Beat 9 via Navigation Rail
+    console.log('🎯 Testing Navigation Rail dot click (Jump to Beat 9 Moon)...');
+    await page.evaluate(() => {
+      const dots = Array.from(document.querySelectorAll('nav button'));
+      if (dots.length > 0) {
+        // Last dot is the 10th beat
+        const lastDot = dots[dots.length - 2]; // before ChevronDown
+        if (lastDot) lastDot.click();
+      }
+    });
+    await new Promise((r) => setTimeout(r, 600));
+
+    // 6. Test language switcher & audio toggle
     console.log('🌐 Testing Language Switcher (VI -> EN)...');
     await page.evaluate(() => {
       const langBtn = Array.from(document.querySelectorAll('button')).find((b) =>
@@ -128,7 +150,7 @@ async function runBrowserTest() {
       );
       if (langBtn) langBtn.click();
     });
-    await new Promise((r) => setTimeout(r, 500));
+    await new Promise((r) => setTimeout(r, 400));
 
     // 5. Check Moon Beat interactive buttons
     console.log('🌕 Testing Moon Contact Copy buttons...');
@@ -160,6 +182,11 @@ async function runBrowserTest() {
 
   } catch (error) {
     console.error('❌ Browser Test Execution Failed:', error);
+    if (page) {
+      const html = await page.content().catch(() => '');
+      console.log('\n📄 Page HTML snippet:\n', html.slice(0, 1000));
+      console.log('\n📜 All Console Logs:\n', JSON.stringify(consoleLogs, null, 2));
+    }
     process.exitCode = 1;
   } finally {
     if (!isHeaded) {

@@ -57,10 +57,11 @@ export const ThreeStage: React.FC = () => {
     };
   }, []);
 
-  // 2. Keyboard Story-Beat Step Navigation
+  // 2. Multi-Input Story Navigation (Wheel, Touchpad, Touch Swipe, Keyboard)
   useEffect(() => {
+    if (isPreloaderActive) return;
+
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (isPreloaderActive) return;
       if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') {
         e.preventDefault();
         engineRef.current?.nextBeat();
@@ -70,8 +71,53 @@ export const ThreeStage: React.FC = () => {
       }
     };
 
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      let dy = e.deltaY;
+      if (e.deltaMode === 1) dy *= 20; // lines
+      if (e.deltaMode === 2) dy *= 300; // pages
+      const clampedDelta = Math.sign(dy) * Math.max(15, Math.min(Math.abs(dy), 75));
+      engineRef.current?.addScrollDelta(clampedDelta);
+    };
+
+    let touchStartY = 0;
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        touchStartY = e.touches[0].clientY;
+      }
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.cancelable) e.preventDefault();
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      if (e.changedTouches.length > 0) {
+        const touchEndY = e.changedTouches[0].clientY;
+        const diff = touchStartY - touchEndY;
+        if (Math.abs(diff) > 30) {
+          if (diff > 0) {
+            engineRef.current?.nextBeat();
+          } else {
+            engineRef.current?.prevBeat();
+          }
+        }
+      }
+    };
+
     window.addEventListener('keydown', handleKeyDown, { passive: false });
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener('wheel', handleWheel, { passive: false });
+    window.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
+    window.addEventListener('touchend', handleTouchEnd, { passive: true });
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('wheel', handleWheel);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleTouchEnd);
+    };
   }, [isPreloaderActive]);
 
   // 3. Pointer & Click Interactions
@@ -189,14 +235,14 @@ export const ThreeStage: React.FC = () => {
       <div className="absolute inset-0 z-20 flex items-center justify-center p-6 sm:p-14 pointer-events-none">
         {/* BEAT 0: DESERT */}
         {currentBeatIndex === 0 && (
-          <div className="max-w-3xl text-center flex flex-col items-center animate-fade-in pointer-events-auto">
-            <span className="inline-block px-3 py-1 mb-4 rounded-full bg-amber-400/10 border border-amber-400/30 text-amber-300 font-mono text-xs tracking-widest uppercase">
+          <div className="max-w-3xl text-center flex flex-col items-center p-8 sm:p-12 rounded-3xl bg-black/45 backdrop-blur-xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.6)] animate-fade-in pointer-events-auto">
+            <span className="inline-block px-3.5 py-1 mb-4 rounded-full bg-amber-400/10 border border-amber-400/30 text-amber-300 font-mono text-xs tracking-widest uppercase">
               [ 01 · KHỞI SINH TRONG TĨNH LẶNG ]
             </span>
-            <h1 className="font-['Syne'] font-extrabold text-[ clamp(38px,6.5vw,92px) ] leading-[1.05] tracking-tight text-white mb-6 drop-shadow-2xl">
+            <h1 className="font-['Syne'] font-extrabold text-[ clamp(32px,5.5vw,78px) ] leading-[1.1] tracking-tight text-white mb-5 drop-shadow-lg">
               Không biết không phải là khoảng trống.
             </h1>
-            <p className="font-sans text-base sm:text-xl text-zinc-300 font-light max-w-xl">
+            <p className="font-sans text-base sm:text-lg text-zinc-300 font-light max-w-xl leading-relaxed">
               Đó là nơi mọi hành trình sáng tạo, âm nhạc và vận hành bắt đầu định hình.
             </p>
           </div>
@@ -204,14 +250,14 @@ export const ThreeStage: React.FC = () => {
 
         {/* BEAT 1: MAGMA FRICTION */}
         {currentBeatIndex === 1 && (
-          <div className="max-w-2xl text-center flex flex-col items-center animate-fade-in pointer-events-auto">
-            <span className="inline-block px-3 py-1 mb-4 rounded-full bg-orange-500/10 border border-orange-500/30 text-orange-400 font-mono text-xs tracking-widest uppercase">
+          <div className="max-w-2xl text-center flex flex-col items-center p-8 sm:p-12 rounded-3xl bg-black/45 backdrop-blur-xl border border-orange-500/20 shadow-[0_20px_50px_rgba(0,0,0,0.6)] animate-fade-in pointer-events-auto">
+            <span className="inline-block px-3.5 py-1 mb-4 rounded-full bg-orange-500/10 border border-orange-500/30 text-orange-400 font-mono text-xs tracking-widest uppercase">
               [ 02 · ĐỊA TẦNG SỤC SÔI ]
             </span>
-            <h2 className="font-['Syne'] font-bold text-[ clamp(36px,5.5vw,78px) ] leading-tight text-white mb-4">
+            <h2 className="font-['Syne'] font-bold text-[ clamp(32px,5vw,72px) ] leading-tight text-white mb-4 drop-shadow-lg">
               Áp lực sinh năng lượng.
             </h2>
-            <p className="font-sans text-base sm:text-lg text-zinc-300 max-w-lg">
+            <p className="font-sans text-base sm:text-lg text-zinc-300 max-w-lg leading-relaxed">
               Dưới sức nén của thử thách, nhiệt lượng âm thầm chuyển hóa thành ý chí và sinh lực.
             </p>
           </div>
@@ -219,11 +265,11 @@ export const ThreeStage: React.FC = () => {
 
         {/* BEAT 2: VOLCANO IDENTITY BIRTH */}
         {currentBeatIndex === 2 && (
-          <div className="max-w-3xl text-center flex flex-col items-center animate-fade-in pointer-events-auto">
+          <div className="max-w-3xl text-center flex flex-col items-center p-8 sm:p-12 rounded-3xl bg-black/55 backdrop-blur-2xl border border-amber-400/25 shadow-[0_20px_50px_rgba(245,158,11,0.15)] animate-fade-in pointer-events-auto">
             <span className="inline-block px-4 py-1.5 mb-4 rounded-full bg-amber-400/15 border border-amber-400/40 text-amber-300 font-mono text-xs tracking-widest uppercase shadow-[0_0_15px_rgba(245,158,11,0.25)]">
               {copy.identity.brand} // THE OPERATING FREQUENCY
             </span>
-            <h1 className="font-['Syne'] font-extrabold text-[ clamp(52px,9vw,130px) ] leading-none tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-white via-amber-100 to-amber-400 mb-4 drop-shadow-[0_10px_35px_rgba(245,158,11,0.3)]">
+            <h1 className="font-['Syne'] font-extrabold text-[ clamp(44px,8vw,110px) ] leading-none tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-white via-amber-100 to-amber-400 mb-4 drop-shadow-[0_10px_35px_rgba(245,158,11,0.3)]">
               {copy.identity.name}
             </h1>
             <p className="font-mono text-xs sm:text-sm tracking-[0.2em] text-zinc-300 uppercase mb-3">
@@ -237,14 +283,14 @@ export const ThreeStage: React.FC = () => {
 
         {/* BEAT 3: WATERFALL FLOW */}
         {currentBeatIndex === 3 && (
-          <div className="max-w-2xl text-center flex flex-col items-center animate-fade-in pointer-events-auto">
-            <span className="inline-block px-3 py-1 mb-4 rounded-full bg-sky-500/10 border border-sky-400/30 text-sky-300 font-mono text-xs tracking-widest uppercase">
+          <div className="max-w-2xl text-center flex flex-col items-center p-8 sm:p-12 rounded-3xl bg-black/45 backdrop-blur-xl border border-sky-500/20 shadow-[0_20px_50px_rgba(0,0,0,0.6)] animate-fade-in pointer-events-auto">
+            <span className="inline-block px-3.5 py-1 mb-4 rounded-full bg-sky-500/10 border border-sky-400/30 text-sky-300 font-mono text-xs tracking-widest uppercase">
               [ 04 · DÒNG CHẢY KHÁT VỌNG ]
             </span>
-            <h2 className="font-['Syne'] font-bold text-[ clamp(36px,5.5vw,82px) ] leading-tight text-white mb-4">
+            <h2 className="font-['Syne'] font-bold text-[ clamp(32px,5vw,72px) ] leading-tight text-white mb-4 drop-shadow-lg">
               Kiên trì tích tụ từng giọt nhỏ.
             </h2>
-            <p className="font-sans text-base sm:text-lg text-zinc-300 max-w-lg">
+            <p className="font-sans text-base sm:text-lg text-zinc-300 max-w-lg leading-relaxed">
               Nhịp điệu vận hành & kỷ luật. Dòng nước tinh khiết nuôi dưỡng những mầm sống vĩ đại.
             </p>
           </div>
@@ -510,15 +556,41 @@ export const ThreeStage: React.FC = () => {
         </button>
       </nav>
 
-      {/* Layer 5: Bottom Pacing Hint */}
+      {/* Layer 5: Bottom Interactive Controls & Pacing Hint */}
       <footer className="absolute bottom-6 left-6 right-6 z-30 flex items-center justify-between text-[11px] font-mono tracking-widest text-zinc-500 pointer-events-none">
-        <div>
-          <span>BEAT 0{currentBeatIndex + 1} / 0{beats.length}</span>
-          <span className="mx-2 text-zinc-700">·</span>
-          <span className="text-zinc-300">{beats[currentBeatIndex]?.title[locale]}</span>
+        <div className="flex items-center gap-2">
+          <span className="text-amber-400 font-bold">BEAT 0{currentBeatIndex + 1} / 0{beats.length}</span>
+          <span className="text-zinc-700">·</span>
+          <span className="text-zinc-300 truncate max-w-[200px] sm:max-w-none">{beats[currentBeatIndex]?.title[locale]}</span>
         </div>
-        <div className="hidden sm:block">
-          <span>SCROLL OR USE [↑ / ↓] TO ADVANCE NARRATIVE</span>
+
+        {/* Center Interactive Step Controls */}
+        <div className="pointer-events-auto flex items-center gap-2 bg-black/70 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
+          <button
+            type="button"
+            onClick={() => engineRef.current?.prevBeat()}
+            disabled={currentBeatIndex === 0}
+            className="p-1 rounded text-zinc-400 hover:text-white disabled:opacity-25 transition-opacity focus:outline-none"
+            aria-label="Previous beat"
+          >
+            <ChevronUp className="w-3.5 h-3.5" />
+          </button>
+          <span className="text-[10px] tracking-wider text-zinc-400 uppercase hidden sm:inline">
+            STEP {currentBeatIndex + 1}
+          </span>
+          <button
+            type="button"
+            onClick={() => engineRef.current?.nextBeat()}
+            disabled={currentBeatIndex === beats.length - 1}
+            className="p-1 rounded text-zinc-400 hover:text-white disabled:opacity-25 transition-opacity focus:outline-none"
+            aria-label="Next beat"
+          >
+            <ChevronDown className="w-3.5 h-3.5" />
+          </button>
+        </div>
+
+        <div className="hidden sm:block text-zinc-500 text-[10px]">
+          <span>SCROLL / SWIPE TO EXPLORE</span>
         </div>
       </footer>
 

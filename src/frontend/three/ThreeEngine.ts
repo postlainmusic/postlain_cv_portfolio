@@ -121,8 +121,8 @@ export class ThreeEngine {
     this.sunLight.position.set(10, 20, 15);
     this.scene.add(this.sunLight);
 
-    this.magmaLight = new THREE.PointLight(0xff4500, 0, 30);
-    this.magmaLight.position.set(0, -5, -10);
+    this.magmaLight = new THREE.PointLight(0xff5500, 0, 25);
+    this.magmaLight.position.set(0, -1.0, 0);
     this.scene.add(this.magmaLight);
 
     // 4. Instantiate 6 Procedural Worlds
@@ -234,32 +234,36 @@ export class ThreeEngine {
   };
 
   private updateCameraPath(progress: number, time: number) {
-    // Camera Spline Path in 3D:
-    // Desert [0.0 - 0.14]: (0, 0, 8)
-    // Volcano [0.14 - 0.36]: dipping into crater (0, -2.5, 4)
-    // Waterfall [0.36 - 0.54]: plunging downward (0, 0.5, 6)
-    // Forest [0.54 - 0.84]: wide horizontal view (0, 0, 9)
-    // Storm [0.84 - 0.92]: vortex center (0, 0, 5)
-    // Moon [0.92 - 1.00]: panoramic celestial starlight (0, 0, 8.5)
-
     if (progress < 0.20) {
+      // 1. Desert
       const p = progress / 0.20;
-      this.camera.position.set(Math.sin(time * 0.2) * 0.3, 0 - p * 2.0, 8 - p * 3.5);
-    } else if (progress < 0.44) {
-      const p = (progress - 0.20) / 0.24;
-      this.camera.position.set(0, -2.0 + p * 2.5, 4.5 + p * 1.5);
-    } else if (progress < 0.60) {
-      const p = (progress - 0.44) / 0.16;
-      this.camera.position.set(0, 0.5 - p * 0.5, 6 + p * 3);
+      this.camera.position.set(Math.sin(time * 0.2) * 0.2, 0.2 - p * 0.5, 8.0 - p * 1.0);
+      this.camera.lookAt(0, -0.8, -2);
+    } else if (progress < 0.40) {
+      // 2. Volcano
+      const p = (progress - 0.20) / 0.20;
+      this.camera.position.set(0, 0.4 + p * 0.2, 7.2 - p * 0.4);
+      this.camera.lookAt(0, -1.2, -2);
+    } else if (progress < 0.54) {
+      // 3. Waterfall
+      const p = (progress - 0.40) / 0.14;
+      this.camera.position.set(0, 0.6 - p * 0.2, 7.5);
+      this.camera.lookAt(0, -0.6, -3);
     } else if (progress < 0.86) {
-      const p = (progress - 0.60) / 0.26;
-      this.camera.position.set(Math.sin(p * Math.PI) * 1.5, 0, 9 - p * 3.5);
+      // 4. Forest
+      const p = (progress - 0.54) / 0.32;
+      this.camera.position.set(Math.sin(p * Math.PI) * 0.8, 0.5, 8.5);
+      this.camera.lookAt(0, 0, -6);
+    } else if (progress < 0.92) {
+      // 5. Storm
+      this.camera.position.set(0, 0.2, 7.2);
+      this.camera.lookAt(0, 0, -4);
     } else {
-      const p = (progress - 0.86) / 0.14;
-      this.camera.position.set(0, 0, 5.5 + p * 3.0);
+      // 6. Moon & Constellation
+      const p = (progress - 0.92) / 0.08;
+      this.camera.position.set(0, 0.2, 8.0 - p * 0.5);
+      this.camera.lookAt(0, 0, -4);
     }
-
-    this.camera.lookAt(0, 0, -10);
   }
 
   public setMouse(clientX: number, clientY: number) {

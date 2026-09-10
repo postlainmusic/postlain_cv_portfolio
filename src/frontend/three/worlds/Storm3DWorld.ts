@@ -1,28 +1,29 @@
 /**
- * STORM 3D WORLD — KINETIC ENERGY VORTEX & LIGHTNING
- * 3D Cloud Vortex Cylinder, Branching 3D Lightning Bolts,
- * Wind Vector Streamlines, and Physical Cloud Rift Separation.
+ * STORM 3D WORLD — THE CLOUD RIFT
+ * 3D Swirling Electric Cloud Vortex, Branching Lightning Arcs,
+ * Physical Cloud Veil Split, and Soft High-Voltage Violet Sparks.
  */
 
 import * as THREE from 'three';
+import { createSoftGlowTexture } from '../utils/textureUtils';
 
 export class Storm3DWorld {
   public group: THREE.Group;
   private vortexMesh: THREE.Mesh;
-  private vortexMat: THREE.ShaderMaterial;
-  private lightningLines: THREE.LineSegments | null = null;
-  private windPoints: THREE.Points;
-  private windGeo: THREE.BufferGeometry;
-  private nextLightningTime: number = 2.0;
+  private vortexMaterial: THREE.ShaderMaterial;
+  private lightningLines: THREE.LineSegments;
+  private lightningGeo: THREE.BufferGeometry;
+  private electricPoints: THREE.Points;
+  private electricGeo: THREE.BufferGeometry;
 
   constructor() {
     this.group = new THREE.Group();
 
-    // 1. 3D Cloud Vortex Cylinder & Shader
-    const vortexGeo = new THREE.CylinderGeometry(18, 18, 30, 48, 16, true);
-    vortexGeo.translate(0, 0, -10);
+    // 1. Swirling Cloud Vortex Cylinder
+    const vortexGeo = new THREE.CylinderGeometry(9, 18, 18, 36, 1, true);
+    vortexGeo.rotateX(Math.PI / 2);
 
-    this.vortexMat = new THREE.ShaderMaterial({
+    this.vortexMaterial = new THREE.ShaderMaterial({
       uniforms: {
         uTime: { value: 0 },
         uRift: { value: 0 },
@@ -35,11 +36,12 @@ export class Storm3DWorld {
         void main() {
           vUv = uv;
           vec3 pos = position;
-          // Swirling vortex twist
-          float angle = pos.y * 0.15 + uTime * 1.2;
+          // Swirling vortex torque
+          float angle = pos.z * 0.18 + uTime * 1.5;
           float s = sin(angle);
           float c = cos(angle);
-          pos.xz = vec2(pos.x * c - pos.z * s, pos.x * s + pos.z * c);
+          pos.xy = mat2(c, -s, s, c) * pos.xy;
+
           vWorldPos = (modelMatrix * vec4(pos, 1.0)).xyz;
           gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
         }
@@ -51,150 +53,127 @@ export class Storm3DWorld {
         varying vec3 vWorldPos;
 
         void main() {
-          vec3 darkCloud = vec3(0.02, 0.04, 0.07);
-          vec3 thunderGlow = vec3(0.12, 0.18, 0.28);
-          
-          float band = sin(vUv.y * 20.0 + uTime * 3.0) * 0.5 + 0.5;
-          vec3 color = mix(darkCloud, thunderGlow, band * 0.4);
+          vec2 uv = vUv * 6.0;
+          float noise1 = sin(uv.x * 2.0 + uTime * 2.0) * cos(uv.y * 3.0 - uTime * 1.5);
+          float noise2 = sin(uv.y * 4.0 + uTime * 3.0);
+          float cloudDensity = smoothstep(-0.2, 0.6, noise1 + noise2);
 
-          // Physical cloud rift alpha cutout in center
-          float riftMask = 1.0 - smoothstep(0.0, 0.85, abs(vUv.x - 0.5) * 2.0 * (1.0 - uRift));
-          float alpha = (0.75 - uRift * 0.7) * (1.0 - riftMask);
+          // Electric Storm Palette: Midnight indigo to high-voltage cyan
+          vec3 stormDark = vec3(0.02, 0.03, 0.06);
+          vec3 electricViolet = vec3(0.35, 0.15, 0.65);
+          vec3 lightningCyan = vec3(0.25, 0.75, 1.0);
 
-          gl_FragColor = vec4(color, max(0.0, alpha));
+          vec3 color = mix(stormDark, electricViolet, cloudDensity * 0.7);
+          color += lightningCyan * pow(max(0.0, sin(uTime * 12.0) * noise2), 4.0) * 1.5;
+
+          // Rift split: Veil tears open in the center
+          float riftMask = 1.0 - smoothstep(0.4, 0.6, abs(vUv.x - 0.5) * 2.0) * uRift;
+          float alpha = cloudDensity * 0.75 * riftMask;
+
+          gl_FragColor = vec4(color, alpha);
         }
       `,
       transparent: true,
       side: THREE.DoubleSide,
     });
 
-    this.vortexMesh = new THREE.Mesh(vortexGeo, this.vortexMat);
+    this.vortexMesh = new THREE.Mesh(vortexGeo, this.vortexMaterial);
+    this.vortexMesh.position.set(0, 0, -4);
     this.group.add(this.vortexMesh);
 
-    // 2. High-Velocity 3D Wind Vector Particles
-    const windCount = 280;
-    const windPositions = new Float32Array(windCount * 3);
-    for (let i = 0; i < windCount; i++) {
-      windPositions[i * 3] = (Math.random() - 0.5) * 36;
-      windPositions[i * 3 + 1] = (Math.random() - 0.5) * 24;
-      windPositions[i * 3 + 2] = -10 + (Math.random() - 0.5) * 20;
-    }
+    // 2. Branching Lightning Arcs
+    const maxLightningSegments = 24;
+    const lightningPositions = new Float32Array(maxLightningSegments * 6);
+    this.lightningGeo = new THREE.BufferGeometry();
+    this.lightningGeo.setAttribute('position', new THREE.BufferAttribute(lightningPositions, 3));
 
-    this.windGeo = new THREE.BufferGeometry();
-    this.windGeo.setAttribute('position', new THREE.BufferAttribute(windPositions, 3));
-
-    const windMat = new THREE.PointsMaterial({
+    const lightningMat = new THREE.LineBasicMaterial({
       color: 0x93c5fd,
-      size: 0.16,
       transparent: true,
-      opacity: 0.7,
+      opacity: 0.85,
       blending: THREE.AdditiveBlending,
     });
 
-    this.windPoints = new THREE.Points(this.windGeo, windMat);
-    this.group.add(this.windPoints);
-  }
-
-  private triggerLightning() {
-    if (this.lightningLines) {
-      this.group.remove(this.lightningLines);
-      this.lightningLines.geometry.dispose();
-      (this.lightningLines.material as THREE.Material).dispose();
-      this.lightningLines = null;
-    }
-
-    const segments = 12;
-    const points: number[] = [];
-    let curX = (Math.random() - 0.5) * 8;
-    let curY = 12;
-    let curZ = -8;
-
-    for (let s = 0; s < segments; s++) {
-      const nextX = curX + (Math.random() - 0.5) * 2.5;
-      const nextY = curY - 2.0;
-      const nextZ = curZ + (Math.random() - 0.5) * 1.5;
-
-      points.push(curX, curY, curZ, nextX, nextY, nextZ);
-
-      curX = nextX;
-      curY = nextY;
-      curZ = nextZ;
-    }
-
-    const lineGeo = new THREE.BufferGeometry();
-    lineGeo.setAttribute('position', new THREE.Float32BufferAttribute(points, 3));
-
-    const lineMat = new THREE.LineBasicMaterial({
-      color: 0xe0f2fe,
-      linewidth: 3,
-      transparent: true,
-      opacity: 1.0,
-      blending: THREE.AdditiveBlending,
-    });
-
-    this.lightningLines = new THREE.LineSegments(lineGeo, lineMat);
+    this.lightningLines = new THREE.LineSegments(this.lightningGeo, lightningMat);
     this.group.add(this.lightningLines);
+
+    // 3. High-Voltage Electric Sparks
+    const sparkCount = 60;
+    const sparkPositions = new Float32Array(sparkCount * 3);
+    for (let i = 0; i < sparkCount; i++) {
+      sparkPositions[i * 3] = (Math.random() - 0.5) * 14;
+      sparkPositions[i * 3 + 1] = (Math.random() - 0.5) * 10;
+      sparkPositions[i * 3 + 2] = (Math.random() - 0.5) * 8 - 3;
+    }
+
+    this.electricGeo = new THREE.BufferGeometry();
+    this.electricGeo.setAttribute('position', new THREE.BufferAttribute(sparkPositions, 3));
+
+    const electricMat = new THREE.PointsMaterial({
+      color: 0xa5b4fc,
+      map: createSoftGlowTexture('#818cf8'),
+      size: 0.52,
+      transparent: true,
+      opacity: 0.8,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+
+    this.electricPoints = new THREE.Points(this.electricGeo, electricMat);
+    this.group.add(this.electricPoints);
   }
 
   public update(progress: number, time: number) {
-    this.vortexMat.uniforms.uTime.value = time;
+    this.vortexMaterial.uniforms.uTime.value = time;
 
-    // Physical Cloud Rift Opening: 0.88 -> 0.94
-    const riftFactor = Math.max(0, Math.min(1, (progress - 0.88) / 0.06));
-    this.vortexMat.uniforms.uRift.value = riftFactor;
+    // Rift split parameter: 0.86 -> 0.94
+    const riftProgress = Math.max(0, Math.min(1, (progress - 0.86) / 0.08));
+    this.vortexMaterial.uniforms.uRift.value = riftProgress;
 
-    // Trigger procedural lightning
-    if (progress >= 0.82 && progress <= 0.94) {
-      this.nextLightningTime -= 0.016;
-      if (this.nextLightningTime <= 0) {
-        this.triggerLightning();
-        this.nextLightningTime = 1.2 + Math.random() * 2.5;
-      }
+    // Procedural Lightning Arcs Generation
+    const pos = this.lightningGeo.attributes.position.array as Float32Array;
+    let startX = (Math.random() - 0.5) * 6;
+    let startY = 5;
+    let startZ = -3;
+
+    for (let i = 0; i < 24; i++) {
+      const idx = i * 6;
+      pos[idx] = startX;
+      pos[idx + 1] = startY;
+      pos[idx + 2] = startZ;
+
+      const nextX = startX + (Math.random() - 0.5) * 2.2;
+      const nextY = startY - 0.45;
+      const nextZ = startZ + (Math.random() - 0.5) * 1.5;
+
+      pos[idx + 3] = nextX;
+      pos[idx + 4] = nextY;
+      pos[idx + 5] = nextZ;
+
+      startX = nextX;
+      startY = nextY;
+      startZ = nextZ;
     }
+    this.lightningGeo.attributes.position.needsUpdate = true;
 
-    if (this.lightningLines) {
-      const mat = this.lightningLines.material as THREE.LineBasicMaterial;
-      mat.opacity -= 0.08;
-      if (mat.opacity <= 0) {
-        this.group.remove(this.lightningLines);
-        this.lightningLines.geometry.dispose();
-        mat.dispose();
-        this.lightningLines = null;
-      }
-    }
-
-    // High velocity wind swirl
-    const positions = this.windGeo.attributes.position.array as Float32Array;
-    for (let i = 0; i < positions.length; i += 3) {
-      positions[i] += 0.45; // rapid rightward sweep
-      positions[i + 1] += Math.sin(time * 3.0 + positions[i]) * 0.05;
-
-      if (positions[i] > 18) {
-        positions[i] = -18;
-      }
-    }
-    this.windGeo.attributes.position.needsUpdate = true;
-
-    // World Visibility Envelope: 0.80 -> 0.96
+    // World Visibility Envelope: 0.84 -> 0.94
     let alpha = 0;
-    if (progress >= 0.80 && progress < 0.86) {
-      alpha = (progress - 0.80) / 0.06;
-    } else if (progress >= 0.86 && progress <= 0.92) {
+    if (progress >= 0.84 && progress < 0.88) {
+      alpha = (progress - 0.84) / 0.04;
+    } else if (progress >= 0.88 && progress <= 0.91) {
       alpha = 1.0;
-    } else if (progress > 0.92 && progress <= 0.96) {
-      alpha = 1.0 - (progress - 0.92) / 0.04;
+    } else if (progress > 0.91 && progress <= 0.94) {
+      alpha = 1.0 - (progress - 0.91) / 0.03;
     }
     this.group.visible = alpha > 0.01;
   }
 
   public dispose() {
     this.vortexMesh.geometry.dispose();
-    this.vortexMat.dispose();
-    this.windGeo.dispose();
-    (this.windPoints.material as THREE.Material).dispose();
-    if (this.lightningLines) {
-      this.lightningLines.geometry.dispose();
-      (this.lightningLines.material as THREE.Material).dispose();
-    }
+    this.vortexMaterial.dispose();
+    this.lightningGeo.dispose();
+    (this.lightningLines.material as THREE.Material).dispose();
+    this.electricGeo.dispose();
+    (this.electricPoints.material as THREE.Material).dispose();
   }
 }
