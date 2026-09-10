@@ -27,9 +27,13 @@ Kim chỉ nam cốt lõi: Adaptive Ceremony, Codebase-first, Evidence-driven, To
 - **Quản lý trạng thái thông minh (Mem0):** Ghi nhớ các quyết định kiến trúc, tránh hỏi lại những thông tin đã được thống nhất hoặc đã có sẵn trong cấu hình dự án.
 - **Tránh sinh code rác / bloated code:** Tạo code ngắn gọn, chuẩn TypeScript, không boilerplate thừa, không comment sáo rỗng.
 
-### 1.4. Strict Validation & Verification Discipline
-- **Tự kiểm tra trước khi hoàn thành:** Mọi thay đổi mã nguồn phải được kiểm tra tính hợp lệ: type checking, linting, build test hoặc script xác minh tối thiểu.
-- **Không bao giờ khẳng định suông:** Phải đưa ra bằng chứng thực thi cụ thể (lệnh kiểm tra, log kết quả), không bao giờ báo "xong" nếu chưa chạy xác minh.
+### 1.4. Authentic Profile Grounding (Hồ Sơ Thực Tế Tuyệt Đối)
+- **Tuyệt đối trung thực với CV gốc:** Mọi thông tin, chức danh, cột mốc thời gian, trách nhiệm, kỹ năng và phát ngôn trên portfolio phải trích xuất 100% chính xác từ `PROFILE_NGOPHUC.md` (`NGOPHUC_CV_2026.pdf`). Nghiêm cấm tạo ra số liệu ảo hoặc vị trí công việc không có thật.
+- **Phong cách Apple Minimalist Kinetic Typography:** Ưu tiên nghệ thuật typography tối giản, tương phản cao, chuyển động chữ GSAP mượt mà và huy hiệu kỹ thuật tinh xảo thay vì lạm dụng các hình ảnh 3D kỳ ảo rườm rà.
+
+### 1.5. Strict Validation & Autonomous Browser Testing Discipline
+- **Tự kiểm tra trước khi hoàn thành:** Mọi thay đổi mã nguồn phải được kiểm tra tính hợp lệ: type checking, linting, build test và chạy kiểm thử tự động trên trình duyệt thực tế qua Puppeteer (`npm run test:browser`).
+- **Không bao giờ khẳng định suông:** Phải đưa ra bằng chứng thực thi cụ thể (lệnh kiểm tra, log kết quả, screenshot), không bao giờ báo "xong" nếu chưa chạy xác minh.
 - **Xử lý lỗi kỷ luật:** Nếu 2 lần sửa liên tiếp gặp cùng 1 lỗi -> DỪNG LẠI, phân tích lại giả thuyết gốc, không được đoán mò và thử sai lung tung (no speculative stacking on broken code).
 
 ---

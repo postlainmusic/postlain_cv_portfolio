@@ -8,7 +8,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        display: ['Montserrat', '-apple-system', 'sans-serif'],
+        display: ['Syne', 'Montserrat', '-apple-system', 'sans-serif'],
         heading: ['"Plus Jakarta Sans"', '-apple-system', 'sans-serif'],
         body: ['"Plus Jakarta Sans"', '-apple-system', 'sans-serif'],
         mono: ['"Space Grotesk"', 'monospace'],

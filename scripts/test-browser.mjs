@@ -1,5 +1,5 @@
 /**
- * AUTOMATED BROWSER TESTING SUITE FOR POSTLAIN SOTY 3D
+ * AUTOMATED BROWSER TESTING SUITE FOR POSTLAIN APPLE MINIMALIST SOTY
  * Automated Codex-Style Browser Verification Agent
  */
 
@@ -18,7 +18,7 @@ const targetUrl = `http://localhost:${port}/`;
 
 async function runBrowserTest() {
   console.log(`\n🚀 [Browser Test Agent] Launching Chromium (Headed: ${isHeaded})...`);
-  
+
   const launchArgs = [
     '--no-sandbox',
     '--disable-setuid-sandbox',
@@ -79,84 +79,89 @@ async function runBrowserTest() {
     console.log(`🌐 Navigating to ${targetUrl}...`);
     await page.goto(targetUrl, { waitUntil: 'domcontentloaded', timeout: 15000 });
 
-    // 1. Verify Preloader & Wait for "ENTER JOURNEY"
+    // 1. Verify Preloader & Wait for "ENTER PORTFOLIO"
     console.log('⏳ Waiting for React root and Preloader...');
-    await page.waitForSelector('#root', { timeout: 15000 });
     await page.waitForSelector('#preloader-curtain', { timeout: 25000 });
-    
-    // Wait for ENTER JOURNEY button to appear
-    console.log('⏳ Waiting for GPU Shader compilation & Enter button...');
+
+    // Wait for ENTER button to appear
+    console.log('⏳ Waiting for Preloader completion & Enter button...');
     await page.waitForFunction(
       () => {
         const btn = Array.from(document.querySelectorAll('button')).find((b) =>
-          b.textContent?.includes('ENTER JOURNEY')
+          b.textContent?.includes('ENTER PORTFOLIO') || b.textContent?.includes('KHÁM PHÁ HÀNH TRÌNH')
         );
         return btn !== undefined;
       },
       { timeout: 25000 }
     );
 
-    console.log('✨ "ENTER JOURNEY" button appeared. Capturing preloader screenshot...');
-    await page.screenshot({ path: path.join(artifactsDir, '00_preloader.png') });
+    console.log('✨ "ENTER PORTFOLIO" button appeared. Capturing preloader screenshot...');
+    await page.screenshot({ path: path.join(artifactsDir, '00_apple_preloader.png') });
 
-    // 2. Click "ENTER JOURNEY"
-    console.log('👆 Clicking "ENTER JOURNEY"...');
+    // 2. Click "ENTER PORTFOLIO"
+    console.log('👆 Clicking "ENTER PORTFOLIO"...');
     await page.evaluate(() => {
       const btn = Array.from(document.querySelectorAll('button')).find((b) =>
-        b.textContent?.includes('ENTER JOURNEY')
+        b.textContent?.includes('ENTER PORTFOLIO') || b.textContent?.includes('KHÁM PHÁ HÀNH TRÌNH')
       );
       if (btn) btn.click();
     });
 
-    await new Promise((r) => setTimeout(r, 1200));
-    console.log('🏜️ Entered 3D Desert World (Beat 0). Capturing screenshot...');
-    await page.screenshot({ path: path.join(artifactsDir, '01_desert.png') });
+    await new Promise((r) => setTimeout(r, 1000));
+    console.log('✨ Entered Apple Minimalist Hero Section. Capturing screenshot...');
+    await page.screenshot({ path: path.join(artifactsDir, '01_apple_hero.png') });
 
-    // 3. Cycle through story beats via REAL Mouse Wheel Scrolling
-    console.log('🖱️ Testing REAL Mouse Wheel Scrolling across all 10 Beats...');
-    for (let beat = 1; beat <= 9; beat++) {
-      await page.mouse.wheel({ deltaY: 280 });
-      await new Promise((r) => setTimeout(r, 650));
-      
-      const filename = `beat_${beat < 10 ? '0' + beat : beat}.png`;
-      await page.screenshot({ path: path.join(artifactsDir, filename) });
-      console.log(`📸 Beat ${beat} reached via Wheel Scroll & captured: ${filename}`);
-    }
+    // 3. Scroll to Philosophy Section (Apple Word Scrub)
+    console.log('🖱️ Scrolling into Section 01: Triết Lý Vận Hành (Apple Word Scrub)...');
+    await page.mouse.wheel({ deltaY: 800 });
+    await new Promise((r) => setTimeout(r, 800));
+    await page.mouse.wheel({ deltaY: 600 });
+    await new Promise((r) => setTimeout(r, 800));
+    await page.screenshot({ path: path.join(artifactsDir, '02_apple_philosophy.png') });
 
-    // 4. Test Reverse Scrolling via Mouse Wheel
-    console.log('🖱️ Testing Reverse Mouse Wheel Scrolling (Upward)...');
-    await page.mouse.wheel({ deltaY: -280 });
-    await new Promise((r) => setTimeout(r, 500));
-    await page.mouse.wheel({ deltaY: -280 });
-    await new Promise((r) => setTimeout(r, 500));
+    // 4. Scroll to Milestones Section (Horizontal Runway)
+    console.log('🖱️ Scrolling into Section 02: Cột Mốc Thực Chiến (4 Career Monoliths)...');
+    await page.mouse.wheel({ deltaY: 1000 });
+    await new Promise((r) => setTimeout(r, 800));
+    await page.mouse.wheel({ deltaY: 1000 });
+    await new Promise((r) => setTimeout(r, 800));
+    await page.screenshot({ path: path.join(artifactsDir, '03_apple_milestones.png') });
 
-    // 5. Test Direct Jump to Beat 9 via Navigation Rail
-    console.log('🎯 Testing Navigation Rail dot click (Jump to Beat 9 Moon)...');
+    // 5. Scroll to Bento Section (4 Live Capability Widgets)
+    console.log('🖱️ Scrolling into Section 03: Vũ Khí Năng Lực (2x2 Bento Matrix)...');
+    await page.mouse.wheel({ deltaY: 1200 });
+    await new Promise((r) => setTimeout(r, 800));
+    await page.mouse.wheel({ deltaY: 800 });
+    await new Promise((r) => setTimeout(r, 800));
+
+    // Test Widget Interactions: Click "TRUYỀN LỬA ĐỘI NGŨ" / "PLAY HARMONIC CHORD"
+    console.log('⚡ Testing Bento interactive widgets...');
     await page.evaluate(() => {
-      const dots = Array.from(document.querySelectorAll('nav button'));
-      if (dots.length > 0) {
-        // Last dot is the 10th beat
-        const lastDot = dots[dots.length - 2]; // before ChevronDown
-        if (lastDot) lastDot.click();
-      }
-    });
-    await new Promise((r) => setTimeout(r, 600));
-
-    // 6. Test language switcher & audio toggle
-    console.log('🌐 Testing Language Switcher (VI -> EN)...');
-    await page.evaluate(() => {
-      const langBtn = Array.from(document.querySelectorAll('button')).find((b) =>
-        b.getAttribute('aria-label')?.includes('language') || b.textContent?.includes('VI') || b.textContent?.includes('EN')
+      const boostBtn = Array.from(document.querySelectorAll('button')).find((b) =>
+        b.textContent?.includes('TRUYỀN LỬA') || b.textContent?.includes('ENERGIZE')
       );
-      if (langBtn) langBtn.click();
+      if (boostBtn) boostBtn.click();
     });
     await new Promise((r) => setTimeout(r, 400));
+    await page.screenshot({ path: path.join(artifactsDir, '04_apple_bento.png') });
 
-    // 5. Check Moon Beat interactive buttons
-    console.log('🌕 Testing Moon Contact Copy buttons...');
+    // 6. Scroll to Contact Section
+    console.log('🖱️ Scrolling into Section 04: Kênh Kết Nối Trực Tiếp (Contact Monolith)...');
+    await page.evaluate(() => {
+      if ((window).__lenis) {
+        (window).__lenis.scrollTo('#contact-section', { immediate: true });
+      } else {
+        const contactEl = document.querySelector('#contact-section');
+        if (contactEl) contactEl.scrollIntoView();
+      }
+    });
+    await new Promise((r) => setTimeout(r, 1200));
+
+    // Test Clipboard Copy for Hotline & Email
+    console.log('📋 Testing 1-click clipboard copy for Hotline & Email...');
     const copyResult = await page.evaluate(() => {
       const copyBtns = Array.from(document.querySelectorAll('button')).filter((b) =>
-        b.textContent?.includes('HOTLINE') || b.textContent?.includes('EMAIL')
+        b.textContent?.includes('SAO CHÉP') || b.textContent?.includes('COPY')
       );
       if (copyBtns.length > 0) {
         copyBtns[0].click();
@@ -164,7 +169,29 @@ async function runBrowserTest() {
       }
       return false;
     });
-    console.log(`📋 Copy button click test: ${copyResult ? 'SUCCESS' : 'SKIPPED'}`);
+    console.log(`📋 Copy action status: ${copyResult ? 'SUCCESS' : 'SKIPPED'}`);
+    await new Promise((r) => setTimeout(r, 600));
+    await page.screenshot({ path: path.join(artifactsDir, '05_apple_contact.png') });
+
+    // 7. Test Language Switcher (VI -> EN)
+    console.log('🌐 Testing Language Switcher (VI -> EN)...');
+    await page.evaluate(() => {
+      const langBtn = Array.from(document.querySelectorAll('button')).find((b) =>
+        b.getAttribute('aria-label')?.includes('ngôn ngữ') || b.textContent?.includes('VI') || b.textContent?.includes('EN')
+      );
+      if (langBtn) langBtn.click();
+    });
+    await new Promise((r) => setTimeout(r, 600));
+
+    // 8. Test Sound Toggle
+    console.log('🔊 Testing Sound Toggle button...');
+    await page.evaluate(() => {
+      const soundBtn = Array.from(document.querySelectorAll('button')).find((b) =>
+        b.getAttribute('aria-label')?.includes('âm thanh') || b.textContent?.includes('SOUND')
+      );
+      if (soundBtn) soundBtn.click();
+    });
+    await new Promise((r) => setTimeout(r, 400));
 
     console.log('\n========================================');
     console.log('📊 [AUTOMATED BROWSER TEST REPORT]');
@@ -179,7 +206,6 @@ async function runBrowserTest() {
     } else {
       console.log('✅ 100% CLEAN TEST: 0 Runtime Errors, 0 Network Failures!');
     }
-
   } catch (error) {
     console.error('❌ Browser Test Execution Failed:', error);
     if (page) {
