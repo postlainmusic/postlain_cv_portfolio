@@ -16,12 +16,12 @@ export const Layout: React.FC<LayoutProps> = ({
   children,
 }) => {
   return (
-    <div className="min-h-screen bg-bg-base text-ink-body flex flex-col selection:bg-accent-amber selection:text-bg-base">
+    <div className="min-h-screen bg-[#08090a] text-zinc-100 flex flex-col selection:bg-accent-amber selection:text-black">
       
-      {/* Accessible Skip to Content Link */}
+      {/* Skip Link for Accessibility */}
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-50 px-4 py-2 bg-accent-amber text-bg-base font-mono text-xs font-bold rounded-md"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-50 px-4 py-2 bg-accent-amber text-black font-mono text-xs font-bold rounded"
       >
         Skip to main content
       </a>
@@ -29,7 +29,7 @@ export const Layout: React.FC<LayoutProps> = ({
       {/* Global Masthead */}
       <Masthead content={content.masthead} activeSection={activeSection} />
 
-      {/* Main Narrative Flow */}
+      {/* Main Content Sections */}
       <main id="main-content" className="flex-1 w-full">
         {children}
       </main>
@@ -37,10 +37,10 @@ export const Layout: React.FC<LayoutProps> = ({
       {/* Audio Experience Dock */}
       <AudioPlayerBar
         listeningContent={content.chapter02.listeningRoom}
-        ventureUrl={content.chapter02.ventureUrl}
+        platformUrl={content.chapter02.platformUrl}
       />
 
-      {/* Colophon & Footer */}
+      {/* Footer Colophon */}
       <Colophon content={content.colophon} />
     </div>
   );

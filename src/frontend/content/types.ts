@@ -1,6 +1,6 @@
 /**
- * BILINGUAL CONTENT CONTRACT SCHEMA (POSTLAIN / THE OPERATING FREQUENCY)
- * Defines semantic roles and content shapes shared identically between Vietnamese & English.
+ * BILINGUAL CONTENT CONTRACT SCHEMA (NGÔ PHÚC - POSTLAIN)
+ * Ground Truth: NGOPHUC_CV_2026.pdf
  */
 
 export interface NavItem {
@@ -11,20 +11,21 @@ export interface NavItem {
 
 export interface TimelineMilestone {
   id: string;
-  period: string;       // e.g. "06/2025 — 07/2026"
-  year: string;         // e.g. "2025"
-  role: string;         // e.g. "Quản Lý Cửa Hàng (Store General Manager)"
-  company: string;      // e.g. "ALDO Flagship (GO! Đà Lạt)"
-  location: string;     // e.g. "Đà Lạt, Lâm Đồng"
+  period: string;             // e.g. "06/2025 — 07/2026"
+  role: string;               // e.g. "Quản lí cửa hàng"
+  company: string;            // e.g. "ALDO GO! ĐL"
+  location: string;           // e.g. "Đà Lạt, Lâm Đồng"
   type: 'retail' | 'culinary' | 'studio' | 'fnb';
-  observation: string;  // Layer A (Artistic / Human)
-  responsibilities: string[]; // Layer B (Semantic / Verified Facts)
-  operationalScope: string;   // Layer B Summary
+  responsibilities: string[]; // Strict responsibilities from CV
+  subRoles?: {
+    period: string;
+    role: string;
+    details: string[];
+  }[];
 }
 
-export interface PillarItem {
+export interface SkillCategory {
   title: string;
-  desc: string;
   skills: string[];
 }
 
@@ -43,10 +44,10 @@ export interface SiteContent {
     localeLabel: string;
   };
   masthead: {
-    monogram: string;
-    city: string;
-    timezone: string;
-    statusBadge: string;
+    brandName: string;
+    brandRole: string;
+    downloadCvLabel: string;
+    downloadCvUrl: string;
     nav: NavItem[];
     soundToggle: {
       on: string;
@@ -54,73 +55,64 @@ export interface SiteContent {
     };
   };
   chapter00: {
-    index: string;
-    thesisTop: string;
-    thesisBottom: string;
+    badge: string;
     name: string;
-    title: string;
-    layerAObservation: string;
-    recruiterSummary: string;
-    statusLine: string;
-    locationAnchor: string;
-    ctaRecord: string;
+    roleTitle: string;
+    personalIntro: string;
+    ctaDownloadCv: string;
+    downloadCvUrl: string;
     ctaContact: string;
-    transitionText: string;
+    ctaExplore: string;
   };
   chapter01: {
     index: string;
     title: string;
     subtitle: string;
-    layerAObservation: string;
     milestones: TimelineMilestone[];
-    expandLogsLabel: string;
-    collapseLogsLabel: string;
-    transitionText: string;
   };
   chapter02: {
     index: string;
     title: string;
     subtitle: string;
-    ventureName: string;
-    ventureUrl: string;
-    ventureDescription: string;
-    layerAObservation: string;
-    pillars: PillarItem[];
+    platformName: string;
+    platformUrl: string;
+    platformDescription: string;
+    interactionHint: string;
     listeningRoom: {
       title: string;
-      status: string;
       trackTitle: string;
       trackMeta: string;
       audioNotice: string;
       visitPlatformBtn: string;
     };
-    transitionText: string;
   };
   chapter03: {
     index: string;
     title: string;
     subtitle: string;
-    layerAObservation: string;
-    capabilitiesTitle: string;
-    capabilities: PillarItem[];
+    skillsTitle: string;
+    skillCategories: SkillCategory[];
     educationTitle: string;
     education: EducationItem[];
-    transitionText: string;
+    hobbiesTitle: string;
+    hobbies: string[];
   };
   chapter04: {
     index: string;
     title: string;
     subtitle: string;
-    layerAObservation: string;
     hotlineLabel: string;
     hotlineNumber: string;
     emailLabel: string;
     emailAddress: string;
     locationLabel: string;
     locationAddress: string;
+    downloadCvLabel: string;
+    downloadCvUrl: string;
     copyNotice: string;
     copiedNotice: string;
     form: {
+      title: string;
       namePlaceholder: string;
       emailPlaceholder: string;
       messagePlaceholder: string;
@@ -133,7 +125,7 @@ export interface SiteContent {
   colophon: {
     statement: string;
     techStack: string;
-    coordinates: string;
     copyright: string;
+    backToTop: string;
   };
 }
