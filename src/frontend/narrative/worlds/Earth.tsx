@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import type { WorldCopy } from '../../content/narrativeCopy';
-import { InputSampler } from '../interaction/InputSampler';
+import { EarthWebGL } from '../webgl/EarthWebGL';
 
 interface EarthProps {
   copy: WorldCopy;
@@ -14,35 +14,26 @@ interface EarthProps {
   onRestart?: () => void;
 }
 
-interface SedimentParticle {
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  size: number;
-  mass: number;
-  alpha: number;
-  baseAlpha: number;
-  settled: boolean;
-}
-
 /**
- * World 05: EARTH (SETTLE — Density / Gravity / Human Ground)
- * Physical Behavior:
- * - Sedimentation physics: mineral particles slowly descend under gentle gravity and air friction.
- * - Pointer movement creates subtle ambient air currents displacing floating motes.
- * - Quiet, dignified human reveal of NGÔ PHÚC / POSTLAIN.
- * - Direct contact gateway: email action, copy address, and graceful return loop to Void.
- * - Zero React setState in RAF loop (Law 5 compliant).
+ * World 05: EARTH (SETTLE — Density / Human Ground)
+ * Upgraded Awwwards WebGL Experience:
+ * - 6,000 3D golden sedimentation particles gently falling in laminar flow
+ * - Timeless luxury typography revealing NGÔ PHÚC / POSTLAIN
+ * - Direct contact gateway and ouroboros loop back to Void
  */
 export const Earth: React.FC<EarthProps> = ({ copy, locale, brand, onRestart }) => {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const webglContainerRef = useRef<HTMLDivElement | null>(null);
+  const webglInstanceRef = useRef<EarthWebGL | null>(null);
   const [copied, setCopied] = useState(false);
-  const isReducedMotionRef = useRef<boolean>(false);
 
   useEffect(() => {
-    isReducedMotionRef.current =
-      typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (webglContainerRef.current) {
+      webglInstanceRef.current = new EarthWebGL(webglContainerRef.current);
+    }
+    return () => {
+      webglInstanceRef.current?.destroy();
+      webglInstanceRef.current = null;
+    };
   }, []);
 
   const handleCopyEmail = async () => {
@@ -51,167 +42,18 @@ export const Earth: React.FC<EarthProps> = ({ copy, locale, brand, onRestart }) 
       setCopied(true);
       setTimeout(() => setCopied(false), 2400);
     } catch {
-      // Fallback
       setCopied(true);
       setTimeout(() => setCopied(false), 2400);
     }
   };
 
-  // Sedimentation particle simulation ticker
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const inputSampler = InputSampler.getInstance();
-    let animId: number;
-    let width = 0;
-    let height = 0;
-    let dpr = 1;
-
-    const particles: SedimentParticle[] = [];
-    const NUM_PARTICLES = 120;
-
-    const initParticles = (w: number, h: number) => {
-      particles.length = 0;
-      for (let i = 0; i < NUM_PARTICLES; i++) {
-        particles.push({
-          x: Math.random() * w,
-          y: Math.random() * h,
-          vx: (Math.random() - 0.5) * 0.2,
-          vy: 0.15 + Math.random() * 0.35, // Slow downward gravitational drift
-          size: 1.0 + Math.random() * 2.2,
-          mass: 1.0 + Math.random() * 2.0,
-          alpha: 0.2 + Math.random() * 0.45,
-          baseAlpha: 0.2 + Math.random() * 0.45,
-          settled: false,
-        });
-      }
-    };
-
-    const resize = () => {
-      dpr = Math.min(window.devicePixelRatio || 1, 2.0);
-      width = window.innerWidth;
-      height = window.innerHeight;
-      canvas.width = Math.floor(width * dpr);
-      canvas.height = Math.floor(height * dpr);
-      canvas.style.width = `${width}px`;
-      canvas.style.height = `${height}px`;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-      if (particles.length === 0) {
-        initParticles(width, height);
-      }
-    };
-
-    resize();
-    window.addEventListener('resize', resize, { passive: true });
-
-    let lastTime = performance.now();
-
-    const render = (currentTime: number) => {
-      const dt = Math.min((currentTime - lastTime) * 0.001, 0.05);
-      lastTime = currentTime;
-      const t = currentTime * 0.001;
-
-      ctx.clearRect(0, 0, width, height);
-
-      if (isReducedMotionRef.current) {
-        // Serene warm ambient ground glow for reduced motion
-        const groundGrad = ctx.createLinearGradient(0, height * 0.6, 0, height);
-        groundGrad.addColorStop(0, 'transparent');
-        groundGrad.addColorStop(1, 'rgba(160, 120, 80, 0.08)');
-        ctx.fillStyle = groundGrad;
-        ctx.fillRect(0, height * 0.6, width, height * 0.4);
-        animId = requestAnimationFrame(render);
-        return;
-      }
-
-      // Input forces create soft air displacement
-      const forces = inputSampler.sampleForces();
-      const pointerState = inputSampler.getPointerState();
-      const ptrX = pointerState.x * width;
-      const ptrY = pointerState.y * height;
-
-      // Draw and update sedimentation particles
-      for (let i = 0; i < particles.length; i++) {
-        const p = particles[i];
-
-        // Gravitational downward settling + slight Brownian drift
-        const brownian = Math.sin(t * 1.5 + i * 0.5) * 0.08;
-        p.vx = p.vx * 0.95 + brownian;
-        p.vy = Math.min(0.8, p.vy * 0.98 + 0.008); // Terminal settling velocity
-
-        // Air displacement from pointer
-        const dx = p.x - ptrX;
-        const dy = p.y - ptrY;
-        const dist = Math.hypot(dx, dy);
-        const airRadius = 140;
-
-        if (dist < airRadius && dist > 0.1) {
-          const push = (1 - dist / airRadius) * (0.8 / p.mass);
-          p.vx += (dx / dist) * push;
-          p.vy += (dy / dist) * push;
-        }
-
-        // Additional impulse from coalesced input events
-        for (let f = 0; f < forces.length; f++) {
-          const force = forces[f];
-          const fdx = p.x - force.x * width;
-          const fdy = p.y - force.y * height;
-          const fdist = Math.hypot(fdx, fdy);
-          if (fdist < 100) {
-            const fpush = (1 - fdist / 100) * force.strength * 0.5;
-            p.vx += (fdx / (fdist || 1)) * fpush;
-            p.vy += (fdy / (fdist || 1)) * fpush;
-          }
-        }
-
-        p.x += p.vx;
-        p.y += p.vy;
-
-        // Wrap around top when reaching viewport bottom to maintain continuous sedimentation
-        if (p.y > height + 10) {
-          p.y = -10;
-          p.x = Math.random() * width;
-          p.vx = (Math.random() - 0.5) * 0.2;
-          p.vy = 0.15 + Math.random() * 0.35;
-        }
-        if (p.x < -10) p.x = width + 10;
-        if (p.x > width + 10) p.x = -10;
-
-        // Render warm mineral dust mote
-        ctx.fillStyle = `rgba(215, 195, 170, ${p.alpha})`;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size * 0.5, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      // Soft sedimentation horizon at the bottom edge
-      const groundGrad = ctx.createLinearGradient(0, height * 0.75, 0, height);
-      groundGrad.addColorStop(0, 'transparent');
-      groundGrad.addColorStop(1, 'rgba(140, 105, 75, 0.08)');
-      ctx.fillStyle = groundGrad;
-      ctx.fillRect(0, height * 0.75, width, height * 0.25);
-
-      animId = requestAnimationFrame(render);
-    };
-
-    animId = requestAnimationFrame(render);
-
-    return () => {
-      cancelAnimationFrame(animId);
-      window.removeEventListener('resize', resize);
-    };
-  }, []);
-
   return (
     <div id="earth" className="world-stage world-stage--earth" aria-label="World 05: Earth">
-      <canvas ref={canvasRef} className="world-canvas earth-canvas" aria-hidden="true" />
-      <div className="earth-warm-glow" aria-hidden="true" />
-      <div className="earth-subtle-grain" aria-hidden="true" />
+      {/* Layer 0: 3D Golden Sedimentation & Mineral Bedrock Depth */}
+      <div ref={webglContainerRef} className="world-webgl-layer" aria-hidden="true" />
+      <div className="world-vignette earth-vignette" aria-hidden="true" />
 
+      {/* Layer 1: Semantic DOM Content & Luxury Typography */}
       <div className="world-content-layer earth-layout">
         <div className="world-editorial-header" aria-hidden="true">
           <span className="world-index-num">05 / EARTH</span>
