@@ -61,13 +61,54 @@ export class ThreeEngine {
     this.camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 150);
     this.camera.position.set(0, 0, 8);
 
-    // 2. High-Performance WebGL Renderer
-    this.renderer = new THREE.WebGLRenderer({
-      canvas: this.canvas,
-      powerPreference: 'high-performance',
-      antialias: true,
+    // 2. High-Performance WebGL Renderer with Rock-Solid Headless & Multi-Platform Support
+    this.canvas.style.backgroundColor = '#030508';
+    
+    let gl: WebGLRenderingContext | WebGL2RenderingContext | null = null;
+    const contextAttributes: WebGLContextAttributes = {
       alpha: false,
-    });
+      depth: true,
+      stencil: false,
+      antialias: false,
+      preserveDrawingBuffer: false,
+      failIfMajorPerformanceCaveat: false,
+    };
+
+    try {
+      gl = this.canvas.getContext('webgl2', contextAttributes);
+    } catch (_) {}
+
+    if (!gl) {
+      try {
+        gl = this.canvas.getContext('webgl', contextAttributes) ||
+             (this.canvas.getContext('experimental-webgl', contextAttributes) as WebGLRenderingContext);
+      } catch (_) {}
+    }
+
+    try {
+      this.renderer = new THREE.WebGLRenderer({
+        canvas: this.canvas,
+        context: gl || undefined,
+        powerPreference: 'default',
+        antialias: false,
+        alpha: false,
+        stencil: false,
+        depth: true,
+        failIfMajorPerformanceCaveat: false,
+      });
+    } catch (err) {
+      console.warn('Initializing WebGLRenderer with depth fallback:', err);
+      this.renderer = new THREE.WebGLRenderer({
+        canvas: this.canvas,
+        antialias: false,
+        alpha: false,
+        stencil: false,
+        depth: false,
+        failIfMajorPerformanceCaveat: false,
+      });
+    }
+
+    this.renderer.setClearColor(0x030508, 1.0);
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.15;
     this.handleResize(container);

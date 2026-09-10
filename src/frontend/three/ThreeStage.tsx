@@ -31,17 +31,24 @@ export const ThreeStage: React.FC = () => {
   // 1. Initialize ThreeEngine & Warm up Shaders
   useEffect(() => {
     if (canvasRef.current && containerRef.current) {
-      const engine = new ThreeEngine(canvasRef.current, containerRef.current);
-      engineRef.current = engine;
+      try {
+        const engine = new ThreeEngine(canvasRef.current, containerRef.current);
+        engineRef.current = engine;
 
-      engine.onBeatChange = (idx) => {
-        setCurrentBeatIndex(idx);
-      };
+        engine.onBeatChange = (idx) => {
+          setCurrentBeatIndex(idx);
+        };
 
-      // Execute GPU shader pre-compilation into VRAM
-      engine.warmUpShaders().then(() => {
+        // Execute GPU shader pre-compilation into VRAM
+        engine.warmUpShaders().then(() => {
+          setIsEngineReady(true);
+        }).catch(() => {
+          setIsEngineReady(true);
+        });
+      } catch (err) {
+        console.warn('ThreeEngine initialization caught gracefully:', err);
         setIsEngineReady(true);
-      });
+      }
     }
 
     return () => {
@@ -110,6 +117,7 @@ export const ThreeStage: React.FC = () => {
       ref={containerRef}
       onPointerMove={handlePointerMove}
       onClick={handleCanvasClick}
+      style={{ backgroundColor: '#030508' }}
       className="relative w-screen h-screen overflow-hidden bg-[#030508] text-[#e8e5dc] select-none font-sans"
       role="region"
       aria-label="POSTLAIN Visual Autobiography 3D Stage"
@@ -125,6 +133,7 @@ export const ThreeStage: React.FC = () => {
       {/* Layer 0: Fixed Fullscreen Three.js WebGL Canvas */}
       <canvas
         ref={canvasRef}
+        style={{ backgroundColor: '#030508' }}
         className="absolute inset-0 w-full h-full block touch-none z-0 cursor-crosshair"
         aria-hidden="true"
       />
