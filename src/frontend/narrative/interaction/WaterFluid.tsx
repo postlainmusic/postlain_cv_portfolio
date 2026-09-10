@@ -23,7 +23,12 @@ const vertex = `
 `;
 
 const updateFragment = `
+  #ifdef GL_FRAGMENT_PRECISION_HIGH
   precision highp float;
+  #else
+  precision mediump float;
+  #endif
+
   varying vec2 v_uv;
   uniform sampler2D u_state;
   uniform vec2 u_pointer;
@@ -61,40 +66,41 @@ const updateFragment = `
     vec2 flowUv = v_uv - back;
     vec4 advected = texture2D(u_state, flowUv);
 
-    velocity = (advected.rg * 2.0 - 1.0) * 0.984;
-    float dye = advected.b * 0.991;
+    velocity = (advected.rg * 2.0 - 1.0) * 0.985;
+    float dye = advected.b * 0.992;
 
-    // Pointer brush force
+    // Pointer cursor force
     vec2 delta = (v_uv - u_pointer) * aspect;
     float dist = length(delta);
-    float brush = exp(-dist * 80.0) * u_active;
-    vec2 impulse = u_velocity * (0.9 + brush * 5.5);
-    velocity += impulse * brush * 2.8;
-    dye += brush * (0.24 + length(u_velocity) * 4.2);
+    float brush = exp(-dist * 65.0) * u_active;
+    vec2 impulse = u_velocity * (1.2 + brush * 6.0);
+    velocity += impulse * brush * 3.5;
+    dye += brush * (0.35 + length(u_velocity) * 5.0);
 
     // Droplet click shockwave
     if (u_impulse_strength > 0.01) {
       vec2 impDelta = (v_uv - u_impulse) * aspect;
       float impDist = length(impDelta);
-      float ring = exp(-pow(impDist - 0.045, 2.0) * 450.0) * u_impulse_strength;
-      vec2 outward = normalize(impDelta + 0.0001) * ring * 1.5;
+      float diff = impDist - 0.045;
+      float ring = exp(-(diff * diff) * 450.0) * u_impulse_strength;
+      vec2 outward = normalize(impDelta + vec2(0.0001)) * ring * 2.0;
       velocity += outward;
-      dye += ring * 0.85;
+      dye += ring * 0.95;
     }
 
     // Ambient Da Lat nocturnal stream drift
-    vec2 ambientFlow = vec2(-0.0004, -0.0003) + vec2(
-      sin(u_time * 0.4 + v_uv.y * 3.5),
-      cos(u_time * 0.35 + v_uv.x * 3.5)
-    ) * 0.00035;
-    velocity += ambientFlow * (0.4 + speed * 0.6);
+    vec2 ambientFlow = vec2(-0.0005, -0.0004) + vec2(
+      sin(u_time * 0.5 + v_uv.y * 3.5),
+      cos(u_time * 0.45 + v_uv.x * 3.5)
+    ) * 0.0004;
+    velocity += ambientFlow * (0.5 + speed * 0.5);
 
     // Micro turbulence noise
     vec2 n = vec2(
-      noise(v_uv * 8.0 + velocity * 2.2 + u_time * 0.1),
-      noise(v_uv * 8.0 - velocity * 2.2 - u_time * 0.1)
+      noise(v_uv * 7.0 + velocity * 2.0 + u_time * 0.12),
+      noise(v_uv * 7.0 - velocity * 2.0 - u_time * 0.12)
     ) - 0.5;
-    velocity += n * 0.0028 * (0.25 + speed);
+    velocity += n * 0.003 * (0.3 + speed);
     velocity *= 0.996;
 
     gl_FragColor = vec4(velocity * 0.5 + 0.5, clamp(dye, 0.0, 1.0), 1.0);
@@ -102,7 +108,12 @@ const updateFragment = `
 `;
 
 const renderFragment = `
+  #ifdef GL_FRAGMENT_PRECISION_HIGH
   precision highp float;
+  #else
+  precision mediump float;
+  #endif
+
   varying vec2 v_uv;
   uniform sampler2D u_state;
   uniform vec2 u_resolution;
@@ -111,11 +122,11 @@ const renderFragment = `
   void main() {
     vec2 texel = 1.0 / u_resolution;
 
-    // Central state
+    // Fluid state
     vec4 state = texture2D(u_state, v_uv);
     float dye = state.b;
 
-    // Normal gradient calculation
+    // Normal gradient
     float left = texture2D(u_state, v_uv - vec2(texel.x, 0.0)).b;
     float right = texture2D(u_state, v_uv + vec2(texel.x, 0.0)).b;
     float up = texture2D(u_state, v_uv + vec2(0.0, texel.y)).b;
@@ -123,41 +134,45 @@ const renderFragment = `
     vec2 normal = vec2(left - right, down - up);
     float edge = length(normal);
 
+    // Procedural ambient water wave ripples (always alive)
+    float w1 = sin(v_uv.x * 14.0 + u_time * 0.8 + state.r * 4.0) * cos(v_uv.y * 12.0 + u_time * 0.7);
+    float w2 = sin(v_uv.x * 26.0 - u_time * 1.0 + v_uv.y * 18.0) * 0.5 + 0.5;
+    float ambientRipples = (w1 * 0.5 + 0.5) * 0.25 + w2 * 0.12;
+
     // Chromatic dispersion (RGB split at wave crests)
-    vec2 offsetR = normal * 1.8 * texel;
-    vec2 offsetB = -normal * 1.8 * texel;
+    vec2 offsetR = normal * 2.5 * texel;
+    vec2 offsetB = -normal * 2.5 * texel;
     float dyeR = texture2D(u_state, v_uv + offsetR).b;
     float dyeB = texture2D(u_state, v_uv + offsetB).b;
 
-    // Natural light shimmer & specular reflection
-    float shimmer = 0.5 + 0.5 * sin(u_time * 0.8 + v_uv.y * 9.0 + state.r * 6.0);
-    vec3 lightDir = normalize(vec3(0.3, 0.6, 0.7));
-    vec3 surfNormal = normalize(vec3(normal * 45.0, 1.0));
-    float specular = pow(max(0.0, dot(surfNormal, lightDir)), 14.0) * (0.4 + edge * 2.5);
+    // Light highlights & specular caustics
+    vec3 lightDir = normalize(vec3(0.35, 0.65, 0.68));
+    vec3 surfNormal = normalize(vec3(normal * 50.0 + vec2(w1 * 0.1, w2 * 0.1), 1.0));
+    float specular = pow(max(0.001, dot(surfNormal, lightDir)), 12.0) * (0.35 + edge * 3.5 + ambientRipples * 0.4);
 
-    // Editorial Palette tokens:
-    // Deep Ink Water: #081a20 (0.03, 0.10, 0.13)
-    // Water Slate:    #16323d (0.085, 0.195, 0.24)
-    // Fog Highlight:  #7890a3 (0.47, 0.56, 0.64)
-    // Light Shimmer:  #e7e3d9 (0.91, 0.89, 0.85)
-    vec3 deep = vec3(0.03, 0.10, 0.13);
-    vec3 midWater = vec3(0.085, 0.195, 0.24);
-    vec3 fogAccent = vec3(0.47, 0.56, 0.64);
-    vec3 light = vec3(0.91, 0.89, 0.85);
+    // Palette Colors:
+    // Deep Midnight Abyss: #0a1820
+    // Luminous Water Slate: #1a4252
+    // Vibrant Cyan Accent: #4f9cb8
+    // Crystal White Shimmer: #eef6f8
+    vec3 deep = vec3(0.04, 0.095, 0.125);
+    vec3 midWater = vec3(0.10, 0.26, 0.32);
+    vec3 accent = vec3(0.31, 0.61, 0.72);
+    vec3 light = vec3(0.93, 0.96, 0.97);
 
-    // Composite fluid color layers
-    vec3 colorR = mix(deep, midWater, smoothstep(0.0, 0.5, dyeR));
-    vec3 colorG = mix(deep, midWater, smoothstep(0.0, 0.5, dye));
-    vec3 colorB = mix(deep, midWater, smoothstep(0.0, 0.5, dyeB));
+    // Layered color blending
+    vec3 colorR = mix(deep, midWater, smoothstep(0.0, 0.6, dyeR + ambientRipples * 0.5));
+    vec3 colorG = mix(deep, midWater, smoothstep(0.0, 0.6, dye + ambientRipples * 0.5));
+    vec3 colorB = mix(deep, midWater, smoothstep(0.0, 0.6, dyeB + ambientRipples * 0.5));
     vec3 color = vec3(colorR.r, colorG.g, colorB.b);
 
-    color = mix(color, fogAccent, smoothstep(0.2, 0.85, dye) * 0.55);
-    color += light * edge * 2.2;
-    color += light * specular * 0.35;
-    color += fogAccent * shimmer * dye * 0.045;
+    color = mix(color, accent, smoothstep(0.15, 0.85, dye) * 0.75 + ambientRipples * 0.2);
+    color += light * edge * 3.2;
+    color += light * specular * 0.45;
+    color += accent * ambientRipples * 0.18;
 
-    // Atmospheric Vignette
-    float vignette = smoothstep(1.18, 0.28, length((v_uv - 0.5) * vec2(1.08, 0.92)));
+    // Subtle atmospheric vignette
+    float vignette = smoothstep(1.22, 0.24, length((v_uv - 0.5) * vec2(1.06, 0.94)));
     gl_FragColor = vec4(color * vignette, 0.98);
   }
 `;
@@ -168,6 +183,7 @@ const createShader = (gl: WebGLRenderingContext, type: number, source: string) =
   gl.shaderSource(shader, source);
   gl.compileShader(shader);
   if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    console.error('WebGL Shader Compilation Error:', gl.getShaderInfoLog(shader));
     gl.deleteShader(shader);
     return null;
   }
@@ -183,7 +199,10 @@ const createProgram = (gl: WebGLRenderingContext, fragment: string) => {
   gl.attachShader(program, vs);
   gl.attachShader(program, fs);
   gl.linkProgram(program);
-  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) return null;
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+    console.error('WebGL Program Link Error:', gl.getProgramInfoLog(program));
+    return null;
+  }
   return { program, vs, fs };
 };
 
@@ -221,11 +240,17 @@ export const WaterFluid = ({ reducedMotion = false }: WaterFluidProps) => {
       powerPreference: 'high-performance',
       preserveDrawingBuffer: false,
     });
-    if (!gl) return;
+    if (!gl) {
+      console.warn('WebGL not supported on this browser context');
+      return;
+    }
 
     const update = createProgram(gl, updateFragment);
     const render = createProgram(gl, renderFragment);
-    if (!update || !render) return;
+    if (!update || !render) {
+      console.error('Failed to create WebGL update or render programs');
+      return;
+    }
 
     const quad = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, quad);
@@ -240,12 +265,12 @@ export const WaterFluid = ({ reducedMotion = false }: WaterFluidProps) => {
     const point: Point = {
       x: 0.5,
       y: 0.5,
-      vx: 0.05,
-      vy: 0.03,
+      vx: 0.08,
+      vy: 0.06,
       down: false,
       impulseX: 0.5,
       impulseY: 0.5,
-      impulseStrength: 0.4,
+      impulseStrength: 0.6,
     };
     let targetPointer = { x: 0.5, y: 0.5 };
 
@@ -327,7 +352,7 @@ export const WaterFluid = ({ reducedMotion = false }: WaterFluidProps) => {
       point.y += (targetPointer.y - point.y) * Math.min(1, dt * 9);
       point.vx *= Math.pow(0.035, dt);
       point.vy *= Math.pow(0.035, dt);
-      point.impulseStrength = Math.max(0, point.impulseStrength - dt * 1.8);
+      point.impulseStrength = Math.max(0, point.impulseStrength - dt * 1.6);
 
       const write = 1 - read;
       gl.bindFramebuffer(gl.FRAMEBUFFER, targets[write].framebuffer);
