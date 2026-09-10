@@ -1,7 +1,7 @@
 /**
- * WATERFALL SCENE & FLUID TYPOGRAPHY
- * Verified 2D Discrete Wave Grid Fluid Simulation (128x72, damping 0.965).
- * Typography is physically carried by the fluid velocity field with refractive caustics.
+ * WATERFALL SCENE — THE LIVING PHOTOREALISTIC ASPIRATION FLOW
+ * Real 4K mountain waterfall canyon combined with verified 2D discrete wave simulation.
+ * Typography is physically carried downstream by the fluid velocity field.
  */
 
 import { ForceEvent } from '../input/InputEngine';
@@ -21,6 +21,8 @@ interface FluidGlyph {
 }
 
 export class WaterfallScene {
+  private img: HTMLImageElement | null = null;
+  private isImageLoaded: boolean = false;
   private buf1: Float32Array = new Float32Array(SIM_COLS * SIM_ROWS);
   private buf2: Float32Array = new Float32Array(SIM_COLS * SIM_ROWS);
   private offscreenCanvas: HTMLCanvasElement;
@@ -29,6 +31,7 @@ export class WaterfallScene {
   private fluidGlyphs: FluidGlyph[] = [];
 
   constructor() {
+    this.loadImage();
     this.offscreenCanvas = document.createElement('canvas');
     this.offscreenCanvas.width = SIM_COLS;
     this.offscreenCanvas.height = SIM_ROWS;
@@ -39,24 +42,32 @@ export class WaterfallScene {
     this.initFluidGlyphs();
   }
 
+  private loadImage() {
+    this.img = new Image();
+    this.img.src = '/images/waterfall.jpg';
+    this.img.onload = () => {
+      this.isImageLoaded = true;
+    };
+  }
+
   private initFluidGlyphs() {
     this.fluidGlyphs = [
-      { text: 'DÒNG CHẢY KHÁT VỌNG', x: 0.5, y: 0.35, vx: 0, vy: 0.0008, baseY: 0.35, opacity: 1 },
-      { text: 'KIÊN TRÌ TÍCH TỤ TỪNG GIỌT NHỎ', x: 0.5, y: 0.48, vx: 0, vy: 0.0006, baseY: 0.48, opacity: 0.85 },
-      { text: 'NHỊP ĐIỆU VẬN HÀNH & KỶ LUẬT', x: 0.5, y: 0.60, vx: 0, vy: 0.0005, baseY: 0.60, opacity: 0.75 },
+      { text: 'DÒNG CHẢY KHÁT VỌNG', x: 0.5, y: 0.35, vx: 0, vy: 0.0009, baseY: 0.35, opacity: 1 },
+      { text: 'KIÊN TRÌ TÍCH TỤ TỪNG GIỌT NHỎ', x: 0.5, y: 0.48, vx: 0, vy: 0.0007, baseY: 0.48, opacity: 0.88 },
+      { text: 'NHỊP ĐIỆU VẬN HÀNH & KỶ LUẬT', x: 0.5, y: 0.60, vx: 0, vy: 0.0006, baseY: 0.60, opacity: 0.78 },
     ];
   }
 
   public update(progress: number, forces: ForceEvent[], deltaTime: number) {
     const dt = Math.min(deltaTime, 33) / 16.67;
 
-    // Inject force events into 2D discrete wave grid
+    // Force injection into wave grid
     for (let i = 0; i < forces.length; i++) {
       const f = forces[i];
       const cx = Math.floor(Math.max(1, Math.min(SIM_COLS - 2, f.x * SIM_COLS)));
       const cy = Math.floor(Math.max(1, Math.min(SIM_ROWS - 2, f.y * SIM_ROWS)));
       const radius = 3;
-      const strength = f.speed * 120 + f.pressure * 80;
+      const strength = f.speed * 140 + f.pressure * 90;
 
       for (let dy = -radius; dy <= radius; dy++) {
         for (let dx = -radius; dx <= radius; dx++) {
@@ -72,7 +83,7 @@ export class WaterfallScene {
       }
     }
 
-    // Discrete Wave Equation solver step
+    // 2D Wave step
     let b1 = this.buf1;
     const b2 = this.buf2;
 
@@ -89,16 +100,16 @@ export class WaterfallScene {
     this.buf1 = b2;
     this.buf2 = b1;
 
-    // Update immersed fluid typography drift
+    // Fluid typography drift
     for (let i = 0; i < this.fluidGlyphs.length; i++) {
       const g = this.fluidGlyphs[i];
       const gx = Math.floor(Math.max(1, Math.min(SIM_COLS - 2, g.x * SIM_COLS)));
       const gy = Math.floor(Math.max(1, Math.min(SIM_ROWS - 2, g.y * SIM_ROWS)));
       const waveVal = this.buf1[gy * SIM_COLS + gx] || 0;
 
-      g.y += (g.vy + waveVal * 0.00002) * dt;
-      if (g.y > 0.85) {
-        g.y = 0.25;
+      g.y += (g.vy + waveVal * 0.000025) * dt;
+      if (g.y > 0.88) {
+        g.y = 0.22;
       }
     }
   }
@@ -110,29 +121,34 @@ export class WaterfallScene {
     progress: number,
     locale: 'vi' | 'en'
   ) {
-    // Scene Envelope: Active between progress 0.36 -> 0.68
     let sceneAlpha = 0;
     if (progress >= 0.36 && progress < 0.46) {
       sceneAlpha = (progress - 0.36) / 0.10;
     } else if (progress >= 0.46 && progress <= 0.58) {
       sceneAlpha = 1.0;
     } else if (progress > 0.58 && progress <= 0.68) {
-      sceneAlpha = 1.0 - (progress - 0.58) / 0.10; // Parting into forest
+      sceneAlpha = 1.0 - (progress - 0.58) / 0.10;
     }
     if (sceneAlpha <= 0) return;
 
     ctx.save();
     ctx.globalAlpha = sceneAlpha;
 
-    // 1. Deep Mineral Fluid Background
-    const bgGrad = ctx.createLinearGradient(0, 0, 0, height);
-    bgGrad.addColorStop(0, '#0c1218');
-    bgGrad.addColorStop(0.4, '#101c26');
-    bgGrad.addColorStop(1, '#182b3a');
-    ctx.fillStyle = bgGrad;
-    ctx.fillRect(0, 0, width, height);
+    // 1. Draw Real 4K Waterfall Canyon Photo Plate with Downward Plunge Parallax
+    if (this.isImageLoaded && this.img) {
+      const plungeScale = 1.0 + (progress - 0.36) * 0.25;
+      const dw = width * plungeScale;
+      const dh = height * plungeScale;
+      const dx = (width - dw) * 0.5;
+      const dy = (height - dh) * 0.5 - (progress - 0.36) * height * 0.15; // Downward tracking
 
-    // 2. Render 2D Wave Grid caustics to offscreen buffer
+      ctx.drawImage(this.img, dx, dy, dw, dh);
+    } else {
+      ctx.fillStyle = '#0e1822';
+      ctx.fillRect(0, 0, width, height);
+    }
+
+    // 2. Wave Grid Fluid Caustics Overlay
     if (this.imgData && this.offCtx) {
       const data = this.imgData.data;
       const b = this.buf1;
@@ -146,18 +162,21 @@ export class WaterfallScene {
           const dy = b[idx + SIM_COLS] - b[idx - SIM_COLS];
           const intensity = Math.max(-128, Math.min(128, (dx + dy) * 1.8));
 
-          data[pIdx] = Math.min(255, Math.max(0, 30 + intensity * 0.7)); // R
-          data[pIdx + 1] = Math.min(255, Math.max(0, 65 + intensity * 1.1)); // G
-          data[pIdx + 2] = Math.min(255, Math.max(0, 95 + intensity * 1.4)); // B
-          data[pIdx + 3] = Math.min(255, Math.max(0, Math.abs(intensity) * 2.0 + 35)); // A
+          data[pIdx] = Math.min(255, Math.max(0, 40 + intensity * 0.8));
+          data[pIdx + 1] = Math.min(255, Math.max(0, 80 + intensity * 1.2));
+          data[pIdx + 2] = Math.min(255, Math.max(0, 120 + intensity * 1.5));
+          data[pIdx + 3] = Math.min(255, Math.max(0, Math.abs(intensity) * 1.8 + 25));
         }
       }
 
       this.offCtx.putImageData(this.imgData, 0, 0);
+      ctx.save();
+      ctx.globalAlpha = 0.55 * sceneAlpha;
       ctx.drawImage(this.offscreenCanvas, 0, 0, width, height);
+      ctx.restore();
     }
 
-    // 3. Immersed Fluid Typography (Carried by Waterfall current)
+    // 3. Immersed Fluid Typography (Flowing with Water Torrent)
     ctx.save();
     ctx.textAlign = 'center';
 
@@ -182,13 +201,13 @@ export class WaterfallScene {
 
       ctx.font =
         i === 0
-          ? '600 clamp(20px, 3.4vw, 42px) "Cormorant Garamond", Georgia, serif'
-          : '400 clamp(12px, 1.8vw, 18px) "Space Grotesk", monospace';
-      ctx.letterSpacing = i === 0 ? '0.12em' : '0.2em';
+          ? '600 clamp(24px, 4.0vw, 52px) "Cormorant Garamond", Georgia, serif'
+          : '500 clamp(12px, 1.8vw, 20px) "Space Grotesk", monospace';
+      ctx.letterSpacing = i === 0 ? '0.12em' : '0.24em';
 
-      ctx.fillStyle = `rgba(220, 238, 250, ${g.opacity * sceneAlpha * 0.9})`;
-      ctx.shadowColor = '#49B3FC';
-      ctx.shadowBlur = 14;
+      ctx.fillStyle = `rgba(240, 250, 255, ${g.opacity * sceneAlpha * 0.95})`;
+      ctx.shadowColor = '#49b3fc';
+      ctx.shadowBlur = 18;
 
       ctx.fillText(text, gx, gy);
     }

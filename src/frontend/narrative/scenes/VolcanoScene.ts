@@ -1,7 +1,7 @@
 /**
- * VOLCANO SCENE & THE PHYSICAL BIRTH OF IDENTITY
- * Molten magma caldera where NGÔ PHÚC / POSTLAIN is physically born from incandescent rock.
- * Features upward convection, elastic stretch, and cooling stabilization.
+ * VOLCANO SCENE — THE LIVING PHOTOREALISTIC BIRTH OF IDENTITY
+ * Real 4K active volcanic crater with churning molten magma lake, incandescent veins,
+ * and the physical birth & stabilization of NGÔ PHÚC / POSTLAIN from liquid rock.
  */
 
 import { ForceEvent } from '../input/InputEngine';
@@ -18,22 +18,33 @@ interface MagmaSpur {
 }
 
 export class VolcanoScene {
+  private img: HTMLImageElement | null = null;
+  private isImageLoaded: boolean = false;
   private spurs: MagmaSpur[] = [];
-  private readonly maxSpurs = 220;
+  private readonly maxSpurs = 260;
 
   constructor() {
+    this.loadImage();
     this.initSpurs();
+  }
+
+  private loadImage() {
+    this.img = new Image();
+    this.img.src = '/images/volcano.jpg';
+    this.img.onload = () => {
+      this.isImageLoaded = true;
+    };
   }
 
   private initSpurs() {
     this.spurs = [];
     for (let i = 0; i < this.maxSpurs; i++) {
       this.spurs.push({
-        x: 0.5 + (Math.random() - 0.5) * 0.4,
-        y: 0.6 + Math.random() * 0.4,
-        vx: (Math.random() - 0.5) * 0.001,
-        vy: -0.001 - Math.random() * 0.003,
-        radius: 2 + Math.random() * 5,
+        x: 0.5 + (Math.random() - 0.5) * 0.45,
+        y: 0.65 + Math.random() * 0.35,
+        vx: (Math.random() - 0.5) * 0.0012,
+        vy: -0.0012 - Math.random() * 0.0035,
+        radius: 2 + Math.random() * 5.5,
         heat: 0.8 + Math.random() * 0.2,
         life: Math.random(),
       });
@@ -47,7 +58,7 @@ export class VolcanoScene {
       const s = this.spurs[i];
       s.x += s.vx * dt;
       s.y += s.vy * dt;
-      s.life += 0.006 * dt;
+      s.life += 0.007 * dt;
 
       // Force attraction
       for (let j = 0; j < forces.length; j++) {
@@ -55,22 +66,20 @@ export class VolcanoScene {
         const dx = s.x - f.x;
         const dy = s.y - f.y;
         const dist = Math.hypot(dx, dy);
-        if (dist < 0.2) {
-          s.vx += (dx / (dist + 0.001)) * f.speed * 0.003;
-          s.vy += (dy / (dist + 0.001)) * f.speed * 0.003;
+        if (dist < 0.22) {
+          s.vx += (dx / (dist + 0.001)) * f.speed * 0.0035;
+          s.vy += (dy / (dist + 0.001)) * f.speed * 0.0035;
         }
       }
 
-      // Drag and buoyancy
       s.vx *= Math.pow(0.94, dt);
       s.vy *= Math.pow(0.96, dt);
 
-      // Reset when life expires or rises past top
       if (s.y < 0.1 || s.life > 1.0) {
         s.x = 0.5 + (Math.random() - 0.5) * 0.45;
-        s.y = 0.75 + Math.random() * 0.25;
+        s.y = 0.72 + Math.random() * 0.28;
         s.vx = (Math.random() - 0.5) * 0.0012;
-        s.vy = -0.0015 - Math.random() * 0.0035;
+        s.vy = -0.0015 - Math.random() * 0.004;
         s.life = 0;
       }
     }
@@ -83,62 +92,52 @@ export class VolcanoScene {
     progress: number,
     locale: 'vi' | 'en'
   ) {
-    // Scene Envelope: Active between progress 0.14 -> 0.48
     let sceneAlpha = 0;
     if (progress >= 0.14 && progress < 0.24) {
-      sceneAlpha = (progress - 0.14) / 0.10; // Fade in from desert
+      sceneAlpha = (progress - 0.14) / 0.10;
     } else if (progress >= 0.24 && progress <= 0.38) {
       sceneAlpha = 1.0;
     } else if (progress > 0.38 && progress <= 0.48) {
-      sceneAlpha = 1.0 - (progress - 0.38) / 0.10; // Cool into water
+      sceneAlpha = 1.0 - (progress - 0.38) / 0.10;
     }
     if (sceneAlpha <= 0) return;
 
     ctx.save();
     ctx.globalAlpha = sceneAlpha;
 
-    // Cooling factor: As progress moves past 0.34, thermal colors grade toward slate basalt
     const coolingProgress = Math.max(0, Math.min(1, (progress - 0.32) / 0.12));
 
-    // 1. Dark Volcanic Sky & Atmosphere
-    const skyGrad = ctx.createLinearGradient(0, 0, 0, height);
-    if (coolingProgress > 0) {
-      skyGrad.addColorStop(0, '#0a0d10');
-      skyGrad.addColorStop(0.5, '#12181f');
-      skyGrad.addColorStop(1, '#1b242e'); // Steam & blue condensation tones
+    // 1. Draw Real 4K Volcano Photo Plate
+    if (this.isImageLoaded && this.img) {
+      const zoomScale = 1.0 + (progress - 0.14) * 0.35;
+      const dw = width * zoomScale;
+      const dh = height * zoomScale;
+      const dx = (width - dw) * 0.5;
+      const dy = (height - dh) * 0.5;
+
+      ctx.drawImage(this.img, dx, dy, dw, dh);
     } else {
-      skyGrad.addColorStop(0, '#0c0706');
-      skyGrad.addColorStop(0.5, '#1e0c08');
-      skyGrad.addColorStop(1, '#3a130c'); // Radiant magma glow
+      ctx.fillStyle = '#0f0806';
+      ctx.fillRect(0, 0, width, height);
     }
-    ctx.fillStyle = skyGrad;
+
+    // 2. Churning Molten Magma Convection Overlay in Caldera Core
+    const coreX = width * 0.5;
+    const coreY = height * 0.72;
+    const coreRadius = Math.max(120, width * 0.22);
+
+    const magmaGlow = ctx.createRadialGradient(coreX, coreY, 10, coreX, coreY, coreRadius * 2.2);
+    if (coolingProgress > 0) {
+      magmaGlow.addColorStop(0, 'rgba(80, 140, 200, 0.45)'); // Steam & cooling vapor
+      magmaGlow.addColorStop(0.5, 'rgba(30, 45, 60, 0.3)');
+      magmaGlow.addColorStop(1, 'rgba(10, 15, 20, 0)');
+    } else {
+      magmaGlow.addColorStop(0, 'rgba(255, 180, 40, 0.75)');
+      magmaGlow.addColorStop(0.4, 'rgba(255, 60, 10, 0.5)');
+      magmaGlow.addColorStop(1, 'rgba(30, 10, 5, 0)');
+    }
+    ctx.fillStyle = magmaGlow;
     ctx.fillRect(0, 0, width, height);
-
-    // 2. Volcanic Crater Base Geometry
-    ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(0, height);
-    ctx.lineTo(width * 0.2, height * 0.62);
-    ctx.lineTo(width * 0.45, height * 0.72);
-    ctx.lineTo(width * 0.55, height * 0.72);
-    ctx.lineTo(width * 0.8, height * 0.62);
-    ctx.lineTo(width, height);
-    ctx.closePath();
-
-    const craterGrad = ctx.createLinearGradient(0, height * 0.62, 0, height);
-    if (coolingProgress > 0) {
-      craterGrad.addColorStop(0, '#151b22');
-      craterGrad.addColorStop(1, '#090d12');
-    } else {
-      craterGrad.addColorStop(0, '#ff4500');
-      craterGrad.addColorStop(0.3, '#cf4525');
-      craterGrad.addColorStop(1, '#1a0805');
-    }
-    ctx.fillStyle = craterGrad;
-    ctx.shadowColor = coolingProgress > 0 ? '#4895ef' : '#ff4500';
-    ctx.shadowBlur = coolingProgress > 0 ? 10 : 35;
-    ctx.fill();
-    ctx.restore();
 
     // 3. Magma Spurs & Rising Convection Embers
     for (let i = 0; i < this.spurs.length; i++) {
@@ -151,66 +150,64 @@ export class VolcanoScene {
       ctx.arc(sx, sy, s.radius * (1 - s.life * 0.4), 0, Math.PI * 2);
 
       if (coolingProgress > 0.5) {
-        ctx.fillStyle = `rgba(160, 200, 240, ${emberAlpha * 0.7})`; // Steam condensation droplet
+        ctx.fillStyle = `rgba(180, 220, 255, ${emberAlpha * 0.8})`;
         ctx.shadowColor = '#7890a3';
-        ctx.shadowBlur = 6;
+        ctx.shadowBlur = 8;
       } else {
-        ctx.fillStyle = `rgba(255, ${Math.floor(100 + (1 - s.life) * 155)}, 30, ${emberAlpha})`;
-        ctx.shadowColor = '#cf4525';
-        ctx.shadowBlur = 12;
+        ctx.fillStyle = `rgba(255, ${Math.floor(120 + (1 - s.life) * 135)}, 30, ${emberAlpha})`;
+        ctx.shadowColor = '#ff4500';
+        ctx.shadowBlur = 14;
       }
       ctx.fill();
     }
 
-    // 4. The Birth of Identity: NGÔ PHÚC & POSTLAIN
-    // Progress window for formation: 0.22 -> 0.36
+    // 4. The Living Birth of Identity: NGÔ PHÚC / POSTLAIN
     const formationFactor = Math.max(0, Math.min(1, (progress - 0.20) / 0.08));
     const settleFactor = Math.max(0, Math.min(1, (progress - 0.26) / 0.06));
 
     if (formationFactor > 0) {
       ctx.save();
-      const identityY = height * 0.38 - (1 - settleFactor) * (height * 0.08); // Elastic rise and settle
+      const identityY = height * 0.36 - (1 - settleFactor) * (height * 0.06);
       ctx.textAlign = 'center';
 
-      // Primary: NGÔ PHÚC (Display Serif Cormorant Garamond)
-      ctx.font = '700 clamp(36px, 6vw, 76px) "Cormorant Garamond", Georgia, serif';
+      // Primary: NGÔ PHÚC (Cormorant Garamond, Born from fire)
+      ctx.font = '700 clamp(42px, 6.8vw, 88px) "Cormorant Garamond", Georgia, serif';
       ctx.letterSpacing = '0.04em';
 
       if (coolingProgress > 0) {
-        ctx.fillStyle = `rgba(240, 244, 248, ${sceneAlpha})`;
-        ctx.shadowColor = 'rgba(120, 144, 163, 0.6)';
-        ctx.shadowBlur = 12;
+        ctx.fillStyle = `rgba(245, 250, 255, ${sceneAlpha})`;
+        ctx.shadowColor = 'rgba(73, 179, 252, 0.75)';
+        ctx.shadowBlur = 16;
       } else {
-        ctx.fillStyle = `rgba(255, 235, 220, ${sceneAlpha})`;
+        ctx.fillStyle = `rgba(255, 245, 235, ${sceneAlpha})`;
         ctx.shadowColor = '#cf4525';
-        ctx.shadowBlur = 25 * (1 - settleFactor * 0.5);
+        ctx.shadowBlur = 30 * (1 - settleFactor * 0.4);
       }
-
       ctx.fillText(AUTOBIOGRAPHY_DATA.identity.name, width * 0.5, identityY);
 
       // Sub-identity: POSTLAIN
-      ctx.font = '600 clamp(13px, 1.8vw, 20px) "Space Grotesk", monospace';
-      ctx.letterSpacing = '0.28em';
+      ctx.font = '600 clamp(14px, 2.0vw, 22px) "Space Grotesk", monospace';
+      ctx.letterSpacing = '0.32em';
       ctx.fillStyle =
         coolingProgress > 0
-          ? 'rgba(160, 185, 210, 0.85)'
-          : 'rgba(255, 120, 60, 0.9)';
-      ctx.shadowBlur = 8;
+          ? 'rgba(180, 210, 240, 0.9)'
+          : 'rgba(255, 140, 70, 0.95)';
+      ctx.shadowBlur = 10;
       ctx.fillText(
         `[ ${AUTOBIOGRAPHY_DATA.identity.brand} ]`,
         width * 0.5,
-        identityY + 44
+        identityY + 48
       );
 
       // Role subtitle: Operations & Studio Manager
-      ctx.font = '400 clamp(10px, 1.2vw, 13px) "Plus Jakarta Sans", sans-serif';
-      ctx.letterSpacing = '0.18em';
-      ctx.fillStyle = 'rgba(210, 200, 190, 0.7)';
+      ctx.font = '500 clamp(11px, 1.3vw, 15px) "Plus Jakarta Sans", sans-serif';
+      ctx.letterSpacing = '0.2em';
+      ctx.fillStyle = 'rgba(235, 225, 215, 0.85)';
       ctx.shadowBlur = 0;
       ctx.fillText(
         AUTOBIOGRAPHY_DATA.identity.roleTitle[locale],
         width * 0.5,
-        identityY + 74
+        identityY + 80
       );
 
       ctx.restore();

@@ -103,6 +103,46 @@ export class ExperienceRuntime {
     this.moonScene.render(this.ctx, w, h, progress, this.locale);
   };
 
+  public handlePointerMove(clientX: number, clientY: number) {
+    if (!this.canvas) return;
+    const rect = this.canvas.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2.0);
+    const canvasX = (clientX - rect.left) * dpr;
+    const canvasY = (clientY - rect.top) * dpr;
+    this.moonScene.handlePointerMove(canvasX, canvasY, this.canvas.width, this.canvas.height);
+  }
+
+  public handleClick(clientX: number, clientY: number) {
+    if (!this.canvas) return;
+    const rect = this.canvas.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2.0);
+    const canvasX = (clientX - rect.left) * dpr;
+    const canvasY = (clientY - rect.top) * dpr;
+    const node = this.moonScene.handleClick(canvasX, canvasY, this.canvas.width, this.canvas.height);
+    if (node) {
+      this.audio.playTactileClick();
+    }
+  }
+
+  public nextBeat() {
+    this.timeline.nextBeat();
+    this.audio.playTactileClick();
+  }
+
+  public prevBeat() {
+    this.timeline.prevBeat();
+    this.audio.playTactileClick();
+  }
+
+  public setBeat(index: number) {
+    this.timeline.setBeat(index);
+    this.audio.playTactileClick();
+  }
+
+  public getCurrentBeatIndex(): number {
+    return this.timeline.getCurrentBeatIndex();
+  }
+
   public setLocale(newLocale: 'vi' | 'en') {
     this.locale = newLocale;
     this.audio.playTactileClick();
@@ -128,3 +168,4 @@ export class ExperienceRuntime {
     this.input.destroy();
   }
 }
+
