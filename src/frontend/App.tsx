@@ -1,80 +1,50 @@
-import React, { useEffect, useState, useRef } from 'react';
-import Lenis from 'lenis';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { AppleNavbar } from './components/apple/AppleNavbar';
+import React, { useState, useEffect } from 'react';
+import { SOTYStageCanvas } from './three/SOTYStageCanvas';
+import { useSOTYTimelineEngine } from './core/SOTYTimelineEngine';
+import { SOTYSession00Genesis } from './components/soty/SOTYSession00Genesis';
+import { SOTYSession01DualEngine } from './components/soty/SOTYSession01DualEngine';
+import { SOTYSession02Crucibles } from './components/soty/SOTYSession02Crucibles';
+import { SOTYSession03Arsenals } from './components/soty/SOTYSession03Arsenals';
+import { SOTYSession04Terminal } from './components/soty/SOTYSession04Terminal';
+import { SOTYNavbar } from './components/soty/SOTYNavbar';
 import { ApplePreloader } from './components/apple/ApplePreloader';
-import { AppleHero } from './components/apple/AppleHero';
-import { AppleScrubPhilosophy } from './components/apple/AppleScrubPhilosophy';
-import { AppleMilestonesRunway } from './components/apple/AppleMilestonesRunway';
-import { AppleBentoSpecs } from './components/apple/AppleBentoSpecs';
-import { AppleContactFooter } from './components/apple/AppleContactFooter';
 import { AppleCustomCursor } from './components/apple/AppleCustomCursor';
 import { AppleToast } from './components/apple/AppleToast';
 import { AppleAudio } from './audio/AppleHapticAudio';
-
-gsap.registerPlugin(ScrollTrigger);
 
 export const App: React.FC = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [lang, setLang] = useState<'vi' | 'en'>('vi');
   const [isSoundOn, setIsSoundOn] = useState(true);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const lenisRef = useRef<Lenis | null>(null);
+  const [mousePos, setMousePos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [dualTension, setDualTension] = useState(0.5);
 
-  // Initialize Lenis Smooth Scroll and sync with GSAP ScrollTrigger
+  const {
+    currentSession,
+    isTransitioning,
+    transitionProgress,
+    goToSession,
+    nextSession,
+    prevSession,
+  } = useSOTYTimelineEngine();
+
+  // Track Mouse Movement for WebGL Parallax and Distortion
   useEffect(() => {
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      orientation: 'vertical',
-      smoothWheel: true,
-      touchMultiplier: 2,
-    });
-
-    lenisRef.current = lenis;
-    (window as any).__lenis = lenis;
-
-    // Sync Lenis with GSAP ScrollTrigger
-    lenis.on('scroll', ScrollTrigger.update);
-
-    const updateTicker = (time: number) => {
-      lenis.raf(time * 1000);
+    const handleMouseMove = (e: MouseEvent) => {
+      const x = (e.clientX / window.innerWidth) * 2 - 1;
+      const y = -(e.clientY / window.innerHeight) * 2 + 1;
+      setMousePos({ x, y });
     };
 
-    gsap.ticker.add(updateTicker);
-    gsap.ticker.lagSmoothing(0);
-
-    return () => {
-      gsap.ticker.remove(updateTicker);
-      lenis.destroy();
-    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
   const handlePreloaderComplete = (withSound: boolean) => {
     setIsSoundOn(withSound);
+    AppleAudio.setSoundEnabled(withSound);
     setIsLoaded(true);
-    // Refresh ScrollTrigger after DOM renders
-    setTimeout(() => {
-      ScrollTrigger.refresh();
-    }, 100);
-  };
-
-  const handleScrollTo = (sectionId: string) => {
-    const el = document.getElementById(sectionId);
-    if (el && lenisRef.current) {
-      lenisRef.current.scrollTo(el, { offset: 0, duration: 1.4 });
-    } else if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  const handleScrollToTop = () => {
-    if (lenisRef.current) {
-      lenisRef.current.scrollTo(0, { duration: 1.4 });
-    } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
   };
 
   const handleShowToast = (msg: string) => {
@@ -85,7 +55,7 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="relative min-h-screen bg-black text-white selection:bg-amber-400 selection:text-black font-body overflow-x-hidden">
+    <div className="fixed inset-0 w-full h-full bg-black text-white selection:bg-amber-400 selection:text-black font-body overflow-hidden select-none">
       {/* Magnetic Spring Custom Cursor */}
       <AppleCustomCursor />
 
@@ -97,36 +67,65 @@ export const App: React.FC = () => {
         <ApplePreloader onComplete={handlePreloaderComplete} lang={lang} />
       )}
 
-      {/* Main Glass Navbar */}
-      <AppleNavbar
+      {/* WebGL 100dvh Shader Canvas */}
+      <SOTYStageCanvas
+        currentSession={currentSession}
+        transitionProgress={transitionProgress}
+        isTransitioning={isTransitioning}
+        mousePos={mousePos}
+        dualTension={dualTension}
+      />
+
+      {/* Clean Top Glass Navbar (No distracting dock/progress bars) */}
+      <SOTYNavbar
         lang={lang}
         setLang={setLang}
         isSoundOn={isSoundOn}
         setIsSoundOn={setIsSoundOn}
-        onScrollTo={handleScrollTo}
+        onGoToGenesis={() => goToSession(0)}
+        onGoToContact={() => goToSession(4)}
       />
 
-      {/* Section 1: Giant Kinetic Typography Hero */}
-      <main id="main-content" tabIndex={-1} className="focus:outline-none">
-        <AppleHero
+      {/* 5 Bespoke SOTY Sessions Container */}
+      <main className="relative w-full h-full z-10">
+        {/* Session 00: Identity Genesis */}
+        <SOTYSession00Genesis
           lang={lang}
-          onScrollDown={() => handleScrollTo('philosophy-section')}
+          onNext={nextSession}
+          isActive={currentSession === 0}
         />
 
-        {/* Section 2: Apple Word-by-Word Scrubbing Philosophy */}
-        <AppleScrubPhilosophy lang={lang} />
+        {/* Session 01: Dual-Engine Matrix */}
+        <SOTYSession01DualEngine
+          lang={lang}
+          onNext={nextSession}
+          onPrev={prevSession}
+          isActive={currentSession === 1}
+          onTensionChange={setDualTension}
+        />
 
-        {/* Section 3: Horizontal Milestone Runway */}
-        <AppleMilestonesRunway lang={lang} />
+        {/* Session 02: 4 Crucible Milestones */}
+        <SOTYSession02Crucibles
+          lang={lang}
+          onNext={nextSession}
+          onPrev={prevSession}
+          isActive={currentSession === 2}
+        />
 
-        {/* Section 4: 2x2 Bento Capability Matrix */}
-        <AppleBentoSpecs lang={lang} />
+        {/* Session 03: 4 Command Arsenals */}
+        <SOTYSession03Arsenals
+          lang={lang}
+          onNext={nextSession}
+          onPrev={prevSession}
+          isActive={currentSession === 3}
+        />
 
-        {/* Section 5: Direct Contact Monolith & Outro */}
-        <AppleContactFooter
+        {/* Session 04: Terminal of Engagement & Hidden Music */}
+        <SOTYSession04Terminal
           lang={lang}
           onShowToast={handleShowToast}
-          onScrollToTop={handleScrollToTop}
+          onRestart={() => goToSession(0)}
+          isActive={currentSession === 4}
         />
       </main>
     </div>

@@ -1,5 +1,5 @@
 /**
- * AUTOMATED BROWSER TESTING SUITE FOR POSTLAIN APPLE MINIMALIST SOTY
+ * AUTOMATED BROWSER TESTING SUITE FOR POSTLAIN SOTY ZERO-SCROLL STAGE
  * Automated Codex-Style Browser Verification Agent
  */
 
@@ -29,6 +29,8 @@ async function runBrowserTest() {
     '--disable-web-security',
     '--allow-running-insecure-content',
     '--enable-unsafe-swiftshader',
+    '--autoplay-policy=no-user-gesture-required',
+    '--mute-audio',
   ];
 
   if (!isHeaded) {
@@ -96,9 +98,9 @@ async function runBrowserTest() {
     );
 
     console.log('✨ "ENTER PORTFOLIO" button appeared. Capturing preloader screenshot...');
-    await page.screenshot({ path: path.join(artifactsDir, '00_apple_preloader.png') });
+    await page.screenshot({ path: path.join(artifactsDir, '00_soty_preloader.png') });
 
-    // 2. Click "ENTER PORTFOLIO"
+    // 2. Click "ENTER PORTFOLIO" -> Enter Session 00 (Genesis)
     console.log('👆 Clicking "ENTER PORTFOLIO"...');
     await page.evaluate(() => {
       const btn = Array.from(document.querySelectorAll('button')).find((b) =>
@@ -107,58 +109,83 @@ async function runBrowserTest() {
       if (btn) btn.click();
     });
 
-    await new Promise((r) => setTimeout(r, 1000));
-    console.log('✨ Entered Apple Minimalist Hero Section. Capturing screenshot...');
-    await page.screenshot({ path: path.join(artifactsDir, '01_apple_hero.png') });
+    await new Promise((r) => setTimeout(r, 1200));
+    console.log('✨ Entered Session 00: Identity Genesis. Capturing screenshot...');
+    await page.screenshot({ path: path.join(artifactsDir, '01_soty_genesis.png') });
 
-    // 3. Scroll to Philosophy Section (Apple Word Scrub)
-    console.log('🖱️ Scrolling into Section 01: Triết Lý Vận Hành (Apple Word Scrub)...');
-    await page.mouse.wheel({ deltaY: 800 });
-    await new Promise((r) => setTimeout(r, 800));
-    await page.mouse.wheel({ deltaY: 600 });
-    await new Promise((r) => setTimeout(r, 800));
-    await page.screenshot({ path: path.join(artifactsDir, '02_apple_philosophy.png') });
+    // 3. Advance to Session 01: Dual-Engine Matrix
+    console.log('🖱️ Advancing to Session 01: The Dual-Engine Matrix...');
+    await page.evaluate(() => {
+      if ((window).__sotyEngine) (window).__sotyEngine.goToSession(1);
+    });
+    await new Promise((r) => setTimeout(r, 1400));
 
-    // 4. Scroll to Milestones Section (Horizontal Runway)
-    console.log('🖱️ Scrolling into Section 02: Cột Mốc Thực Chiến (4 Career Monoliths)...');
-    await page.mouse.wheel({ deltaY: 1000 });
-    await new Promise((r) => setTimeout(r, 800));
-    await page.mouse.wheel({ deltaY: 1000 });
-    await new Promise((r) => setTimeout(r, 800));
-    await page.screenshot({ path: path.join(artifactsDir, '03_apple_milestones.png') });
+    // Test Tension Slider
+    console.log('🎛️ Adjusting Dual-Engine Tension slider...');
+    await page.evaluate(() => {
+      const slider = document.querySelector('input[type="range"]');
+      if (slider) {
+        slider.value = '75';
+        slider.dispatchEvent(new Event('input', { bubbles: true }));
+        slider.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    });
+    await new Promise((r) => setTimeout(r, 600));
+    console.log('✨ Capturing Session 01 Dual-Engine screenshot...');
+    await page.screenshot({ path: path.join(artifactsDir, '02_soty_dual_engine.png') });
 
-    // 5. Scroll to Bento Section (4 Live Capability Widgets)
-    console.log('🖱️ Scrolling into Section 03: Vũ Khí Năng Lực (2x2 Bento Matrix)...');
-    await page.mouse.wheel({ deltaY: 1200 });
-    await new Promise((r) => setTimeout(r, 800));
-    await page.mouse.wheel({ deltaY: 800 });
-    await new Promise((r) => setTimeout(r, 800));
+    // 4. Advance to Session 02: 4 Crucible Milestones
+    console.log('🖱️ Advancing to Session 02: 4 Crucible Milestones...');
+    await page.evaluate(() => {
+      if ((window).__sotyEngine) (window).__sotyEngine.goToSession(2);
+    });
+    await new Promise((r) => setTimeout(r, 1400));
 
-    // Test Widget Interactions: Click "TRUYỀN LỬA ĐỘI NGŨ" / "PLAY HARMONIC CHORD"
-    console.log('⚡ Testing Bento interactive widgets...');
+    // Test Station Tabs: Click ALDO GO! tab
+    console.log('👆 Clicking Milestone Station Tab [04/04] ALDO GO!...');
+    await page.evaluate(() => {
+      const tabs = Array.from(document.querySelectorAll('button')).filter((b) =>
+        b.textContent?.includes('ALDO GO') || b.textContent?.includes('[04/04]')
+      );
+      if (tabs.length > 0) tabs[0].click();
+    });
+    await new Promise((r) => setTimeout(r, 600));
+    console.log('✨ Capturing Session 02 Crucibles screenshot...');
+    await page.screenshot({ path: path.join(artifactsDir, '03_soty_crucibles.png') });
+
+    // 5. Advance to Session 03: 4 Command Arsenals
+    console.log('🖱️ Advancing to Session 03: 4 Command Arsenals...');
+    await page.evaluate(() => {
+      if ((window).__sotyEngine) (window).__sotyEngine.goToSession(3);
+    });
+    await new Promise((r) => setTimeout(r, 1400));
+
+    // Test Interactive Console 1 (Morale booster) & Console 4 (Synth note)
+    console.log('⚡ Testing Console Widgets: Morale Booster & Synthesizer Note...');
     await page.evaluate(() => {
       const boostBtn = Array.from(document.querySelectorAll('button')).find((b) =>
         b.textContent?.includes('TRUYỀN LỬA') || b.textContent?.includes('ENERGIZE')
       );
       if (boostBtn) boostBtn.click();
-    });
-    await new Promise((r) => setTimeout(r, 400));
-    await page.screenshot({ path: path.join(artifactsDir, '04_apple_bento.png') });
 
-    // 6. Scroll to Contact Section
-    console.log('🖱️ Scrolling into Section 04: Kênh Kết Nối Trực Tiếp (Contact Monolith)...');
-    await page.evaluate(() => {
-      if ((window).__lenis) {
-        (window).__lenis.scrollTo('#contact-section', { immediate: true });
-      } else {
-        const contactEl = document.querySelector('#contact-section');
-        if (contactEl) contactEl.scrollIntoView();
-      }
+      const synthBtn = Array.from(document.querySelectorAll('button')).find((b) =>
+        b.textContent?.trim() === 'A3' || b.textContent?.trim() === 'C4'
+      );
+      if (synthBtn) synthBtn.click();
     });
-    await new Promise((r) => setTimeout(r, 1200));
+    await new Promise((r) => setTimeout(r, 600));
+    console.log('✨ Capturing Session 03 Arsenals screenshot...');
+    await page.screenshot({ path: path.join(artifactsDir, '04_soty_arsenals.png') });
+
+    // 6. Advance to Session 04: Terminal of Engagement
+    console.log('🖱️ Advancing to Session 04: Terminal of Engagement & Hidden Music...');
+    await page.evaluate(() => {
+      if ((window).__sotyEngine) (window).__sotyEngine.goToSession(4);
+    });
+    await new Promise((r) => setTimeout(r, 1400));
 
     // Test Clipboard Copy for Hotline & Email
-    console.log('📋 Testing 1-click clipboard copy for Hotline & Email...');
+    console.log('📋 Testing 1-click clipboard copy for Hotline...');
     const copyResult = await page.evaluate(() => {
       const copyBtns = Array.from(document.querySelectorAll('button')).filter((b) =>
         b.textContent?.includes('SAO CHÉP') || b.textContent?.includes('COPY')
@@ -171,7 +198,8 @@ async function runBrowserTest() {
     });
     console.log(`📋 Copy action status: ${copyResult ? 'SUCCESS' : 'SKIPPED'}`);
     await new Promise((r) => setTimeout(r, 600));
-    await page.screenshot({ path: path.join(artifactsDir, '05_apple_contact.png') });
+    console.log('✨ Capturing Session 04 Terminal screenshot...');
+    await page.screenshot({ path: path.join(artifactsDir, '05_soty_terminal.png') });
 
     // 7. Test Language Switcher (VI -> EN)
     console.log('🌐 Testing Language Switcher (VI -> EN)...');
