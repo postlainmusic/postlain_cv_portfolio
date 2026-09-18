@@ -54,17 +54,17 @@ export const App: React.FC = () => {
           <span className="amber-mark amber-mark-b" aria-hidden="true" />
 
           <div className="hero-top" data-reveal>
-            <span>HỒ SƠ CÁ NHÂN / 2026</span><span>ĐÀ LẠT / VIỆT NAM</span>
+            <span>HỒ SƠ NGHỀ NGHIỆP / 2026</span><span>ĐÀ LẠT / VIỆT NAM</span>
           </div>
 
           <div className="hero-main">
-            <p className="eyebrow" data-reveal>ĐANG HOẠT ĐỘNG / SẴN SÀNG ĐIỀU HÀNH</p>
+            <p className="eyebrow" data-reveal>OPERATIONS · STUDIO · RETAIL</p>
             <h1 data-reveal>NGÔ<br />PHÚC</h1>
             <p className="hero-alias" data-reveal>[ POSTLAIN ]</p>
             <div className="hero-statement" data-reveal>
               <span className="quote-mark">“</span>
               <p>{vi
-                ? 'Đam mê nghệ thuật và công nghệ. Tôi thích biến những quy trình rối thành cách làm rõ ràng, gọn và hiệu quả.'
+                ? 'Có kinh nghiệm quản lý vận hành trong bán lẻ, F&B và studio. Quan tâm đến quy trình rõ ràng và ứng dụng công nghệ trong công việc.'
                 : 'I work where art, technology and operations meet, turning complicated processes into clear, practical systems.'}</p>
             </div>
           </div>
@@ -81,14 +81,14 @@ export const App: React.FC = () => {
           <div className="section-number" data-reveal>01</div>
           <div className="section-intro" data-reveal>
             <p className="eyebrow">TRIẾT LÝ LÀM VIỆC</p>
-            <h2>{vi ? 'Quản lí bằng logic. Làm việc bằng cảm nhận.' : 'Run with logic. Work with instinct.'}</h2>
+            <h2>{vi ? 'VẬN HÀNH VÀ SÁNG TẠO' : 'Run with logic. Work with instinct.'}</h2>
             <p>{vi
-              ? 'Kinh nghiệm đi qua bán lẻ, bếp, phòng thu và vận hành đội ngũ. Mỗi nơi cho một cách nhìn khác về con người, tốc độ và chất lượng.'
+              ? 'Kinh nghiệm trong bán lẻ, F&B và studio, cùng nền tảng về công nghệ và âm nhạc.'
               : 'Retail, kitchen, studio and team operations shaped the way I read people, pace and quality.'}</p>
           </div>
           <div className="duo-lines" data-reveal>
-            <article><span>01 / VẬN HÀNH</span><h3>{vi ? 'Rõ việc. Đúng nhịp.' : 'Clear work. Right rhythm.'}</h3><p>{vi ? 'SOP, phân ca, doanh thu, hàng hóa, nhân sự và xử lý phát sinh.' : 'SOPs, scheduling, revenue, inventory, people and problems in motion.'}</p></article>
-            <article><span>02 / NGHỆ THUẬT</span><h3>{vi ? 'Giữ được phần người.' : 'Keep the human part.'}</h3><p>{vi ? 'Âm nhạc, hình ảnh và thẩm mỹ giúp cách vận hành không trở nên máy móc.' : 'Music, image and taste keep operations from becoming mechanical.'}</p></article>
+            <article><span>01 / VẬN HÀNH</span><h3>{vi ? 'Rõ việc. Đúng quy trình.' : 'Clear work. Right rhythm.'}</h3><p>{vi ? 'SOP, phân ca, doanh thu, hàng hóa, nhân sự và xử lý công việc hằng ngày.' : 'SOPs, scheduling, revenue, inventory, people and problems in motion.'}</p></article>
+            <article><span>02 / NGHỆ THUẬT</span><h3>{vi ? 'Làm việc cùng đội ngũ.' : 'Keep the human part.'}</h3><p>{vi ? 'Kinh nghiệm studio và âm nhạc hỗ trợ cách tiếp cận công việc sáng tạo.' : 'Music, image and taste keep operations from becoming mechanical.'}</p></article>
           </div>
         </section>
 
@@ -96,7 +96,7 @@ export const App: React.FC = () => {
           <div className="section-number" data-reveal>02</div>
           <div className="section-intro" data-reveal>
             <p className="eyebrow">KINH NGHIỆM THỰC CHIẾN</p>
-            <h2>{vi ? 'Bốn môi trường. Một cách làm.' : 'Four environments. One way of working.'}</h2>
+            <h2>{vi ? 'KINH NGHIỆM LÀM VIỆC' : 'Four environments. One way of working.'}</h2>
           </div>
           <div className="career-list">
             {APPLE_CONTENT.milestones.slice().reverse().map((item, index) => (
@@ -117,7 +117,7 @@ export const App: React.FC = () => {
           <div className="section-number" data-reveal>03</div>
           <div className="contact-copy" data-reveal>
             <p className="eyebrow">LIÊN HỆ</p>
-            <h2>{vi ? 'Nếu có việc đáng làm, hãy nói chuyện.' : 'If there is good work to do, let’s talk.'}</h2>
+            <h2>{vi ? 'TRAO ĐỔI VỀ CÔNG VIỆC' : 'Open to management, operations, studio and digital opportunities.'}</h2>
           </div>
           <div className="contact-lines" data-reveal>
             <a href="tel:0938649420"><span>ĐIỆN THOẠI</span><strong>0938 649 420</strong></a>
