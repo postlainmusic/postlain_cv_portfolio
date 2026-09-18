@@ -92,8 +92,8 @@ export const APPLE_CONTENT: AppleContentData = {
       en: "OPERATIONS & STUDIO MANAGER",
     },
     statement: {
-      vi: "Đam mê nghệ thuật và công nghệ, đặc biệt yêu thích việc quản lí và sắp xếp các quy trình một cách logic và tự động hoá.",
-      en: "Passionate about art and technology, specializing in architecting operations with rigorous logic and automated workflows.",
+      vi: "Có kinh nghiệm quản lý vận hành trong bán lẻ, F&B và studio. Quan tâm đến việc xây dựng quy trình rõ ràng và ứng dụng công nghệ để nâng cao hiệu quả.",
+      en: "Operations experience across retail, F&B and studio environments, with a focus on clear processes and practical use of technology.",
     },
     location: {
       vi: "ĐÀ LẠT, LÂM ĐỒNG · VIỆT NAM",
@@ -108,59 +108,59 @@ export const APPLE_CONTENT: AppleContentData = {
   philosophy: {
     sectionBadge: "01 · TRIẾT LÝ VẬN HÀNH // DUAL-ENGINE",
     slogan: {
-      vi: "Quản lí bằng logic. Thổi hồn bằng nghệ thuật.",
-      en: "Led by logic. Elevated by art.",
+      vi: "VẬN HÀNH VÀ SÁNG TẠO",
+      en: "OPERATIONS AND CREATIVE WORK",
     },
     lead: {
-      vi: "Vận hành xuất sắc không bắt nguồn từ những bảng tính khô khan, mà là nghệ thuật đồng điệu hóa con người, công nghệ và nhịp đập sáng tạo.",
-      en: "Operational excellence is not born from cold spreadsheets alone, but from orchestrating people, technology, and creative rhythm into unison.",
+      vi: "Tập trung vào con người, quy trình và hiệu quả trong công việc hằng ngày.",
+      en: "Focused on people, process and practical results in day-to-day operations.",
     },
     body: {
-      vi: "Hành trình thực chiến kết hợp nền tảng Quan hệ công chúng (ĐH Văn Lang) và Tư duy thiết kế Web (Cao đẳng FPT) tạo nên một năng lực quản trị lưỡng cực hiếm có: kiểm soát kỷ luật quy trình bằng số liệu và tự động hóa AI, đồng thời giữ lửa nhiệt huyết và truyền cảm hứng nghệ thuật cho toàn bộ đội ngũ nhân sự.",
-      en: "Bridging Public Relations (Van Lang University) with Web Design Systems (FPT Polytechnic) yields a rare dual-engine operational capability: executing rigorous process discipline via metrics and AI automation, while maintaining cultural resonance, team morale, and creative elevation.",
+      vi: "Kinh nghiệm thực tế kết hợp với nền tảng Quan hệ công chúng tại Đại học Văn Lang và Thiết kế Web tại FPT Polytechnic.",
+      en: "Practical experience supported by a background in Public Relations at Van Lang University and Web Design at FPT Polytechnic.",
     },
     dualEngine: {
       left: {
         title: {
-          vi: "BÁN CẦU VẬN HÀNH & AI",
-          en: "OPERATIONAL & AI ENGINE",
+          vi: "VẬN HÀNH & CÔNG NGHỆ",
+          en: "OPERATIONS & TECHNOLOGY",
         },
         desc: {
-          vi: "Chuẩn hóa quy trình, tối ưu hóa kho vận chuỗi bán lẻ, quản trị doanh thu phòng thu và xây dựng phần mềm quản lý nhân sự bằng AI.",
-          en: "Process standardization, retail supply-chain control, studio revenue management, and developing internal AI human capital workflows.",
+          vi: "Chuẩn hóa quy trình, quản lý hàng hóa và doanh thu, đồng thời ứng dụng AI cho các công việc lặp lại.",
+          en: "Process standardization, inventory and revenue management, with practical AI automation for repetitive tasks.",
         },
         points: {
           vi: [
-            "Quản trị doanh thu & dòng tiền thực chiến",
-            "Thiết lập SOP và phân ca làm việc tối ưu",
-            "Tự động hóa tác vụ lặp bằng giải pháp AI",
+            "Quản lý doanh thu và dòng tiền",
+            "Thiết lập SOP và phân ca",
+            "Ứng dụng AI cho công việc lặp lại",
           ],
           en: [
-            "Real-world revenue & cash-flow governance",
-            "Standard Operating Procedures & shift scheduling",
-            "Automating repetitive workflows with AI tools",
+            "Revenue and cash-flow management",
+            "SOPs and shift scheduling",
+            "AI-assisted workflow automation",
           ],
         },
       },
       right: {
         title: {
-          vi: "BÁN CẦU NGHỆ THUẬT & TRUYỀN THÔNG",
-          en: "CREATIVE & PR ENGINE",
+          vi: "STUDIO & TRUYỀN THÔNG",
+          en: "STUDIO & COMMUNICATION",
         },
         desc: {
-          vi: "Quản lý nghệ sĩ độc quyền, điều phối sản xuất thu âm/ghi hình, đối tác MCN truyền thông và sáng tạo âm nhạc số thực nghiệm.",
-          en: "Artist management, session production scheduling, MCN media partnerships, and experimental digital sound production.",
+          vi: "Quản lý nghệ sĩ, điều phối lịch sản xuất, làm việc với đối tác truyền thông và phát triển dự án âm nhạc.",
+          en: "Artist management, production scheduling, media partnerships and independent music projects.",
         },
         points: {
           vi: [
-            "Cầu nối đàm phán giữa nghệ sĩ và đối tác MCN",
-            "Định hướng Marketing và trải nghiệm khách hàng",
-            "Nghiên cứu âm thanh số thực nghiệm (Hidden Music)",
+            "Làm việc với nghệ sĩ và đối tác truyền thông",
+            "Marketing và chăm sóc khách hàng",
+            "Phát triển dự án âm nhạc Hidden Music",
           ],
           en: [
-            "Strategic liaison between artists & MCN media",
-            "Marketing trajectory & high-touch client care",
-            "Sonic art & digital sound research (Hidden Music)",
+            "Artist and media partner coordination",
+            "Marketing and client care",
+            "Hidden Music / digital music",
           ],
         },
       },
@@ -170,12 +170,12 @@ export const APPLE_CONTENT: AppleContentData = {
   milestonesHeader: {
     sectionBadge: "02 · CỘT MỐC THỰC CHIẾN // CAREER RUNWAY",
     title: {
-      vi: "HÀNH TRÌNH RÈN GIŨA",
-      en: "PROVEN MILESTONES",
+      vi: "KINH NGHIỆM LÀM VIỆC",
+      en: "WORK EXPERIENCE",
     },
     subtitle: {
-      vi: "4 môi trường áp lực cao định hình bản lĩnh quản trị toàn diện",
-      en: "4 high-intensity arenas shaping multidisciplinary operational command",
+      vi: "Kinh nghiệm trong bán lẻ, F&B và studio.",
+      en: "Experience across retail, F&B and studio operations.",
     },
   },
 
@@ -194,8 +194,8 @@ export const APPLE_CONTENT: AppleContentData = {
         en: "Da Lat, Lam Dong",
       },
       coreValue: {
-        vi: "Kỷ luật quy trình vận hành đầu đời & Quản lý nhịp độ ca kíp.",
-        en: "Foundational operational discipline & shift cadence management.",
+        vi: "Phân công ca, kiểm soát chất lượng phục vụ và tuân thủ quy trình.",
+        en: "Shift coordination, service quality and operational standards.",
       },
       responsibilities: {
         vi: [
@@ -225,8 +225,8 @@ export const APPLE_CONTENT: AppleContentData = {
         en: "Da Lat, Lam Dong",
       },
       coreValue: {
-        vi: "Quản trị doanh thu, định hướng Marketing & Điều phối hệ sinh thái nghệ sĩ - MCN.",
-        en: "Revenue governance, marketing strategy & artist-MCN ecosystem orchestration.",
+        vi: "Quản lý doanh thu, khách hàng, lịch sản xuất và hoạt động nghệ sĩ.",
+        en: "Revenue, client relationships, production scheduling and artist operations.",
       },
       responsibilities: {
         vi: [
@@ -258,8 +258,8 @@ export const APPLE_CONTENT: AppleContentData = {
         en: "Da Lat, Lam Dong",
       },
       coreValue: {
-        vi: "Kiểm soát áp lực nhiệt độ cao, tính chính xác từng giây và kỹ năng tự học vượt bậc.",
-        en: "High-temperature pressure mastery, split-second timing & rapid autodidactic skill acquisition.",
+        vi: "Điều phối ca bếp, chuẩn bị nguyên liệu và đảm bảo chất lượng món ăn.",
+        en: "Kitchen shift coordination, preparation and food quality control.",
       },
       responsibilities: {
         vi: [
@@ -291,8 +291,8 @@ export const APPLE_CONTENT: AppleContentData = {
         en: "Da Lat, Lam Dong",
       },
       coreValue: {
-        vi: "Quản trị chuỗi bán lẻ hiện đại, kiểm soát kho vận và tối ưu hóa hiệu suất nhân sự.",
-        en: "Modern retail chain governance, inventory supply management & human capital optimization.",
+        vi: "Quản lý cửa hàng, nhân sự, hàng hóa, doanh số và trải nghiệm khách hàng.",
+        en: "Store operations, people, inventory, sales and customer experience.",
       },
       responsibilities: {
         vi: [
@@ -315,12 +315,12 @@ export const APPLE_CONTENT: AppleContentData = {
   bentoHeader: {
     sectionBadge: "03 · NĂNG LỰC CỐT LÕI // CAPABILITY MATRIX",
     title: {
-      vi: "VŨ KHÍ NĂNG LỰC",
-      en: "CORE CAPABILITIES",
+      vi: "NĂNG LỰC",
+      en: "CAPABILITIES",
     },
     subtitle: {
-      vi: "4 trụ cột vững chắc kết nối công nghệ AI và nghệ thuật vận hành",
-      en: "4 foundational pillars bridging AI technology with high-touch operational art",
+      vi: "Những năng lực hỗ trợ trực tiếp cho công việc vận hành và sáng tạo.",
+      en: "Capabilities supporting operations, technology and creative work.",
     },
   },
 
@@ -329,16 +329,16 @@ export const APPLE_CONTENT: AppleContentData = {
       id: "flame-keeper",
       badge: "LEADERSHIP // 01",
       title: {
-        vi: "QUẢN TRỊ & GIỮ LỬA NHÂN SỰ",
-        en: "TEAM LEADERSHIP & FLAME KEEPER",
+        vi: "QUẢN LÝ ĐỘI NGŨ",
+        en: "TEAM LEADERSHIP",
       },
       subtitle: {
-        vi: "Khả năng quan sát, điều phối và duy trì năng lượng cho toàn thể đội ngũ",
-        en: "Observational acuity, seamless dispatch & sustaining team morale",
+        vi: "Phân công, đào tạo và phối hợp đội ngũ trong công việc hằng ngày.",
+        en: "Team coordination, training and day-to-day people management.",
       },
       description: {
-        vi: "Thấu hiểu tâm lý nhân sự qua từng môi trường thực tế (quầy pha chế, phòng thu âm nhạc, bếp nóng áp lực cao, cửa hàng bán lẻ). Khả năng điều phối hài hòa và luôn là ngọn lửa gắn kết, giữ vững nhiệt huyết làm việc cho toàn đội ngũ ngay cả trong những giai đoạn áp lực cao điểm.",
-        en: "Deep psychological understanding across frontline environments (barista bars, music studios, high-heat kitchens, and retail floors). Skilled at conflict mediation and acting as the cultural anchor that keeps team energy high under peak stress.",
+        vi: "Có kinh nghiệm làm việc và điều phối nhân sự tại môi trường bán lẻ, F&B và studio.",
+        en: "Experience coordinating teams across retail, F&B and studio environments.",
       },
       tags: ["TEAM_MORALE", "OBSERVATION", "CONFLICT_RESOLUTION", "EMPATHY"],
     },
@@ -346,12 +346,12 @@ export const APPLE_CONTENT: AppleContentData = {
       id: "ai-automation",
       badge: "AI & SYSTEMS // 02",
       title: {
-        vi: "TỰ ĐỘNG HÓA & PHẦN MỀM AI",
-        en: "AI WORKFLOWS & SOFTWARE AUTOMATION",
+        vi: "AI & TỰ ĐỘNG HÓA",
+        en: "AI & AUTOMATION",
       },
       subtitle: {
-        vi: "Phát triển phần mềm quản lý nhân sự & triển khai tự động hóa quy trình",
-        en: "Developing internal HR software & deploying automated operational workflows",
+        vi: "Ứng dụng AI và công cụ số để đơn giản hóa quy trình.",
+        en: "Using AI and digital tools to simplify operational workflows.",
       },
       description: {
         vi: "Tự nghiên cứu, xây dựng và ứng dụng các giải pháp tự động hóa bằng AI vào quản trị nội bộ: tự động sắp xếp ca kíp, đồng bộ hóa lịch trình thu âm - quay hình, cảnh báo hàng tồn kho và theo dõi chỉ số hiệu suất (KPI) giúp bộ máy vận hành luôn tinh gọn, chính xác.",
@@ -363,12 +363,12 @@ export const APPLE_CONTENT: AppleContentData = {
       id: "web-engineering",
       badge: "TECHNOLOGY // 03",
       title: {
-        vi: "NỀN TẢNG CÔNG NGHỆ & WEB",
-        en: "WEB DESIGN & DIGITAL SYSTEMS",
+        vi: "WEB & CÔNG NGHỆ",
+        en: "WEB & DIGITAL",
       },
       subtitle: {
-        vi: "Chuyên ngành Thiết kế WEB (Cao đẳng FPT) & Tin học văn phòng nâng cao",
-        en: "FPT Web Design foundation & advanced digital management systems",
+        vi: "Nền tảng Thiết kế Web tại FPT Polytechnic và khả năng làm việc với các công cụ số.",
+        en: "Web Design foundation at FPT Polytechnic and practical digital tools.",
       },
       description: {
         vi: "Nền tảng đào tạo bài bản về Thiết kế Web tại FPT Polytechnic giúp Ngô Phúc có tư duy kiến trúc giao diện, chuẩn hóa dữ liệu số và làm việc hiệu quả với các đội ngũ kỹ thuật phần mềm. Thành thạo tin học, phân tích báo cáo và số hóa tài liệu quản trị.",
@@ -380,8 +380,8 @@ export const APPLE_CONTENT: AppleContentData = {
       id: "sonic-artistry",
       badge: "CREATIVE & AUDIO // 04",
       title: {
-        vi: "SONIC ARTISTRY & HIDDEN MUSIC",
-        en: "SONIC ARTISTRY & HIDDEN MUSIC",
+        vi: "ÂM NHẠC & HIDDEN MUSIC",
+        en: "ÂM NHẠC & HIDDEN MUSIC",
       },
       subtitle: {
         vi: "Sáng tác, sản xuất âm nhạc số thực nghiệm & Tư duy thẩm mỹ phim ảnh",
@@ -398,12 +398,12 @@ export const APPLE_CONTENT: AppleContentData = {
   contact: {
     sectionBadge: "04 · KẾT NỐI TRỰC TIẾP // DIRECT CHANNELS",
     title: {
-      vi: "SẴN SÀNG ĐỒNG HÀNH",
-      en: "DIRECT ENGAGEMENT",
+      vi: "LIÊN HỆ",
+      en: "CONTACT",
     },
     subtitle: {
-      vi: "Mở rộng cơ hội hợp tác điều hành, quản trị studio và cố vấn tự động hóa",
-      en: "Open for operational leadership, studio management, and AI workflow consulting",
+      vi: "Trao đổi về cơ hội quản lý, vận hành, studio hoặc các dự án số.",
+      en: "Open to management, operations, studio and digital opportunities.",
     },
     hotline: "0938-649-420",
     email: "studionopu@gmail.com",
